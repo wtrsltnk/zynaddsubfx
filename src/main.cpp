@@ -20,7 +20,9 @@
 
 */
 
+#ifndef DISABLE_GUI
 #include <FL/Fl.H>
+#endif
 
 #include "UI/common.H"
 
@@ -30,10 +32,13 @@
 #include <algorithm>
 #include <signal.h>
 
+#ifndef WIN32
 #include <unistd.h>
-#include <pthread.h>
-
 #include <getopt.h>
+#else
+#include <Windows.h>
+#endif
+#include <pthread.h>
 
 #include "DSP/FFTwrapper.h"
 #include "Misc/Master.h"
@@ -197,6 +202,11 @@ int main(int argc, char *argv[])
 
     sprng(time(NULL));
 
+    int option_index = 0, opt, exitwithhelp = 0, exitwithversion = 0;
+
+    string loadfile, loadinstrument, execAfterInit;
+
+#ifndef WIN32
     /* Parse command-line options */
     struct option opts[] = {
         {
@@ -252,10 +262,6 @@ int main(int argc, char *argv[])
         }
     };
     opterr = 0;
-    int option_index = 0, opt, exitwithhelp = 0, exitwithversion = 0;
-
-    string loadfile, loadinstrument, execAfterInit;
-
     while(1) {
         int tmp = 0;
 
@@ -358,7 +364,7 @@ int main(int argc, char *argv[])
                 break;
         }
     }
-
+#endif
     synth->alias();
 
     if(exitwithversion) {
@@ -542,7 +548,11 @@ done:
 
         Fl::wait(0.02f);
 #else
+#ifndef WIN32
         usleep(100000);
+#else
+        Sleep(1000);
+#endif
 #endif
     }
 

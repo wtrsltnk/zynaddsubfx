@@ -33,13 +33,13 @@ class AudioOut:public virtual Engine
         AudioOut();
         virtual ~AudioOut();
 
-        /**Sets the Sample Rate of this Output
-         * (used for getNext()).*/
-        void setSamplerate(int _samplerate);
+//        /**Sets the Sample Rate of this Output
+//         * (used for getNext()).*/
+//        void setSamplerate(int _samplerate);
 
-        /**Sets the Samples required per Out of this driver
-         * not a realtime opperation */
-        int getSampleRate();
+//        /**Sets the Samples required per Out of this driver
+//         * not a realtime opperation */
+//        int getSampleRate();
         void setBufferSize(int _bufferSize);
 
         /**Sets the Frame Size for output*/
@@ -54,7 +54,7 @@ class AudioOut:public virtual Engine
          * (has nsamples sampled at a rate of samplerate)*/
         const Stereo<float *> getNext();
 
-        int samplerate;
+//        int samplerate;
         int bufferSize;
 };
 

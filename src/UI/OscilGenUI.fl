@@ -186,7 +186,7 @@ master=master_;} {}
   Function {draw()} {open
   } {
     code {int ox=x(),oy=y(),lx=w(),ly=h()-1,i;
-float smps[synth->oscilsize];
+float* smps = new float[synth->oscilsize];
 pthread_mutex_lock(&master->mutex);
 if (oscbase==0) oscil->get(smps,-1.0);
     else oscil->getcurrentbasefunction(smps);
@@ -239,6 +239,7 @@ for (i=1;i<lx;i++){
    fl_vertex(i+ox,y2*ly/2.0+oy+ly/2);
 };
 fl_end_line();
+delete []smps;
 
 fl_line_style(FL_SOLID,0);} {}
   }

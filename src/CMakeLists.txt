@@ -3,18 +3,21 @@ message(STATUS "Checking Include Path" $ENV{CMAKE_INCLUDE_PATH} ${CMAKE_INCLUDE_
 message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_PATH})
 
 #Dependency check
-find_package(PkgConfig REQUIRED)
+#find_package(PkgConfig REQUIRED)
 find_package(zlib REQUIRED)
-pkg_check_modules(FFTW REQUIRED fftw3)
-pkg_check_modules(MXML REQUIRED mxml)
-find_package(Threads   REQUIRED)
+#pkg_check_modules(FFTW REQUIRED fftw3)
+find_package(FFTW REQUIRED)
+#pkg_check_modules(MXML REQUIRED mxml)
+find_package(MXML REQUIRED)
+find_package(PTHREAD REQUIRED)
 find_package(OSS)
 find_package(Alsa)
-pkg_check_modules(JACK jack)
-pkg_check_modules(PORTAUDIO portaudio-2.0>=19)
+#pkg_check_modules(JACK jack)
+#pkg_check_modules(PORTAUDIO portaudio-2.0>=19)
+find_package(PORTAUDIO)
 set(FLTK_SKIP_OPENGL true)
-pkg_check_modules(NTK ntk)
-pkg_check_modules(NTK_IMAGES ntk_images)
+#pkg_check_modules(NTK ntk)
+#pkg_check_modules(NTK_IMAGES ntk_images)
 find_package(FLTK)
 find_package(OpenGL) #for FLTK
 find_package(CxxTest)
@@ -22,18 +25,18 @@ if(CXXTEST_FOUND)
     set(CXXTEST_USE_PYTHON TRUE)
 endif()
 # lash
-pkg_search_module(LASH lash-1.0)
-mark_as_advanced(LASH_LIBRARIES)
-pkg_search_module(DSSI dssi>=0.9.0)
-mark_as_advanced(DSSI_LIBRARIES)
-pkg_search_module(LIBLO liblo>=0.26)
-mark_as_advanced(LIBLO_LIBRARIES)
+#pkg_search_module(LASH lash-1.0)
+#mark_as_advanced(LASH_LIBRARIES)
+#pkg_search_module(DSSI dssi>=0.9.0)
+#mark_as_advanced(DSSI_LIBRARIES)
+#pkg_search_module(LIBLO liblo>=0.26)
+#mark_as_advanced(LIBLO_LIBRARIES)
 
-CHECK_FUNCTION_EXISTS(sched_setscheduler HAVE_SCHEDULER)
+#CHECK_FUNCTION_EXISTS(sched_setscheduler HAVE_SCHEDULER)
 
-execute_process(COMMAND echo fistpl 0
-                COMMAND as -
-                ERROR_VARIABLE AVOID_ASM)
+#execute_process(COMMAND echo fistpl 0
+#                COMMAND as -
+#                ERROR_VARIABLE AVOID_ASM)
 
 ######### Settings ###########
 # NOTE: These cache variables should normally not be changed in this
@@ -119,6 +122,8 @@ else  ()
 endif()
 
 
+if(MSVC)
+else(MSVC)
 #Build Flags
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
@@ -143,6 +148,7 @@ set (BuildOptionsBasic
 
 set (BuildOptionsDebug
     "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
+endif(MSVC)
 
 ########### Settings dependant code ###########
 # From here on, the setting variables have  been prepared so concentrate
@@ -191,13 +197,18 @@ if(LibloEnable)
 endif()
 
 # other include directories
-include_directories(${ZLIB_INCLUDE_DIRS} ${MXML_INCLUDE_DIRS})
+include_directories(
+    ${ZLIB_INCLUDE_DIRS}
+#    ${MXML_INCLUDE_DIR}
+    )
 
+if(MSVC)
+else(MSVC)
 add_definitions(
-	 -g #TODO #todo put in a better location
-	 -Wall
-	 -Wextra
-	 )
+         -g #TODO #todo put in a better location
+         -Wall
+         -Wextra
+         )
 if(NOT AVOID_ASM)
 	message(STATUS "Compiling with x86 opcode support")
     add_definitions(-DASM_F2I_YES)
@@ -222,6 +233,8 @@ else (BuildForDebug)
 endif (BuildForDebug)
 
 add_definitions(-fPIC)
+
+endif(MSVC)
 
 if(FLTK_FOUND)
 	mark_as_advanced(FORCE FLTK_BASE_LIBRARY)
@@ -297,12 +310,19 @@ endif()
 # Following this should be only general compilation code, and no mention
 # of module-specific variables
 
-link_directories(${AUDIO_LIBRARY_DIRS} ${ZLIB_LIBRARY_DIRS} ${FFTW_LIBRARY_DIRS} ${MXML_LIBRARY_DIRS} ${FLTK_LIBRARY_DIRS} ${NTK_LIBRARY_DIRS})
+link_directories(
+    ${AUDIO_LIBRARY_DIRS}
+    ${ZLIB_LIBRARY_DIRS}
+    ${FFTW_LIBRARY_DIRS}
+    ${MXML_LIBRARY_DIRS}
+    ${FLTK_LIBRARY_DIRS}
+    ${NTK_LIBRARY_DIRS}
+)
 
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_BINARY_DIR}
-	)
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 
 
@@ -314,6 +334,7 @@ set(NONGUI_LIBRARIES
 	zynaddsubfx_dsp
 	zynaddsubfx_nio
 	)
+
 
 add_subdirectory(Misc)
 add_subdirectory(Synth)
@@ -335,13 +356,14 @@ target_link_libraries(zynaddsubfx_core
 	${FFTW_LIBRARIES}
 	${MXML_LIBRARIES}
 	${OS_LIBRARIES}
-	pthread)
+        ${PTHREAD_LIBRARIES}
+        )
 
 if(CompileTests)
 	add_subdirectory(Tests)
 endif(CompileTests)
 
-message(STATUS "using link directories: ${AUDIO_LIBRARY_DIRS} ${ZLIB_LIBRARY_DIRS} ${FFTW_LIBRARY_DIRS} ${MXML_LIBRARY_DIRS} ${FLTK_LIBRARY_DIRS}")
+message(STATUS "using link directories: ${AUDIO_LIBRARY_DIRS} ${ZLIB_LIBRARY_DIRS} ${FFTW_LIBRARY_DIRS} ${FLTK_LIBRARY_DIRS}")
 
 
 add_executable(zynaddsubfx main.cpp)
@@ -370,7 +392,7 @@ if (DssiEnable)
 	endif ()
 endif()
 
-message(STATUS "Link libraries: ${ZLIB_LIBRARY} ${FFTW_LIBRARY} ${MXML_LIBRARIES} ${AUDIO_LIBRARIES} ${OS_LIBRARIES}")
+message(STATUS "Link libraries: ${ZLIB_LIBRARY} ${FFTW_LIBRARY} ${AUDIO_LIBRARIES} ${OS_LIBRARIES}")
 install(TARGETS zynaddsubfx
 	RUNTIME DESTINATION bin
 	)

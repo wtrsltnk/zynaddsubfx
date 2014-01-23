@@ -17,7 +17,7 @@ set(zynaddsubfx_nio_SRCS
 
 set(zynaddsubfx_nio_lib )
 
-add_definitions(-DOUT_DEFAULT="${DefaultOutput}")
+add_definitions(-DOUT_DEFAULT="PA")
 add_definitions(-DIN_DEFAULT="${DefaultInput}")
 
 if(JackEnable)

@@ -136,7 +136,7 @@ ADnote::ADnote(ADnoteParameters *pars,
             };
                 break;
             default: { //unison for more than 2 subvoices
-                float unison_values[unison];
+                float *unison_values = new float[unison];
                 float min = -1e-6, max = 1e-6;
                 for(int k = 0; k < unison; ++k) {
                     float step = (k / (float) (unison - 1)) * 2.0f - 1.0f; //this makes the unison spread more uniform
@@ -150,6 +150,7 @@ ADnote::ADnote(ADnoteParameters *pars,
                     unison_base_freq_rap[nvoice][k] =
                         powf(2.0f, (unison_spread * unison_values[k]) / 1200);
                 }
+                delete []unison_values;
             };
         }
 
@@ -895,7 +896,8 @@ void ADnote::setfreq(int nvoice, float in_freq)
         if(speed > synth->oscilsize_f)
             speed = synth->oscilsize_f;
 
-        F2I(speed, oscfreqhi[nvoice][k]);
+        oscfreqhi[nvoice][k] = int(floor(speed));
+        //F2I(speed, oscfreqhi[nvoice][k]);
         oscfreqlo[nvoice][k] = speed - floor(speed);
     }
 }
@@ -911,7 +913,8 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
         if(speed > synth->samplerate_f)
             speed = synth->samplerate_f;
 
-        F2I(speed, oscfreqhiFM[nvoice][k]);
+        oscfreqhiFM[nvoice][k] = int(floor(speed));
+//        F2I(speed, oscfreqhiFM[nvoice][k]);
         oscfreqloFM[nvoice][k] = speed - floor(speed);
     }
 }
@@ -1091,8 +1094,8 @@ inline void ADnote::fadein(float *smps) const
     if(tmp < 8.0f)
         tmp = 8.0f;
 
-    int n;
-    F2I(tmp, n); //how many samples is the fade-in
+    int n = int(floor(tmp));
+//    F2I(tmp, n); //how many samples is the fade-in
     if(n > synth->buffersize)
         n = synth->buffersize;
     for(int i = 0; i < n; ++i) { //fade-in
@@ -1384,7 +1387,8 @@ inline void ADnote::ComputeVoiceOscillatorFrequencyModulation(int nvoice,
         float  freqlo = oscfreqlo[nvoice][k];
 
         for(i = 0; i < synth->buffersize; ++i) {
-            F2I(tw[i], FMmodfreqhi);
+            FMmodfreqhi = int(floor(tw[i]));
+//            F2I(tw[i], FMmodfreqhi);
             FMmodfreqlo = fmod(tw[i] + 0.0000000001f, 1.0f);
             if(FMmodfreqhi < 0)
                 FMmodfreqlo++;

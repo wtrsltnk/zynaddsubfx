@@ -23,7 +23,11 @@
 #include "NulEngine.h"
 #include "../globals.h"
 
+#ifndef WIN32
 #include <unistd.h>
+#else
+#include <Windows.h>
+#endif
 #include <iostream>
 
 using namespace std;
@@ -32,8 +36,8 @@ NulEngine::NulEngine()
     :AudioOut(), pThread(NULL)
 {
     name = "NULL";
-    playing_until.tv_sec  = 0;
-    playing_until.tv_usec = 0;
+//    playing_until.tv_sec  = 0;
+//    playing_until.tv_usec = 0;
 }
 
 void *NulEngine::_AudioThread(void *arg)
@@ -46,28 +50,32 @@ void *NulEngine::AudioThread()
     while(pThread) {
         getNext();
 
-        struct timeval now;
-        int remaining = 0;
-        gettimeofday(&now, NULL);
-        if((playing_until.tv_usec == 0) && (playing_until.tv_sec == 0)) {
-            playing_until.tv_usec = now.tv_usec;
-            playing_until.tv_sec  = now.tv_sec;
-        }
-        else {
-            remaining = (playing_until.tv_usec - now.tv_usec)
-                        + (playing_until.tv_sec - now.tv_sec) * 1000000;
-            if(remaining > 10000) //Don't sleep() less than 10ms.
-                //This will add latency...
-                usleep(remaining - 10000);
-            if(remaining < 0)
-                cerr << "WARNING - too late" << endl;
-        }
-        playing_until.tv_usec += synth->buffersize * 1000000
-                                 / synth->samplerate;
-        if(remaining < 0)
-            playing_until.tv_usec -= remaining;
-        playing_until.tv_sec  += playing_until.tv_usec / 1000000;
-        playing_until.tv_usec %= 1000000;
+//        struct timeval now;
+//        int remaining = 0;
+//        gettimeofday(&now, NULL);
+//        if((playing_until.tv_usec == 0) && (playing_until.tv_sec == 0)) {
+//            playing_until.tv_usec = now.tv_usec;
+//            playing_until.tv_sec  = now.tv_sec;
+//        }
+//        else {
+//            remaining = (playing_until.tv_usec - now.tv_usec)
+//                        + (playing_until.tv_sec - now.tv_sec) * 1000000;
+//            if(remaining > 10000) //Don't sleep() less than 10ms.
+//                //This will add latency...
+#ifndef WIN32
+                usleep(10000);
+#else
+                Sleep(1);
+#endif
+//            if(remaining < 0)
+//                cerr << "WARNING - too late" << endl;
+//        }
+//        playing_until.tv_usec += synth->buffersize * 1000000
+//                                 / synth->samplerate;
+//        if(remaining < 0)
+//            playing_until.tv_usec -= remaining;
+//        playing_until.tv_sec  += playing_until.tv_usec / 1000000;
+//        playing_until.tv_usec %= 1000000;
     }
     return NULL;
 }

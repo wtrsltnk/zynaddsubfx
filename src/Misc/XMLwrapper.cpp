@@ -351,7 +351,7 @@ char *XMLwrapper::doloadfile(const string &filename) const
     char  *xmldata = NULL;
     gzFile gzfile  = gzopen(filename.c_str(), "rb");
 
-    if(gzfile != NULL) { //The possibly compressed file opened
+    if(gzfile != Z_NULL && unsigned int(gzfile) < 0xffffff) { //The possibly compressed file opened
         stringstream strBuf;             //reading stream
         const int    bufSize = 500;      //fetch size
         char fetchBuf[bufSize + 1];      //fetch buffer

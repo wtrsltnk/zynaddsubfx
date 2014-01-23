@@ -25,12 +25,16 @@
 #include <cassert>
 #include <math.h>
 #include <stdio.h>
+#ifndef WIN32
 #include <err.h>
+#include <unistd.h>
+#else
+#include <Windows.h>
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #ifdef HAVE_SCHEDULER
@@ -85,18 +89,18 @@ float getdetune(unsigned char type,
             findet = fabs(fdetune / 8192.0f) * 10.0f;
             break;
         case 3:
-            cdet   = fabs(cdetune * 100);
-            findet = powf(10, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
+            cdet   = fabsf(cdetune * 100);
+            findet = powf(10, fabsf(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
             break;
         case 4:
-            cdet   = fabs(cdetune * 701.95500087f); //perfect fifth
+            cdet   = fabsf(cdetune * 701.95500087f); //perfect fifth
             findet =
                 (powf(2, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095 * 1200;
             break;
         //case ...: need to update N_DETUNE_TYPES, if you'll add more
         default:
-            cdet   = fabs(cdetune * 50.0f);
-            findet = fabs(fdetune / 8192.0f) * 35.0f; //almost like "Paul's Sound Designer 2"
+            cdet   = fabsf(cdetune * 50.0f);
+            findet = fabsf(fdetune / 8192.0f) * 35.0f; //almost like "Paul's Sound Designer 2"
             break;
     }
     if(finedetune < 8192)
@@ -126,14 +130,18 @@ void set_realtime()
     sc.sched_priority = 60;
     //if you want get "sched_setscheduler undeclared" from compilation,
     //you can safely remove the folowing line:
-    sched_setscheduler(0, SCHED_FIFO, &sc);
+//    sched_setscheduler(0, SCHED_FIFO, &sc);
     //if (err==0) printf("Real-time");
 #endif
 }
 
 void os_sleep(long length)
 {
+#ifndef WIN32
     usleep(length);
+#else
+    Sleep(length);
+#endif
 }
 
 std::string legalizeFilename(std::string filename)
@@ -196,8 +204,8 @@ void clearTmpBuffers(void)
 {
     for(pool_itr_t itr = pool.begin(); itr != pool.end(); ++itr) {
         if(!itr->free) //Warn about used buffers
-            warn("Temporary buffer (%p) about to be freed may be in use",
-                 itr->dat);
+//            warn("Temporary buffer (%p) about to be freed may be in use", itr->dat);
+            printf("Temporary buffer (%p) about to be freed may be in use", itr->dat);
         delete [] itr->dat;
     }
     pool.clear();

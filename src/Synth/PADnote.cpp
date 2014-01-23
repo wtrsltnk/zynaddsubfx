@@ -208,8 +208,8 @@ inline void PADnote::fadein(float *smps)
     if(tmp < 8.0f)
         tmp = 8.0f;
 
-    int n;
-    F2I(tmp, n); //how many samples is the fade-in
+    int n = int(floor(tmp));
+//    F2I(tmp, n); //how many samples is the fade-in
     if(n > synth->buffersize)
         n = synth->buffersize;
     for(int i = 0; i < n; ++i) { //fade-in

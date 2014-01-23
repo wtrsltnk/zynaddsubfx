@@ -23,7 +23,11 @@
 #ifndef NUL_ENGINE_H
 #define NUL_ENGINE_H
 
+#ifndef WIN32
 #include <sys/time.h>
+#else
+#include <time.h>
+#endif
 #include <pthread.h>
 #include "../globals.h"
 #include "AudioOut.h"
@@ -49,7 +53,7 @@ class NulEngine:public AudioOut, MidiIn
         static void *_AudioThread(void *arg);
 
     private:
-        struct timeval playing_until;
+//        struct timeval playing_until;
         pthread_t     *pThread;
 };
 

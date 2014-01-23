@@ -49,7 +49,7 @@ decl {\#include "OscilGenUI.h"} {public
 decl {\#include "PresetsUI.h"} {public
 } 
 
-class PADnoteHarmonicProfile {: {public Fl_Box}
+class PADnoteHarmonicProfile {open : {public Fl_Box}
 } {
   Function {PADnoteHarmonicProfile(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {pars=NULL;} {}
@@ -58,10 +58,11 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
     code {master=master_;
 this->pars=pars;} {}
   }
-  Function {draw()} {} {
+  Function {draw()} {open
+  } {
     code {int ox=x(),oy=y(),lx=w(),ly=h();
 if (!visible()) return;
-float smps[lx];
+float* smps = new float[lx];
 
 float realbw=pars->getprofile(smps,lx);
 bool active=active_r();
@@ -133,16 +134,19 @@ fl_line_style(0);} {}
   }
 } 
 
-class PADnoteOvertonePosition {: {public Fl_Box}
+class PADnoteOvertonePosition {open : {public Fl_Box}
 } {
-  Function {PADnoteOvertonePosition(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+  Function {PADnoteOvertonePosition(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
+  } {
     code {pars=NULL;} {}
   }
-  Function {init(PADnoteParameters *pars,Master *master_)} {} {
+  Function {init(PADnoteParameters *pars,Master *master_)} {open
+  } {
     code {master=master_;
 this->pars=pars;} {}
   }
-  Function {draw()} {} {
+  Function {draw()} {open
+  } {
     code {if (!visible()) return;
 const int maxdb=60;
 
@@ -162,7 +166,7 @@ for (int i=1;i<maxharmonic;i++){
 
 
 int n=synth->oscilsize/2;
-float spc[n];
+float* spc = new float[n];
 for (int i=0;i<n;i++) spc[i]=0.0;
 
 pthread_mutex_lock(&master->mutex);
@@ -179,7 +183,7 @@ for (int i=0;i<n;i++){
 if (max<0.000001) max=1.0;
 max=max*1.05;
 
-float spectrum[lx];
+float* spectrum = new float[lx];
 for (int i=0;i<lx;i++) spectrum[i]=0;
 
 
@@ -224,11 +228,11 @@ for (int i=0;i<lx;i++){
 };} {}
   }
   decl {Master *master;} {}
-  decl {PADnoteParameters *pars;} {public
+  decl {PADnoteParameters *pars;} {selected public
   }
 } 
 
-class PADnoteUI {open : {public PresetsUI_}
+class PADnoteUI {: {public PresetsUI_}
 } {
   Function {PADnoteUI(PADnoteParameters *parameters,Master *master_)} {open
   } {
@@ -242,7 +246,7 @@ make_window();} {}
   } {
     Fl_Window padnotewindow {
       label {PAD synth Parameters} open
-      xywh {294 392 535 435} type Double visible
+      xywh {555 112 527 427} type Double visible
     } {
       Fl_Tabs {} {
         callback {if (o->value()!=harmonicstructuregroup) applybutton->hide();
@@ -250,7 +254,7 @@ make_window();} {}
         xywh {0 0 535 395} box UP_FRAME
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure} open selected
+          label {Harmonic Structure} open
           xywh {0 20 535 375} box UP_FRAME
         } {
           Fl_Group bwprofilegroup {

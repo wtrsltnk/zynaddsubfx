@@ -21,7 +21,7 @@
 
 #include <cmath>
 #include <cstring>
-#include <err.h>
+//#include <err.h>
 
 #include "Unison.h"
 
@@ -108,8 +108,9 @@ void Unison::updateParameters(void)
     //If functions exceed this limit, they should have requested a bigguer delay
     //and thus are buggy
     if(unison_amplitude_samples >= max_delay - 1) {
-        warnx("BUG: Unison amplitude samples too big");
-        warnx("Unision max_delay should be larger");
+//            TODO : this is linux only, replace with std error
+//        warnx("BUG: Unison amplitude samples too big");
+//        warnx("Unision max_delay should be larger");
         unison_amplitude_samples = max_delay - 2;
     }
 
@@ -138,8 +139,9 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
         for(int k = 0; k < unison_size; ++k) {
             float vpos = uv[k].realpos1 * (1.0f - xpos) + uv[k].realpos2 * xpos;        //optimize
             float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
-            int   posi;
-            F2I(pos, posi); //optimize!
+            // TOT: fix this!
+            int   posi = pos;
+            //F2I(pos, posi); //optimize!
             int posi_next = posi + 1;
             if(posi >= max_delay)
                 posi -= max_delay;

@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-#include <err.h>
+//#include <err.h>
 #include "../Misc/Util.h"
 #include "SVFilter.h"
 
@@ -140,8 +140,9 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
         case 3:
             out = &x.notch;
             break;
-        default:
-            errx(1, "Impossible SVFilter type encountered [%d]", type);
+//        default:
+//            TODO : this is linux only, replace with std error
+//            errx(1, "Impossible SVFilter type encountered [%d]", type);
     }
 
     for(int i = 0; i < synth->buffersize; ++i) {

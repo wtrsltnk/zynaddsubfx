@@ -137,26 +137,27 @@ void OutMgr::addSmps(float *l, float *r)
     //allow wave file to syphon off stream
     wave->push(Stereo<float *>(l, r), synth->buffersize);
 
-    const int s_out = currentOut->getSampleRate(),
-              s_sys = synth->samplerate;
+//  I skip this code for now, because AudioOut::getSampleRate() is never used except here
+//    const int s_out = currentOut->getSampleRate(),
+//              s_sys = synth->samplerate;
 
-    if(s_out != s_sys) { //we need to resample
-        const size_t steps = resample(priBuffCurrent.l,
-                                      l,
-                                      s_sys,
-                                      s_out,
-                                      synth->buffersize);
-        resample(priBuffCurrent.r, r, s_sys, s_out, synth->buffersize);
+//    if(s_out != s_sys) { //we need to resample
+//        const size_t steps = resample(priBuffCurrent.l,
+//                                      l,
+//                                      s_sys,
+//                                      s_out,
+//                                      synth->buffersize);
+//        resample(priBuffCurrent.r, r, s_sys, s_out, synth->buffersize);
 
-        priBuffCurrent.l += steps;
-        priBuffCurrent.r += steps;
-    }
-    else { //just copy the samples
+//        priBuffCurrent.l += steps;
+//        priBuffCurrent.r += steps;
+//    }
+//    else { //just copy the samples
         memcpy(priBuffCurrent.l, l, synth->bufferbytes);
         memcpy(priBuffCurrent.r, r, synth->bufferbytes);
         priBuffCurrent.l += synth->buffersize;
         priBuffCurrent.r += synth->buffersize;
-    }
+//    }
 }
 
 void OutMgr::removeStaleSmps()

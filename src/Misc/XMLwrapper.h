@@ -244,7 +244,7 @@ class XMLwrapper
         mxml_node_t *tree; /**<all xml data*/
         mxml_node_t *root; /**<xml data used by zynaddsubfx*/
         mxml_node_t *node; /**<current subtree in parsing or writing */
-        mxml_node_t *info; /**<Node used to store the information about the data*/
+        mxml_node_t *info; /**<mxml_node_t used to store the information about the data*/
 
         /**
          * Create mxml_node_t with specified name and parameters

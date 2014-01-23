@@ -109,7 +109,9 @@ void FormantFilter::setpos(float input)
     if(pos < 0.0f)
         pos += 1.0f;
 
-    F2I(pos * sequencesize, p2);
+    float f=(pos * sequencesize);
+    p2 = int(floor(f));
+//    F2I(f, p2);
     p1 = p2 - 1;
     if(p1 < 0)
         p1 += sequencesize;

@@ -30,22 +30,23 @@ using namespace std;
 #include "../Misc/Master.h"
 #include "AudioOut.h"
 
-AudioOut::AudioOut()
-    :samplerate(synth->samplerate), bufferSize(synth->buffersize)
+AudioOut::AudioOut() :
+//      samplerate(synth->samplerate),
+      bufferSize(synth->buffersize)
 {}
 
 AudioOut::~AudioOut()
 {}
 
-void AudioOut::setSamplerate(int _samplerate)
-{
-    samplerate = _samplerate;
-}
+//void AudioOut::setSamplerate(int _samplerate)
+//{
+//    samplerate = _samplerate;
+//}
 
-int AudioOut::getSampleRate()
-{
-    return samplerate;
-}
+//int AudioOut::getSampleRate()
+//{
+//    return samplerate;
+//}
 
 void AudioOut::setBufferSize(int _bufferSize)
 {
