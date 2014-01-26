@@ -1,9 +1,9 @@
-# - Find zlib
+# - Find fftw
 # Find the native FFTW includes and library
 #
-#  FFTW_INCLUDE_DIRS - where to find zlib.h, etc.
-#  FFTW_LIBRARIES    - List of libraries when using zlib.
-#  FFTW_FOUND        - True if zlib found.
+#  FFTW_INCLUDE_DIRS - where to find fftw3.h, etc.
+#  FFTW_LIBRARIES    - List of libraries when using fftw.
+#  FFTW_FOUND        - True if fftw found.
 
 #=============================================================================
 # Copyright 2001-2009 Kitware, Inc.

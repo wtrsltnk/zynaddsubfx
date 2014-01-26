@@ -44,7 +44,7 @@
 #include "Util.h"
 #include "Part.h"
 
-#define INSTRUMENT_EXTENSION ".xiz"
+#define INSTRUMENT_EXTENSION ".xml"
 
 //if this file exists into a directory, this make the directory to be considered as a bank, even if it not contains a instrument file
 #define FORCE_BANK_DIR_FILE ".bankdir"
@@ -183,7 +183,10 @@ void Bank::loadfromslot(unsigned int ninstrument, Part *part)
     part->AllNotesOff();
     part->defaultsinstrument();
 
-    part->loadXMLinstrument(ins[ninstrument].filename.c_str());
+    if (fileexists(ins[ninstrument].filename.c_str()))
+    {
+        part->loadXMLinstrument(ins[ninstrument].filename.c_str());
+    }
 }
 
 /*

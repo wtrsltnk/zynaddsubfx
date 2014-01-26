@@ -4,7 +4,6 @@ message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_
 
 #Dependency check
 #find_package(PkgConfig REQUIRED)
-find_package(zlib REQUIRED)
 #pkg_check_modules(FFTW REQUIRED fftw3)
 find_package(FFTW REQUIRED)
 #pkg_check_modules(MXML REQUIRED mxml)
@@ -31,6 +30,8 @@ endif()
 #mark_as_advanced(DSSI_LIBRARIES)
 #pkg_search_module(LIBLO liblo>=0.26)
 #mark_as_advanced(LIBLO_LIBRARIES)
+
+add_definitions(-D__WINDOWS_MM__)
 
 #CHECK_FUNCTION_EXISTS(sched_setscheduler HAVE_SCHEDULER)
 
@@ -198,8 +199,7 @@ endif()
 
 # other include directories
 include_directories(
-    ${ZLIB_INCLUDE_DIRS}
-#    ${MXML_INCLUDE_DIR}
+    ${MXML_INCLUDE_DIR}
     )
 
 if(MSVC)
@@ -312,7 +312,6 @@ endif()
 
 link_directories(
     ${AUDIO_LIBRARY_DIRS}
-    ${ZLIB_LIBRARY_DIRS}
     ${FFTW_LIBRARY_DIRS}
     ${MXML_LIBRARY_DIRS}
     ${FLTK_LIBRARY_DIRS}
@@ -352,7 +351,6 @@ add_library(zynaddsubfx_core STATIC
 	)
 
 target_link_libraries(zynaddsubfx_core
-	${ZLIB_LIBRARIES}
 	${FFTW_LIBRARIES}
 	${MXML_LIBRARIES}
 	${OS_LIBRARIES}
@@ -363,7 +361,7 @@ if(CompileTests)
 	add_subdirectory(Tests)
 endif(CompileTests)
 
-message(STATUS "using link directories: ${AUDIO_LIBRARY_DIRS} ${ZLIB_LIBRARY_DIRS} ${FFTW_LIBRARY_DIRS} ${FLTK_LIBRARY_DIRS}")
+message(STATUS "using link directories: ${AUDIO_LIBRARY_DIRS} ${FFTW_LIBRARY_DIRS} ${FLTK_LIBRARY_DIRS}")
 
 
 add_executable(zynaddsubfx main.cpp)
@@ -374,6 +372,7 @@ target_link_libraries(zynaddsubfx
 	${GUI_LIBRARIES}
 	${NIO_LIBRARIES}
 	${AUDIO_LIBRARIES}
+        winmm.lib
 	)
 
 if (DssiEnable)
@@ -392,7 +391,7 @@ if (DssiEnable)
 	endif ()
 endif()
 
-message(STATUS "Link libraries: ${ZLIB_LIBRARY} ${FFTW_LIBRARY} ${AUDIO_LIBRARIES} ${OS_LIBRARIES}")
+message(STATUS "Link libraries: ${FFTW_LIBRARY} ${AUDIO_LIBRARIES} ${OS_LIBRARIES}")
 install(TARGETS zynaddsubfx
 	RUNTIME DESTINATION bin
 	)

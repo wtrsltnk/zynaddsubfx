@@ -13,6 +13,8 @@ set(zynaddsubfx_nio_SRCS
     Engine.cpp
     EngineMgr.cpp
     Nio.cpp
+    RtEngine.cpp
+    RtMidi.cpp
     )
 
 set(zynaddsubfx_nio_lib )

@@ -35,9 +35,9 @@ class MidiIn:public virtual Engine
         virtual void setMidiEn(bool nval) = 0;
         /**Returns if driver is initialized*/
         virtual bool getMidiEn() const = 0;
-//        static void midiProcess(unsigned char head,
-//                                unsigned char num,
-//                                unsigned char value);
+        static void midiProcess(unsigned char head,
+                                unsigned char num,
+                                unsigned char value);
 };
 
 #endif

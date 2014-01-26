@@ -1,50 +1,50 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
-decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {private local
+decl {//Copyright (c) 2002-2005 Nasca Octavian Paul} {} 
+
+decl {//License: GNU GPL version 2 or later} {} 
+
+decl {\#include <stdio.h>} {public
 } 
 
-decl {//License: GNU GPL version 2 or later} {private local
+decl {\#include <math.h>} {public
 } 
 
-decl {\#include <stdio.h>} {public local
+decl {\#include <stdlib.h>} {public
 } 
 
-decl {\#include <math.h>} {public local
+decl {\#include <FL/Fl_File_Chooser.H>} {public
 } 
 
-decl {\#include <stdlib.h>} {public local
+decl {\#include "../globals.h"} {public
 } 
 
-decl {\#include <FL/Fl_File_Chooser.H>} {public local
+decl {\#include "../Misc/Util.h"} {public
 } 
 
-decl {\#include "../globals.h"} {public local
+decl {\#include "../Misc/Dump.h"} {public
 } 
 
-decl {\#include "../Misc/Util.h"} {public local
+decl {extern Dump dump;} {public
 } 
 
-decl {\#include "../Misc/Dump.h"} {public local
-} 
-
-decl {extern Dump dump;} {public local
-} 
-
-class ConfigUI {} {
-  Function {make_window()} {} {
+class ConfigUI {open
+} {
+  Function {make_window()} {open
+  } {
     Fl_Window configwindow {
       label {ZynAddSubFX Settings}
       callback {writebankcfg();
-o->hide();}
+o->hide();} open
       xywh {554 443 510 370} type Double visible
     } {
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {5 5 500 330}
       } {
         Fl_Group {} {
-          label {Main settings}
+          label {Main settings} open
           xywh {5 25 500 310}
         } {
           Fl_Group {} {
@@ -120,9 +120,9 @@ config.cfg.SoundBufferSize=strtoul(o->value(),&tmp,10);}
           }
           Fl_Choice {} {
             label OscilSize
-            callback {config.cfg.OscilSize=128<<o->value();}
+            callback {config.cfg.OscilSize=128<<o->value();} selected
             tooltip {ADSynth Oscillator Size (samples)} xywh {175 80 75 20} down_box BORDER_BOX labelfont 1 labelsize 11 textsize 10
-            code0 {o->value( (int) (log(config.cfg.OscilSize/128.0-1.0)/log(2)) +1);}
+            code0 {o->value( (int) (log(config.cfg.OscilSize/128.0-1.0)/log(2.0)) +1);}
           } {
             MenuItem {} {
               label 128

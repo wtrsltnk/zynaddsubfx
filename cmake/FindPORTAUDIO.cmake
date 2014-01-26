@@ -1,9 +1,9 @@
 # - Find portaudio
 # Find the native PORTAUDIO includes and library
 #
-#  PORTAUDIO_INCLUDE_DIRS - where to find zlib.h, etc.
-#  PORTAUDIO_LIBRARIES    - List of libraries when using zlib.
-#  PORTAUDIO_FOUND        - True if zlib found.
+#  PORTAUDIO_INCLUDE_DIRS - where to find portaudio.h, etc.
+#  PORTAUDIO_LIBRARIES    - List of libraries when using portaudio.
+#  PORTAUDIO_FOUND        - True if portaudio found.
 
 #=============================================================================
 # Copyright 2001-2009 Kitware, Inc.

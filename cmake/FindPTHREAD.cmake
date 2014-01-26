@@ -1,9 +1,9 @@
 # - Find PTHREAD
 # Find the native PTHREAD includes and library
 #
-#  PTHREAD_INCLUDE_DIRS - where to find zlib.h, etc.
-#  PTHREAD_LIBRARIES    - List of libraries when using zlib.
-#  PTHREAD_FOUND        - True if zlib found.
+#  PTHREAD_INCLUDE_DIRS - where to find pthread.h, etc.
+#  PTHREAD_LIBRARIES    - List of libraries when using pthread.
+#  PTHREAD_FOUND        - True if pthread found.
 
 #=============================================================================
 # Copyright 2001-2009 Kitware, Inc.

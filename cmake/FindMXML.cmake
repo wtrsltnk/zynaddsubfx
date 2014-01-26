@@ -1,8 +1,8 @@
 # - Find mxml
 #
-#  MXML_INCLUDE_DIRS - where to find zlib.h, etc.
-#  MXML_LIBRARIES    - List of libraries when using zlib.
-#  MXML_FOUND        - True if zlib found.
+#  MXML_INCLUDE_DIRS - where to find mxml.h, etc.
+#  MXML_LIBRARIES    - List of libraries when using mxml.
+#  MXML_FOUND        - True if mxml found.
 
 #=============================================================================
 # Copyright 2001-2009 Kitware, Inc.

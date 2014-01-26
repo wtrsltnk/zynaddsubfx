@@ -24,54 +24,54 @@
 #include "../globals.h"
 #include "InMgr.h"
 
-//void MidiIn::midiProcess(unsigned char head,
-//                         unsigned char num,
-//                         unsigned char value)
-//{
-//    MidiEvent     ev;
-//    unsigned char chan = head & 0x0f;
-//    switch(head & 0xf0) {
-//        case 0x80: //Note Off
-//            ev.type    = M_NOTE;
-//            ev.channel = chan;
-//            ev.num     = num;
-//            ev.value   = 0;
-//            InMgr::getInstance().putEvent(ev);
-//            break;
-//        case 0x90: //Note On
-//            ev.type    = M_NOTE;
-//            ev.channel = chan;
-//            ev.num     = num;
-//            ev.value   = value;
-//            InMgr::getInstance().putEvent(ev);
-//            break;
-//        case 0xA0: /* pressure, aftertouch */
-//            ev.type    = M_PRESSURE;
-//            ev.channel = chan;
-//            ev.num     = num;
-//            ev.value   = value;
-//            InMgr::getInstance().putEvent(ev);
-//            break;
-//        case 0xb0: //Controller
-//            ev.type    = M_CONTROLLER;
-//            ev.channel = chan;
-//            ev.num     = num;
-//            ev.value   = value;
-//            InMgr::getInstance().putEvent(ev);
-//            break;
-//        case 0xc0: //Program Change
-//            ev.type    = M_PGMCHANGE;
-//            ev.channel = chan;
-//            ev.num     = num;
-//            ev.value   = 0;
-//            InMgr::getInstance().putEvent(ev);
-//            break;
-//        case 0xe0: //Pitch Wheel
-//            ev.type    = M_CONTROLLER;
-//            ev.channel = chan;
-//            ev.num     = C_pitchwheel;
-//            ev.value   = (num + value * (int) 128) - 8192;
-//            InMgr::getInstance().putEvent(ev);
-//            break;
-//    }
-//}
+void MidiIn::midiProcess(unsigned char head,
+                         unsigned char num,
+                         unsigned char value)
+{
+    MidiEvent     ev;
+    unsigned char chan = head & 0x0f;
+    switch(head & 0xf0) {
+        case 0x80: //Note Off
+            ev.type    = M_NOTE;
+            ev.channel = chan;
+            ev.num     = num;
+            ev.value   = 0;
+            InMgr::getInstance().putEvent(ev);
+            break;
+        case 0x90: //Note On
+            ev.type    = M_NOTE;
+            ev.channel = chan;
+            ev.num     = num;
+            ev.value   = value;
+            InMgr::getInstance().putEvent(ev);
+            break;
+        case 0xA0: /* pressure, aftertouch */
+            ev.type    = M_PRESSURE;
+            ev.channel = chan;
+            ev.num     = num;
+            ev.value   = value;
+            InMgr::getInstance().putEvent(ev);
+            break;
+        case 0xb0: //Controller
+            ev.type    = M_CONTROLLER;
+            ev.channel = chan;
+            ev.num     = num;
+            ev.value   = value;
+            InMgr::getInstance().putEvent(ev);
+            break;
+        case 0xc0: //Program Change
+            ev.type    = M_PGMCHANGE;
+            ev.channel = chan;
+            ev.num     = num;
+            ev.value   = 0;
+            InMgr::getInstance().putEvent(ev);
+            break;
+        case 0xe0: //Pitch Wheel
+            ev.type    = M_CONTROLLER;
+            ev.channel = chan;
+            ev.num     = C_pitchwheel;
+            ev.value   = (num + value * (int) 128) - 8192;
+            InMgr::getInstance().putEvent(ev);
+            break;
+    }
+}

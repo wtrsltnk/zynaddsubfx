@@ -225,19 +225,17 @@ class XMLwrapper
         /**
          * Save the file.
          * @param filename File to save to
-         * @param compression Level of gzip compression
          * @param xmldata String to be saved
          */
         int dosavefile(const char *filename,
-                       int compression,
                        const char *xmldata) const;
 
         /**
          * Loads specified file and returns data.
          *
-         * Will load a gziped file or an uncompressed file.
+         * Will load an uncompressed file.
          * @param filename the file
-         * @return The decompressed data
+         * @return The data
          */
         char *doloadfile(const std::string &filename) const;
 
