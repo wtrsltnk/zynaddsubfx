@@ -3,46 +3,22 @@ message(STATUS "Checking Include Path" $ENV{CMAKE_INCLUDE_PATH} ${CMAKE_INCLUDE_
 message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_PATH})
 
 #Dependency check
-#find_package(PkgConfig REQUIRED)
-#pkg_check_modules(FFTW REQUIRED fftw3)
 find_package(FFTW REQUIRED)
-#pkg_check_modules(MXML REQUIRED mxml)
 find_package(MXML REQUIRED)
 find_package(PTHREAD REQUIRED)
 find_package(OSS)
 find_package(Alsa)
-#pkg_check_modules(JACK jack)
-#pkg_check_modules(PORTAUDIO portaudio-2.0>=19)
 find_package(PORTAUDIO)
 set(FLTK_SKIP_OPENGL true)
-#pkg_check_modules(NTK ntk)
-#pkg_check_modules(NTK_IMAGES ntk_images)
 find_package(FLTK)
 find_package(OpenGL) #for FLTK
 find_package(CxxTest)
 if(CXXTEST_FOUND)
     set(CXXTEST_USE_PYTHON TRUE)
 endif()
-# lash
-#pkg_search_module(LASH lash-1.0)
-#mark_as_advanced(LASH_LIBRARIES)
-#pkg_search_module(DSSI dssi>=0.9.0)
-#mark_as_advanced(DSSI_LIBRARIES)
-#pkg_search_module(LIBLO liblo>=0.26)
-#mark_as_advanced(LIBLO_LIBRARIES)
 
 add_definitions(-D__WINDOWS_MM__)
 
-#CHECK_FUNCTION_EXISTS(sched_setscheduler HAVE_SCHEDULER)
-
-#execute_process(COMMAND echo fistpl 0
-#                COMMAND as -
-#                ERROR_VARIABLE AVOID_ASM)
-
-######### Settings ###########
-# NOTE: These cache variables should normally not be changed in this
-# file, but either in in CMakeCache.txt before compile, or by passing
-# parameters directly into cmake using the -D flag.
 SET (GuiModule fltk CACHE STRING "GUI module, either fltk, ntk or off")
 SET (CompileTests ${CXXTEST_FOUND} CACHE BOOL "whether tests should be compiled in or not")
 SET (AlsaEnable ${ALSA_FOUND} CACHE BOOL
@@ -341,6 +317,7 @@ add_subdirectory(Effects)
 add_subdirectory(Params)
 add_subdirectory(DSP)
 add_subdirectory(Nio)
+add_subdirectory(QUI)
 
 add_library(zynaddsubfx_core STATIC
 	${zynaddsubfx_dsp_SRCS}
@@ -354,8 +331,8 @@ target_link_libraries(zynaddsubfx_core
 	${FFTW_LIBRARIES}
 	${MXML_LIBRARIES}
 	${OS_LIBRARIES}
-        ${PTHREAD_LIBRARIES}
-        )
+	${PTHREAD_LIBRARIES}
+	)
 
 if(CompileTests)
 	add_subdirectory(Tests)
@@ -372,7 +349,7 @@ target_link_libraries(zynaddsubfx
 	${GUI_LIBRARIES}
 	${NIO_LIBRARIES}
 	${AUDIO_LIBRARIES}
-        winmm.lib
+	winmm.lib
 	)
 
 if (DssiEnable)
@@ -391,15 +368,15 @@ if (DssiEnable)
 	endif ()
 endif()
 
-message(STATUS "Link libraries: ${FFTW_LIBRARY} ${AUDIO_LIBRARIES} ${OS_LIBRARIES}")
-install(TARGETS zynaddsubfx
-	RUNTIME DESTINATION bin
-	)
+add_executable(zynmusicstudio musicstudio.cpp)
 
-if(NtkGui)
-install(DIRECTORY ../pixmaps DESTINATION share/zynaddsubfx)
-add_definitions(-DPIXMAP_PATH="${CMAKE_INSTALL_PREFIX}/share/zynaddsubfx/pixmaps/")
-add_definitions(-DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
-endif(NtkGui)
+target_link_libraries(zynmusicstudio
+    zynaddsubfx_core
+    zynaddsubfx_nio
+    zynmusicstudio_qui
+    ${NIO_LIBRARIES}
+    ${AUDIO_LIBRARIES}
+    winmm.lib
+    )
 
-include(CTest)
+qt5_use_modules(zynmusicstudio Widgets)

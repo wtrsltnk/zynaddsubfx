@@ -1539,7 +1539,7 @@ int ADnote::noteout(float *outl, float *outr)
         }
 
 
-        float unison_amplitude = 1.0f / sqrt(unison_size[nvoice]); //reduce the amplitude for large unison sizes
+        float unison_amplitude = 1.0f / sqrt(float(unison_size[nvoice])); //reduce the amplitude for large unison sizes
         // Amplitude
         float oldam = oldamplitude[nvoice] * unison_amplitude;
         float newam = newamplitude[nvoice] * unison_amplitude;

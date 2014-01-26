@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  RtEngine.cpp - Midi input through RtMidi for Windows
+  partcontainer.h - Scrollable container widget for parts
   Copyright (C) 2014 Wouter Saaltink
   Author: Wouter Saaltink
 
@@ -19,27 +19,37 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#ifndef RTENGINE_H
-#define RTENGINE_H
+#ifndef PARTCONTAINER_H
+#define PARTCONTAINER_H
 
-#include "MidiIn.h"
-#include "RtMidi.h"
+#include <QWidget>
 
-class RtEngine:public MidiIn
+namespace Ui {
+class PartContainer;
+}
+
+class PartWindow;
+
+class PartContainer : public QWidget
 {
+    Q_OBJECT
+
 public:
-    RtEngine();
-    virtual ~RtEngine();
+    explicit PartContainer(QWidget *parent = 0);
+    ~PartContainer();
 
-    virtual bool Start();
-    virtual void Stop();
+    int vscrollOffset();
+    int vscale();
 
-    virtual void setMidiEn(bool nval);
-    virtual bool getMidiEn() const;
+    PartWindow* addPart();
+    void selectMe(PartWindow* part);
 
-    static void callback(double timeStamp, std::vector<unsigned char> *message, void *userData);
 private:
-    RtMidiIn* midiin;
+    Ui::PartContainer *ui;
+
+    PartWindow* selectedPart;
+    int _vscrollOffset;
+    int _vscale;
 };
 
-#endif // RTENGINE_H
+#endif // PARTCONTAINER_H

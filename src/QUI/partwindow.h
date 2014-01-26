@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  RtEngine.cpp - Midi input through RtMidi for Windows
+  partwindow.h - Part for editing sythesizer part
   Copyright (C) 2014 Wouter Saaltink
   Author: Wouter Saaltink
 
@@ -19,27 +19,35 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#ifndef RTENGINE_H
-#define RTENGINE_H
+#ifndef PARTWINDOW_H
+#define PARTWINDOW_H
 
-#include "MidiIn.h"
-#include "RtMidi.h"
+#include <QWidget>
+#include "partcontainer.h"
 
-class RtEngine:public MidiIn
+namespace Ui {
+class PartWindow;
+}
+
+class PartWindow : public QWidget
 {
+    Q_OBJECT
+
 public:
-    RtEngine();
-    virtual ~RtEngine();
+    explicit PartWindow(PartContainer* c, QWidget *parent = 0);
+    ~PartWindow();
 
-    virtual bool Start();
-    virtual void Stop();
+    void select();
+    void unselect();
 
-    virtual void setMidiEn(bool nval);
-    virtual bool getMidiEn() const;
+protected slots:
+    void onToggleCollapse();
 
-    static void callback(double timeStamp, std::vector<unsigned char> *message, void *userData);
 private:
-    RtMidiIn* midiin;
+    Ui::PartWindow *ui;
+    PartContainer* container;
+    bool collapsed;
+    bool selected;
 };
 
-#endif // RTENGINE_H
+#endif // PARTWINDOW_H
