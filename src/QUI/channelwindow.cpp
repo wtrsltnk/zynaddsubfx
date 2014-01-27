@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  partwindow.cpp - Part for editing sythesizer part
+  partwindow.cpp - Channel for editing sythesizer part
   Copyright (C) 2014 Wouter Saaltink
   Author: Wouter Saaltink
 
@@ -19,12 +19,12 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#include "partwindow.h"
-#include "ui_partwindow.h"
+#include "channelwindow.h"
+#include "ui_channelwindow.h"
 
-PartWindow::PartWindow(PartContainer* c, QWidget *parent) :
+ChannelWindow::ChannelWindow(ChannelContainer* c, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PartWindow),
+    ui(new Ui::ChannelWindow),
     container(c),
     collapsed(true)
 {
@@ -34,12 +34,12 @@ PartWindow::PartWindow(PartContainer* c, QWidget *parent) :
     this->onToggleCollapse();
 }
 
-PartWindow::~PartWindow()
+ChannelWindow::~ChannelWindow()
 {
     delete ui;
 }
 
-void PartWindow::onToggleCollapse()
+void ChannelWindow::onToggleCollapse()
 {
     this->container->selectMe(this);
     this->collapsed = !this->collapsed;
@@ -58,13 +58,13 @@ void PartWindow::onToggleCollapse()
     }
 }
 
-void PartWindow::select()
+void ChannelWindow::select()
 {
     this->selected = true;
     this->setStyleSheet("background-color:#999;");
 }
 
-void PartWindow::unselect()
+void ChannelWindow::unselect()
 {
     this->selected = false;
     this->setStyleSheet("background-color:#333;");

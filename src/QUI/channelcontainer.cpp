@@ -19,39 +19,39 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#include "partcontainer.h"
-#include "ui_partcontainer.h"
-#include "partwindow.h"
+#include "channelcontainer.h"
+#include "ui_channelcontainer.h"
+#include "channelwindow.h"
 
-PartContainer::PartContainer(QWidget *parent) :
+ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PartContainer),
-    selectedPart(0)
+    ui(new Ui::ChannelContainer),
+    selectedChannel(0)
 {
     ui->setupUi(this);
 }
 
-PartContainer::~PartContainer()
+ChannelContainer::~ChannelContainer()
 {
     delete ui;
 }
 
-PartWindow* PartContainer::addPart()
+ChannelWindow* ChannelContainer::addChannel()
 {
-    PartWindow* part = new PartWindow(this, ui->scrollArea);
+    ChannelWindow* channel = new ChannelWindow(this, ui->scrollArea);
     QLayoutItem* spacer = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-1);
     ui->scrollArea->widget()->layout()->removeItem(spacer);
-    ui->scrollArea->widget()->layout()->addWidget(part);
+    ui->scrollArea->widget()->layout()->addWidget(channel);
     ui->scrollArea->widget()->layout()->addItem(spacer);
 
-    return part;
+    return channel;
 }
 
-void PartContainer::selectMe(PartWindow* part)
+void ChannelContainer::selectMe(ChannelWindow* part)
 {
-    if (this->selectedPart != 0 && this->selectedPart != part)
-        this->selectedPart->unselect();
+    if (this->selectedChannel != 0 && this->selectedChannel != part)
+        this->selectedChannel->unselect();
 
-    this->selectedPart = part;
-    this->selectedPart->select();
+    this->selectedChannel = part;
+    this->selectedChannel->select();
 }

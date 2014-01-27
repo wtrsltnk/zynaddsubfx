@@ -106,7 +106,7 @@
          <item>
           <widget class="QPushButton" name="btnMidi">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Currently used Midi input driver&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Currently used Midi input driver</string>
            </property>
            <property name="text">
             <string/>
@@ -139,7 +139,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="PartContainer" name="widget" native="true"/>
+       <widget class="ChannelContainer" name="widget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -167,9 +167,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PartContainer</class>
+   <class>ChannelContainer</class>
    <extends>QWidget</extends>
-   <header>partcontainer.h</header>
+   <header>channelcontainer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

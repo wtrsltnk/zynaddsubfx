@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  partwindow.h - Part for editing sythesizer part
+  partcontainer.h - Scrollable container widget for parts
   Copyright (C) 2014 Wouter Saaltink
   Author: Wouter Saaltink
 
@@ -19,35 +19,37 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#ifndef PARTWINDOW_H
-#define PARTWINDOW_H
+#ifndef PARTCONTAINER_H
+#define PARTCONTAINER_H
 
 #include <QWidget>
-#include "partcontainer.h"
 
 namespace Ui {
-class PartWindow;
+class ChannelContainer;
 }
 
-class PartWindow : public QWidget
+class ChannelWindow;
+
+class ChannelContainer : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PartWindow(PartContainer* c, QWidget *parent = 0);
-    ~PartWindow();
+    explicit ChannelContainer(QWidget *parent = 0);
+    ~ChannelContainer();
 
-    void select();
-    void unselect();
+    int vscrollOffset();
+    int vscale();
 
-protected slots:
-    void onToggleCollapse();
+    ChannelWindow* addChannel();
+    void selectMe(ChannelWindow* part);
 
 private:
-    Ui::PartWindow *ui;
-    PartContainer* container;
-    bool collapsed;
-    bool selected;
+    Ui::ChannelContainer *ui;
+
+    ChannelWindow* selectedChannel;
+    int _vscrollOffset;
+    int _vscale;
 };
 
-#endif // PARTWINDOW_H
+#endif // PARTCONTAINER_H

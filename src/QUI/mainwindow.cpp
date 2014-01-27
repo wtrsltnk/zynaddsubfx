@@ -29,8 +29,8 @@
 #include "../Nio/MidiIn.h"
 #include "../Nio/AudioOut.h"
 #include <QPainter>
-#include "partwindow.h"
 #include <QMenu>
+#include "channelwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
@@ -56,10 +56,10 @@ MainWindow::MainWindow(QWidget *parent) :
     this->vutimer.setInterval(1000/40);
     this->vutimer.start();
 
-    this->ui->widget->addPart();
-    this->ui->widget->addPart();
-    this->ui->widget->addPart();
-    this->ui->widget->addPart();
+    this->ui->widget->addChannel();
+    this->ui->widget->addChannel();
+    this->ui->widget->addChannel();
+    this->ui->widget->addChannel();
 }
 
 MainWindow::~MainWindow()

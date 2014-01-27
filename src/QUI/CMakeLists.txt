@@ -1,17 +1,17 @@
 set(zynmusicstudio_qui_SRCS
     mainwindow.cpp
-    partwindow.cpp
-    partcontainer.cpp
+    channelwindow.cpp
+    channelcontainer.cpp
     )
 set(zynmusicstudio_qui_HEADERS
     mainwindow.h
-    partwindow.h
-    partcontainer.h
+    channelwindow.h
+    channelcontainer.h
     )
 set(zynmusicstudio_qui_FORMS
     mainwindow.ui
-    partwindow.ui
-    partcontainer.ui
+    channelwindow.ui
+    channelcontainer.ui
     )
 
 # QT library

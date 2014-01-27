@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PartWindow</class>
- <widget class="QWidget" name="PartWindow">
+ <class>ChannelWindow</class>
+ <widget class="QWidget" name="ChannelWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
