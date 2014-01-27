@@ -138,21 +138,20 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
         oldrmsdbl=rmsdbl;
         oldrmsdbr=rmsdbr;
 
-
         rmsdbl*=VULENX;rmsdbr*=VULENX;
 
         int irmsdbl=(int) rmsdbl;
         int irmsdbr=(int) rmsdbr;
         //compute RMS - end
 
-        painter.fillRect(ox,oy,idbr,VULENY, QBrush(Qt::lightGray, Qt::Dense7Pattern));
-        painter.fillRect(ox,oy+ly/2,idbl,VULENY, QBrush(Qt::lightGray, Qt::Dense7Pattern));
+        painter.fillRect(ox,oy,idbr,VULENY, QBrush(Qt::green, Qt::Dense7Pattern));
+        painter.fillRect(ox,oy+ly/2,idbl,VULENY, QBrush(Qt::green, Qt::Dense7Pattern));
 
         painter.fillRect(ox+idbr,oy,VULENX-idbr,VULENY, QBrush(Qt::white, Qt::Dense7Pattern));
         painter.fillRect(ox+idbl,oy+ly/2,VULENX-idbl,VULENY, QBrush(Qt::white, Qt::Dense7Pattern));
 
-        painter.fillRect(ox+irmsdbr-1,oy,3,VULENY, QBrush(Qt::green, Qt::Dense7Pattern));
-        painter.fillRect(ox+irmsdbl-1,oy+ly/2,3,VULENY, QBrush(Qt::green, Qt::Dense7Pattern));
+        painter.fillRect(ox+irmsdbr-1,oy,3,VULENY, QBrush(Qt::yellow, Qt::SolidPattern));
+        painter.fillRect(ox+irmsdbl-1,oy+ly/2,3,VULENY, QBrush(Qt::yellow, Qt::SolidPattern));
 
         painter.end();
         return true;
