@@ -135,8 +135,7 @@ void initprogram(void)
     cerr << std::fixed;
     cerr << "\nSample Rate = \t\t" << synth->samplerate << endl;
     cerr << "Sound Buffer Size = \t" << synth->buffersize << " samples" << endl;
-    cerr << "Internal latency = \t" << synth->buffersize_f * 1000.0f
-    / synth->samplerate_f << " ms" << endl;
+    cerr << "Internal latency = \t" << synth->buffersize_f * 1000.0f / synth->samplerate_f << " ms" << endl;
     cerr << "ADsynth Oscil.Size = \t" << synth->oscilsize << " samples" << endl;
 
 
