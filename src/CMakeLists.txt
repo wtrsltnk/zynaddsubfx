@@ -1,8 +1,6 @@
-#checking include/library paths
 message(STATUS "Checking Include Path" $ENV{CMAKE_INCLUDE_PATH} ${CMAKE_INCLUDE_PATH})
 message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_PATH})
 
-#Dependency check
 find_package(FFTW REQUIRED)
 find_package(MXML REQUIRED)
 find_package(PTHREAD REQUIRED)
@@ -289,7 +287,7 @@ target_link_libraries(zynaddsubfx_core
     ${PTHREAD_LIBRARIES}
     )
 
-add_executable(zynaddsubfx main.cpp)
+add_executable(zynaddsubfx zynaddsubfx.cpp)
 
 target_link_libraries(zynaddsubfx
     zynaddsubfx_core
@@ -315,7 +313,7 @@ if(DssiEnable)
     endif()
 endif()
 
-add_executable(zynmusicstudio musicstudio.cpp)
+add_executable(zynmusicstudio zynmusicstudio.cpp)
 
 target_link_libraries(zynmusicstudio
     zynaddsubfx_core
