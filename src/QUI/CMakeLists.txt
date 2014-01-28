@@ -2,16 +2,22 @@ set(zynmusicstudio_qui_SRCS
     mainwindow.cpp
     channelwindow.cpp
     channelcontainer.cpp
+    instrumentwindow.cpp
+    instrumentcontainer.cpp
     )
 set(zynmusicstudio_qui_HEADERS
     mainwindow.h
     channelwindow.h
     channelcontainer.h
+    instrumentwindow.h
+    instrumentcontainer.h
     )
 set(zynmusicstudio_qui_FORMS
     mainwindow.ui
     channelwindow.ui
     channelcontainer.ui
+    instrumentwindow.ui
+    instrumentcontainer.ui
     )
 
 # QT library
