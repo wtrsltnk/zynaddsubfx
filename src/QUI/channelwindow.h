@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  partwindow.h - Part for editing sythesizer part
+  channelwindow.h - Part for editing sythesizer part
   Copyright (C) 2014 Wouter Saaltink
   Author: Wouter Saaltink
 
@@ -19,8 +19,8 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#ifndef PARTWINDOW_H
-#define PARTWINDOW_H
+#ifndef CHANNELWINDOW_H
+#define CHANNELWINDOW_H
 
 #include <QWidget>
 #include "channelcontainer.h"
@@ -50,4 +50,4 @@ private:
     bool selected;
 };
 
-#endif // PARTWINDOW_H
+#endif // CHANNELWINDOW_H
