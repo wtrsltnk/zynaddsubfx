@@ -19,8 +19,8 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#ifndef PARTCONTAINER_H
-#define PARTCONTAINER_H
+#ifndef CHANNELCONTAINER_H
+#define CHANNELCONTAINER_H
 
 #include <QWidget>
 
@@ -52,4 +52,4 @@ private:
     int _vscale;
 };
 
-#endif // PARTCONTAINER_H
+#endif // CHANNELCONTAINER_H
