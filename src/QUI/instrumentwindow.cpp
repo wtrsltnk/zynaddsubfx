@@ -21,15 +21,60 @@
 */
 #include "instrumentwindow.h"
 #include "ui_instrumentwindow.h"
+#include "../Misc/Master.h"
 
-InstrumentWindow::InstrumentWindow(QWidget *parent) :
+InstrumentWindow::InstrumentWindow(int index, InstrumentContainer* c, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::InstrumentWindow)
+    ui(new Ui::InstrumentWindow),
+    container(c)
 {
     ui->setupUi(this);
+    this->ui->content->hide();
+
+    this->part = Master::getInstance().part[index];
+    this->ui->chkActive->setChecked(part->Penabled);
+    this->ui->lblName->setText(QString((const char*)part->Pname));
+    this->ui->dialVolume->setValue(part->Pvolume);
+    this->ui->dialPan->setValue(part->Ppanning); // todo, make dial from 0 127
+
+    this->setStyleSheet("background-color:#666;");
+    connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
+
+    connect(this->ui->dialVolume, SIGNAL(valueChanged(int)), this, SLOT(onChangeVolume(int)));
+    connect(this->ui->dialPan, SIGNAL(valueChanged(int)), this, SLOT(onChangePan(int)));
+    connect(this->ui->chkActive, SIGNAL(stateChanged(int)), this, SLOT(onChangeEnabled(int)));
 }
 
 InstrumentWindow::~InstrumentWindow()
 {
     delete ui;
+}
+
+void InstrumentWindow::onToggleCollapse()
+{
+    if (this->ui->content->isVisible())
+    {
+        this->ui->content->hide();
+        this->ui->collapse->setText("+");
+    }
+    else
+    {
+        this->ui->content->show();
+        this->ui->collapse->setText("-");
+    }
+}
+
+void InstrumentWindow::onChangeVolume(int value)
+{
+    this->part->setPvolume(value);
+}
+
+void InstrumentWindow::onChangePan(int value)
+{
+    this->part->setPpanning(value);
+}
+
+void InstrumentWindow::onChangeEnabled(int value)
+{
+    this->part->Penabled = value;
 }

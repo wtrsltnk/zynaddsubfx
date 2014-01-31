@@ -4,6 +4,7 @@ set(zynmusicstudio_qui_SRCS
     channelcontainer.cpp
     instrumentwindow.cpp
     instrumentcontainer.cpp
+    keyboard.cpp
     )
 set(zynmusicstudio_qui_HEADERS
     mainwindow.h
@@ -11,6 +12,7 @@ set(zynmusicstudio_qui_HEADERS
     channelcontainer.h
     instrumentwindow.h
     instrumentcontainer.h
+    keyboard.h
     )
 set(zynmusicstudio_qui_FORMS
     mainwindow.ui
@@ -18,6 +20,7 @@ set(zynmusicstudio_qui_FORMS
     channelcontainer.ui
     instrumentwindow.ui
     instrumentcontainer.ui
+    keyboard.ui
     )
 
 # QT library

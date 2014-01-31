@@ -115,6 +115,7 @@ void Part::defaults()
 void Part::defaultsinstrument()
 {
     ZERO(Pname, PART_MAX_NAME_LEN);
+    strcpy((char*)Pname, PART_DEFAULT_NAME);
 
     info.Ptype = 0;
     ZERO(info.Pauthor, MAX_INFO_TEXT_SIZE + 1);

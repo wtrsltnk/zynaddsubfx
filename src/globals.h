@@ -102,6 +102,11 @@
 #define PART_MAX_NAME_LEN 30
 
 /*
+ * The default instrument's name
+ */
+#define PART_DEFAULT_NAME "default"
+
+/*
  * The maximum number of bands of the equaliser
  */
 #define MAX_EQ_BANDS 8

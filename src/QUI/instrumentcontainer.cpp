@@ -21,6 +21,7 @@
 */
 #include "instrumentcontainer.h"
 #include "ui_instrumentcontainer.h"
+#include "instrumentwindow.h"
 
 InstrumentContainer::InstrumentContainer(QWidget *parent) :
     QWidget(parent),
@@ -32,4 +33,15 @@ InstrumentContainer::InstrumentContainer(QWidget *parent) :
 InstrumentContainer::~InstrumentContainer()
 {
     delete ui;
+}
+
+InstrumentWindow* InstrumentContainer::addInstrument(int index)
+{
+    InstrumentWindow* Instrument = new InstrumentWindow(index, this, ui->scrollArea);
+    QLayoutItem* spacer = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-1);
+    ui->scrollArea->widget()->layout()->removeItem(spacer);
+    ui->scrollArea->widget()->layout()->addWidget(Instrument);
+    ui->scrollArea->widget()->layout()->addItem(spacer);
+
+    return Instrument;
 }

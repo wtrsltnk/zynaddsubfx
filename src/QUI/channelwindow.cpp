@@ -22,14 +22,18 @@
 #include "channelwindow.h"
 #include "ui_channelwindow.h"
 
-ChannelWindow::ChannelWindow(ChannelContainer* c, QWidget *parent) :
+ChannelWindow::ChannelWindow(int index, ChannelContainer* c, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelWindow),
     container(c),
-    collapsed(true)
+    collapsed(true),
+    channelIndex(index)
 {
     ui->setupUi(this);
 
+    QString str = "CHNL ";
+    str += str.number(this->channelIndex);
+    ui->lblChannel->setText(str);
     connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
     this->onToggleCollapse();
 }
@@ -61,11 +65,11 @@ void ChannelWindow::onToggleCollapse()
 void ChannelWindow::select()
 {
     this->selected = true;
-    this->setStyleSheet("background-color:#999;");
+    this->setStyleSheet("background-color:#666;");
 }
 
 void ChannelWindow::unselect()
 {
     this->selected = false;
-    this->setStyleSheet("background-color:#333;");
+    this->setStyleSheet("background-color:#444;");
 }

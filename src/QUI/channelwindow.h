@@ -34,7 +34,7 @@ class ChannelWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChannelWindow(ChannelContainer* c, QWidget *parent = 0);
+    explicit ChannelWindow(int index, ChannelContainer* c, QWidget *parent = 0);
     ~ChannelWindow();
 
     void select();
@@ -48,6 +48,7 @@ private:
     ChannelContainer* container;
     bool collapsed;
     bool selected;
+    int channelIndex;
 };
 
 #endif // CHANNELWINDOW_H

@@ -37,6 +37,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void updateUi();
+
 protected slots:
     void OnMasterGainChanged(int value);
     void OnNoteCheckChanged(int state);
@@ -51,6 +53,8 @@ private:
     QTimer vutimer;
 
     bool eventFilter(QObject* watched, QEvent* event);
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
 
 };
 

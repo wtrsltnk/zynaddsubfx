@@ -28,6 +28,8 @@ namespace Ui {
 class InstrumentContainer;
 }
 
+class InstrumentWindow;
+
 class InstrumentContainer : public QWidget
 {
     Q_OBJECT
@@ -35,6 +37,8 @@ class InstrumentContainer : public QWidget
 public:
     explicit InstrumentContainer(QWidget *parent = 0);
     ~InstrumentContainer();
+
+    InstrumentWindow* addInstrument(int index);
 
 private:
     Ui::InstrumentContainer *ui;

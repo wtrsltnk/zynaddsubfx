@@ -44,9 +44,6 @@
 #include "Misc/Master.h"
 #include "Misc/Part.h"
 #include "Misc/Util.h"
-#include "Misc/Dump.h"
-extern Dump dump;
-
 
 //Nio System
 #include "Nio/Nio.h"
@@ -117,7 +114,6 @@ int main(int argc, char *argv[])
 
     synth = new SYNTH_T;
     config.init();
-    dump.startnow();
 
     /* Get the settings from the Config*/
     synth->samplerate = config.cfg.SampleRate;

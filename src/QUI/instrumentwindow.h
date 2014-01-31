@@ -23,6 +23,8 @@
 #define INSTRUMENTWINDOW_H
 
 #include <QWidget>
+#include "instrumentcontainer.h"
+#include "../Misc/Part.h"
 
 namespace Ui {
 class InstrumentWindow;
@@ -33,11 +35,19 @@ class InstrumentWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit InstrumentWindow(QWidget *parent = 0);
+    explicit InstrumentWindow(int index, InstrumentContainer* c, QWidget *parent = 0);
     ~InstrumentWindow();
+
+protected slots:
+    void onToggleCollapse();
+    void onChangeVolume(int value);
+    void onChangePan(int value);
+    void onChangeEnabled(int value);
 
 private:
     Ui::InstrumentWindow *ui;
+    InstrumentContainer* container;
+    Part* part;
 };
 
 #endif // INSTRUMENTWINDOW_H

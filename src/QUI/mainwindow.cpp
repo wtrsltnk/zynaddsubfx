@@ -22,15 +22,22 @@
 */
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QPainter>
+#include <QMenu>
+#include <QKeyEvent>
+#include <iostream>
 #include "../Misc/Master.h"
+#include "../Misc/Part.h"
 #include "../Nio/InMgr.h"
 #include "../Nio/OutMgr.h"
 #include "../Nio/EngineMgr.h"
 #include "../Nio/MidiIn.h"
 #include "../Nio/AudioOut.h"
-#include <QPainter>
-#include <QMenu>
 #include "channelwindow.h"
+#include "instrumentwindow.h"
+#include "keyboard.h"
+
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
@@ -56,15 +63,17 @@ MainWindow::MainWindow(QWidget *parent) :
     this->vutimer.setInterval(1000/40);
     this->vutimer.start();
 
-    this->ui->widget->addChannel();
-    this->ui->widget->addChannel();
-    this->ui->widget->addChannel();
-    this->ui->widget->addChannel();
+    this->ui->instruments->addInstrument(0);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updateUi()
+{
+
 }
 
 void MainWindow::OnMasterGainChanged(int value)
@@ -157,6 +166,18 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
         return true;
     }
     return false;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    if (event->isAutoRepeat() == false)
+        this->ui->keyboard->selectCharacter(char(event->key()), true);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent* event)
+{
+    if (event->isAutoRepeat() == false)
+        this->ui->keyboard->selectCharacter(char(event->key()), false);
 }
 
 void MainWindow::OnVuTimer()

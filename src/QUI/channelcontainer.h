@@ -41,7 +41,7 @@ public:
     int vscrollOffset();
     int vscale();
 
-    ChannelWindow* addChannel();
+    ChannelWindow* addChannel(int index);
     void selectMe(ChannelWindow* part);
 
 private:

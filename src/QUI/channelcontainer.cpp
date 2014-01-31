@@ -22,6 +22,8 @@
 #include "channelcontainer.h"
 #include "ui_channelcontainer.h"
 #include "channelwindow.h"
+#include "../Misc/Master.h"
+#include "../Misc/Part.h"
 
 ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
@@ -29,6 +31,18 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     selectedChannel(0)
 {
     ui->setupUi(this);
+
+    bool usedChannels[NUM_MIDI_CHANNELS] = { false };
+
+    // Find all active channels
+    for (int i = 0; i < NUM_MIDI_PARTS; i++)
+        if (((Part*)Master::getInstance().part[i])->Penabled)
+            usedChannels[((Part*)Master::getInstance().part[i])->Prcvchn] = true;
+
+    // Add all active channels
+    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+        if (usedChannels[i])
+            this->addChannel(i);
 }
 
 ChannelContainer::~ChannelContainer()
@@ -36,9 +50,9 @@ ChannelContainer::~ChannelContainer()
     delete ui;
 }
 
-ChannelWindow* ChannelContainer::addChannel()
+ChannelWindow* ChannelContainer::addChannel(int index)
 {
-    ChannelWindow* channel = new ChannelWindow(this, ui->scrollArea);
+    ChannelWindow* channel = new ChannelWindow(index, this, ui->scrollArea);
     QLayoutItem* spacer = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-1);
     ui->scrollArea->widget()->layout()->removeItem(spacer);
     ui->scrollArea->widget()->layout()->addWidget(channel);
