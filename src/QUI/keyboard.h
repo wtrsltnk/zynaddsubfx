@@ -42,8 +42,16 @@ public:
         Key(Octave* parent, unsigned char n);
         virtual ~Key();
 
+        void setOn(bool on);
+
         Octave* parent;
         unsigned char note;
+        bool isSharp;
+
+    protected:
+        virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+        virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
     };
 
     class Octave : public QGraphicsItemGroup
@@ -56,13 +64,12 @@ public:
         unsigned char octave;
     };
 
-    static int KeyWidth;
+    static int KeyWidth, KeyHeight;
 
 public:
     explicit Keyboard(QWidget *parent = 0);
     ~Keyboard();
 
-    void selectKeyByMouse(int key);
     void selectCharacter(char c, bool on);
 
 private:
@@ -72,8 +79,6 @@ private:
     bool sendnotes;
     QGraphicsScene* scene;
     Octave* octaves[10];
-
-    bool eventFilter(QObject* watched, QEvent* event);
 
     unsigned char keyToNote(int key);
 

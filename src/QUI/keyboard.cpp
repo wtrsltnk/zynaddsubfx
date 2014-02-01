@@ -33,20 +33,89 @@ using namespace std;
 Keyboard::Key::Key(Octave* o, unsigned char n)
     : QGraphicsPolygonItem(o), note(n)
 {
+    this->setAcceptHoverEvents(true);
     QPolygon p;
-    p << QPoint((n % 12) * Keyboard::KeyWidth + 0, 0)
-      << QPoint((n % 12) * Keyboard::KeyWidth + Keyboard::KeyWidth, 0)
-      << QPoint((n % 12) * Keyboard::KeyWidth + Keyboard::KeyWidth, 50)
-      << QPoint((n % 12) * Keyboard::KeyWidth + 0, 50);
+    if (n % 12 == 0 || n % 12 == 2 || n % 12 == 4 || n % 12 == 5 || n % 12 == 7 || n % 12 == 9 || n % 12 == 11)
+    {
+        int a = 0;
+        if (n % 12 == 2) a = 1;
+        if (n % 12 == 4) a = 2;
+        if (n % 12 == 5) a = 3;
+        if (n % 12 == 7) a = 4;
+        if (n % 12 == 9) a = 5;
+        if (n % 12 == 11) a = 6;
+        p << QPoint(a * Keyboard::KeyWidth + 0, 0)
+          << QPoint(a * Keyboard::KeyWidth + Keyboard::KeyWidth, 0)
+          << QPoint(a * Keyboard::KeyWidth + Keyboard::KeyWidth, Keyboard::KeyHeight)
+          << QPoint(a * Keyboard::KeyWidth + 0, Keyboard::KeyHeight);
+        this->setBrush(QBrush(Qt::white));
+        this->setZValue(1);
+        this->isSharp = false;
+    }
+    else
+    {
+        int a = 0;
+        if (n % 12 == 3) a = 1;
+        if (n % 12 == 6) a = 3;
+        if (n % 12 == 8) a = 4;
+        if (n % 12 == 10) a = 5;
+        p << QPoint(a * Keyboard::KeyWidth + ((Keyboard::KeyWidth/3) * 2), 0)
+          << QPoint(a * Keyboard::KeyWidth + ((Keyboard::KeyWidth/3) * 2) + ((Keyboard::KeyWidth/3) * 2), 0)
+          << QPoint(a * Keyboard::KeyWidth + ((Keyboard::KeyWidth/3) * 2) + ((Keyboard::KeyWidth/3) * 2), Keyboard::KeyHeight * 0.6)
+          << QPoint(a * Keyboard::KeyWidth + ((Keyboard::KeyWidth/3) * 2), Keyboard::KeyHeight * 0.6);
+        this->setBrush(QBrush(Qt::black));
+        this->setZValue(2);
+        this->isSharp = true;
+    }
     this->setPolygon(p);
 }
 
 Keyboard::Key::~Key()
 { }
 
+void Keyboard::Key::setOn(bool on)
+{
+    if (on)
+    {
+        if (this->isSharp)
+            this->setBrush(QBrush(Qt::gray));
+        else
+            this->setBrush(QBrush(Qt::lightGray));
+    }
+    else
+    {
+        if (this->isSharp)
+            this->setBrush(QBrush(Qt::black));
+        else
+            this->setBrush(QBrush(Qt::white));
+    }
+    this->update();
+}
+
+void Keyboard::Key::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    Master::getInstance().noteOn(0, this->note, 100);
+    if (this->isSharp)
+        this->setBrush(QBrush(Qt::gray));
+    else
+        this->setBrush(QBrush(Qt::lightGray));
+    this->update();
+}
+
+void Keyboard::Key::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    Master::getInstance().noteOff(0, this->note);
+    if (this->isSharp)
+        this->setBrush(QBrush(Qt::black));
+    else
+        this->setBrush(QBrush(Qt::white));
+    this->update();
+}
+
 Keyboard::Octave::Octave(unsigned char o)
     : QGraphicsItemGroup(), octave(o)
 {
+    this->setHandlesChildEvents(false);
     for (int i = 0; i < 12; i++)
     {
         this->keys[i] = new Key(this, o * 12 + i);
@@ -58,6 +127,7 @@ Keyboard::Octave::~Octave()
 { }
 
 int Keyboard::KeyWidth = 24;
+int Keyboard::KeyHeight = 100;
 
 Keyboard::Keyboard(QWidget *parent) :
     QWidget(parent),
@@ -66,12 +136,15 @@ Keyboard::Keyboard(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->ui->graphicsView->setMouseTracking(true);
+    this->ui->graphicsView->viewport()->setMouseTracking(true);
+
     this->scene = new QGraphicsScene();
     for (int i = 0; i < 10; i++)
     {
         this->octaves[i] = new Octave(i);
         this->scene->addItem(this->octaves[i]);
-        this->octaves[i]->setPos(Keyboard::KeyWidth * 7 * i, i*4);
+        this->octaves[i]->setPos(Keyboard::KeyWidth * 7 * i, 0);
     }
 
     this->ui->graphicsView->setScene(this->scene);
@@ -104,87 +177,12 @@ Keyboard::~Keyboard()
     delete ui;
 }
 
-bool Keyboard::eventFilter(QObject* watched, QEvent* event)
-{
-//    if (watched == ui->piano && event->type() == QEvent::Paint)
-//    {
-//        QPainter painter;
-//        painter.begin(ui->piano);
-//        painter.setRenderHint(QPainter::Antialiasing, false);
-//        for (int i = 0; i < this->octavecount * 7; i++)
-//        {
-//            painter.fillRect(1, 0, this->keywidth-2, this->keyheight, QBrush(Qt::white));
-//            painter.setPen(Qt::red);
-//            if (this->selectedNotes[this->keyToNote(i)])
-//                painter.drawEllipse(this->keywidth/3, this->keyheight-20, this->keywidth/3, this->keywidth/3);
-//            painter.setPen(Qt::gray);
-//            painter.setFont(QFont("Verdana", 8));
-//            QString note = 'A' + (i % 7) + QString("%1").arg(i / 7);
-//            painter.drawText(1, this->keyheight-12, this->keywidth-2, 10, Qt::AlignHCenter | Qt::AlignVCenter, note);
-//            painter.translate(this->keywidth, 0);
-//        }
-
-//        painter.resetTransform();
-//        for (int i = 0; i < this->octavecount * 7 - 1; i++)
-//        {
-//            if (i % 7 != 2 && i % 7 != 5)
-//            {
-//                painter.fillRect((this->keywidth/3) * 2, 0, (this->keywidth/3) * 2, this->keyheight * 0.6, QBrush(Qt::black));
-//                if (this->selectedNotes[this->keyToNote(i + 1000)])
-//                    painter.drawEllipse(this->keywidth - (this->keywidth/6) - 1, (this->keyheight/3), this->keywidth/3, this->keywidth/3);
-//            }
-//            painter.translate(this->keywidth, 0);
-//        }
-//        painter.end();
-//    }
-//    if (watched == ui->piano && event->type() == QEvent::MouseMove)
-//    {
-//        int key = ((QMouseEvent*)event)->pos().x() / this->keywidth;
-//        if (((QMouseEvent*)event)->pos().y() < (this->keyheight / 3) * 2
-//                && (
-//                    (((QMouseEvent*)event)->pos().x() % this->keywidth) <= (this->keywidth / 3)
-//                    || (((QMouseEvent*)event)->pos().x() % this->keywidth) >= (this->keywidth / 3) * 2
-//                ))
-//        {
-//            int i = (((QMouseEvent*)event)->pos().x() - ((this->keywidth / 3) * 2)) / this->keywidth;
-//            if (i % 7 != 2 && i % 7 != 5)
-//                key = 1000 + i;
-//        }
-
-//        this->selectKeyByMouse(key);
-//        this->ui->piano->update();
-//    }
-//    if (watched == ui->piano && event->type() == QEvent::MouseButtonPress)
-//    {
-//        this->sendnotes = true;
-//        Master::getInstance().noteOn(0, this->keyToNote(this->selectedkey), 100);
-//    }
-//    if (watched == ui->piano && event->type() == QEvent::MouseButtonRelease)
-//    {
-//        this->sendnotes = false;
-//        Master::getInstance().noteOff(0, this->keyToNote(this->selectedkey));
-//    }
-    return false;
-}
-
-void Keyboard::selectKeyByMouse(int key)
-{
-//    if (this->selectedkey != key)
-//    {
-//        if (sendnotes)
-//        {
-//            Master::getInstance().noteOff(0, this->keyToNote(this->selectedkey));
-//            Master::getInstance().noteOn(0, this->keyToNote(key), 100);
-//        }
-//    }
-//    this->selectedkey = key;
-}
-
 void Keyboard::selectCharacter(char c, bool on)
 {
     unsigned char note = Keyboard::characterNoteMapping[c];
     if (note != 0)
     {
+        this->octaves[(note - (note % 12)) / 12]->keys[note % 12]->setOn(on);
         if (this->selectedNotes[note] != on)
         {
             if (on)
@@ -194,27 +192,6 @@ void Keyboard::selectCharacter(char c, bool on)
 
             this->selectedNotes[note] = on;
         }
-    }
-}
-
-unsigned char Keyboard::keyToNote(int key)
-{
-    if (key >= 0 && key < 1000)
-    {
-        unsigned char a[] = { 0, 2, 4, 5, 7, 9, 11 };
-        unsigned char b = key - (key % 7);
-        b = (b / 7) * 12;
-        b += a[key % 7];
-        return b;
-    }
-    else
-    {
-        key -= 1000;
-        unsigned char a[] = { 1, 3, 5, 6, 8, 10, 10 };
-        unsigned char b = key - (key % 7);
-        b = (b / 7) * 12;
-        b += a[key % 7];
-        return b;
     }
 }
 

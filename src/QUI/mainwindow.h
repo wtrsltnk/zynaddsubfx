@@ -41,7 +41,6 @@ public:
 
 protected slots:
     void OnMasterGainChanged(int value);
-    void OnNoteCheckChanged(int state);
     void OnVuTimer();
     void OnShowOptionalMidiDevice();
     void OnSelectMidiDevice();

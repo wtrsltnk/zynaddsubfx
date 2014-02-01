@@ -57,7 +57,6 @@ MainWindow::MainWindow(QWidget *parent) :
     this->ui->vu->installEventFilter(this);
 
     connect(this->ui->masterGain, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
-    connect(this->ui->note, SIGNAL(stateChanged(int)), this, SLOT(OnNoteCheckChanged(int)));
     connect(&this->vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
 
     this->vutimer.setInterval(1000/40);
@@ -79,14 +78,6 @@ void MainWindow::updateUi()
 void MainWindow::OnMasterGainChanged(int value)
 {
     Master::getInstance().setPvolume(value);
-}
-
-void MainWindow::OnNoteCheckChanged(int state)
-{
-    if (state)
-        Master::getInstance().noteOn(0, 70, 100);
-    else
-        Master::getInstance().noteOff(0, 70);
 }
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
