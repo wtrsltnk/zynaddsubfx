@@ -43,10 +43,12 @@ public:
         virtual ~Key();
 
         void setOn(bool on);
+        void setEnabled(bool enabled);
 
         Octave* parent;
         unsigned char note;
         bool isSharp;
+        bool isEnabled;
 
     protected:
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -71,6 +73,8 @@ public:
     ~Keyboard();
 
     void selectCharacter(char c, bool on);
+    void setNoteOn(unsigned char note, bool on);
+    void setNoteEnabled(unsigned char note, bool enabled);
 
 private:
     Ui::Keyboard *ui;
@@ -82,7 +86,6 @@ private:
 
     unsigned char keyToNote(int key);
 
-    unsigned char characterToNote(char c);
     static unsigned char characterNoteMapping[];
 };
 

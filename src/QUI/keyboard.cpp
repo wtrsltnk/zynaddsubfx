@@ -31,7 +31,7 @@
 using namespace std;
 
 Keyboard::Key::Key(Octave* o, unsigned char n)
-    : QGraphicsPolygonItem(o), note(n)
+    : QGraphicsPolygonItem(o), parent(o), note(n), isEnabled(true)
 {
     this->setAcceptHoverEvents(true);
     QPolygon p;
@@ -75,7 +75,30 @@ Keyboard::Key::~Key()
 
 void Keyboard::Key::setOn(bool on)
 {
-    if (on)
+    if (this->isEnabled)
+    {
+        if (on)
+        {
+            if (this->isSharp)
+                this->setBrush(QBrush(QColor(0, 0, 155)));
+            else
+                this->setBrush(QBrush(QColor(200, 210, 255)));
+        }
+        else
+        {
+            if (this->isSharp)
+                this->setBrush(QBrush(Qt::black));
+            else
+                this->setBrush(QBrush(Qt::white));
+        }
+        this->update();
+    }
+}
+
+void Keyboard::Key::setEnabled(bool enabled)
+{
+    this->isEnabled = enabled;
+    if (this->isEnabled == false)
     {
         if (this->isSharp)
             this->setBrush(QBrush(Qt::gray));
@@ -95,21 +118,13 @@ void Keyboard::Key::setOn(bool on)
 void Keyboard::Key::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     Master::getInstance().noteOn(0, this->note, 100);
-    if (this->isSharp)
-        this->setBrush(QBrush(Qt::gray));
-    else
-        this->setBrush(QBrush(Qt::lightGray));
-    this->update();
+    this->setOn(true);
 }
 
 void Keyboard::Key::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     Master::getInstance().noteOff(0, this->note);
-    if (this->isSharp)
-        this->setBrush(QBrush(Qt::black));
-    else
-        this->setBrush(QBrush(Qt::white));
-    this->update();
+    this->setOn(false);
 }
 
 Keyboard::Octave::Octave(unsigned char o)
@@ -182,7 +197,10 @@ void Keyboard::selectCharacter(char c, bool on)
     unsigned char note = Keyboard::characterNoteMapping[c];
     if (note != 0)
     {
-        this->octaves[(note - (note % 12)) / 12]->keys[note % 12]->setOn(on);
+        int key = note % 12;
+        int octave = (note - key) / 12;
+        if (octave < 10 && key < 12)
+            this->octaves[(note - (note % 12)) / 12]->keys[note % 12]->setOn(on);
         if (this->selectedNotes[note] != on)
         {
             if (on)
@@ -195,9 +213,20 @@ void Keyboard::selectCharacter(char c, bool on)
     }
 }
 
-unsigned char Keyboard::characterToNote(char c)
+void Keyboard::setNoteOn(unsigned char note, bool on)
 {
-    return 0;
+    int key = note % 12;
+    int octave = (note - key) / 12;
+    if (octave < 10 && key < 12)
+        this->octaves[(note - (note % 12)) / 12]->keys[note % 12]->setOn(on);
+}
+
+void Keyboard::setNoteEnabled(unsigned char note, bool enabled)
+{
+    int key = note % 12;
+    int octave = (note - key) / 12;
+    if (octave < 10 && key < 12)
+        this->octaves[octave]->keys[key]->setEnabled(enabled);
 }
 
 unsigned char Keyboard::characterNoteMapping[128] = { 0 };

@@ -62,7 +62,16 @@ MainWindow::MainWindow(QWidget *parent) :
     this->vutimer.setInterval(1000/40);
     this->vutimer.start();
 
-    this->ui->instruments->addInstrument(0);
+    Part* part = Master::getInstance().part[0];
+    part->Pminkey = 24;
+    part->Pmaxkey = 108;
+
+    for (int k = 0; k < part->Pminkey; k++)
+        this->ui->keyboard->setNoteEnabled(k, false);
+    for (int k = part->Pmaxkey; k < 127; k++)
+        this->ui->keyboard->setNoteEnabled(k, false);
+
+    this->ui->instruments->addInstrument(part);
 }
 
 MainWindow::~MainWindow()

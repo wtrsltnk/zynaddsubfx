@@ -35,9 +35,9 @@ InstrumentContainer::~InstrumentContainer()
     delete ui;
 }
 
-InstrumentWindow* InstrumentContainer::addInstrument(int index)
+InstrumentWindow* InstrumentContainer::addInstrument(Part* p)
 {
-    InstrumentWindow* Instrument = new InstrumentWindow(index, this, ui->scrollArea);
+    InstrumentWindow* Instrument = new InstrumentWindow(p, this, ui->scrollArea);
     QLayoutItem* spacer = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-1);
     ui->scrollArea->widget()->layout()->removeItem(spacer);
     ui->scrollArea->widget()->layout()->addWidget(Instrument);

@@ -23,6 +23,7 @@
 #define INSTRUMENTCONTAINER_H
 
 #include <QWidget>
+#include "../Misc/Part.h"
 
 namespace Ui {
 class InstrumentContainer;
@@ -38,7 +39,7 @@ public:
     explicit InstrumentContainer(QWidget *parent = 0);
     ~InstrumentContainer();
 
-    InstrumentWindow* addInstrument(int index);
+    InstrumentWindow* addInstrument(Part* p);
 
 private:
     Ui::InstrumentContainer *ui;
