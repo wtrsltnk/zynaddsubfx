@@ -26,9 +26,11 @@
 #define GLOBALS_H
 #include <stdint.h>
 #include <stdio.h>
+#include <math.h>
 
+#ifdef WIN32
 #define snprintf _snprintf
-
+#endif
 
 /**
  * The number of harmonics of additive synth
