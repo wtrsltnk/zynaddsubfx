@@ -52,6 +52,7 @@ protected slots:
 private:
     Ui::MainWindow *ui;
     QTimer _vutimer;
+    int _selectedChannel;
 
     bool eventFilter(QObject* watched, QEvent* event);
     void keyPressEvent(QKeyEvent* event);

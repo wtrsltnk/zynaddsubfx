@@ -76,6 +76,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnSelectChannel(int channel)
 {
+    this->_selectedChannel = channel;
     this->SelectChannel(channel);
 }
 
@@ -88,6 +89,7 @@ void MainWindow::SelectChannel(int channel)
         if (part->Prcvchn == channel)
         {
             this->ui->instruments->addInstrument(part);
+            this->SelectPart(i);
         }
     }
 }
@@ -100,8 +102,6 @@ void MainWindow::SelectPart(int index)
         this->ui->keyboard->setNoteEnabled(k, false);
     for (int k = part->Pmaxkey; k < 128; k++)
         this->ui->keyboard->setNoteEnabled(k, false);
-
-    this->ui->instruments->addInstrument(part);
 }
 
 void MainWindow::OnMasterGainChanged(int value)

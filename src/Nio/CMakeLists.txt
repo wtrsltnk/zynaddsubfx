@@ -3,6 +3,10 @@
 #         - Null Output
 #         - Null Output Running by default
 #         - Managed with OutMgr
+
+add_definitions(-DOUT_DEFAULT="NULL")
+add_definitions(-DIN_DEFAULT="NULL")
+
 set(zynaddsubfx_nio_SRCS
     WavEngine.cpp
     NulEngine.cpp
@@ -18,9 +22,6 @@ set(zynaddsubfx_nio_SRCS
     )
 
 set(zynaddsubfx_nio_lib )
-
-add_definitions(-DOUT_DEFAULT="PA")
-add_definitions(-DIN_DEFAULT="${DefaultInput}")
 
 if(JackEnable)
     include_directories(${JACK_INCLUDE_DIR})
@@ -42,7 +43,6 @@ endif(AlsaEnable)
 if(OssEnable)
     list(APPEND zynaddsubfx_nio_SRCS OssEngine.cpp)
 endif(OssEnable)
-
 
 add_library(zynaddsubfx_nio STATIC
     ${zynaddsubfx_nio_SRCS} 
