@@ -39,16 +39,16 @@ public:
     class Key : public QGraphicsPolygonItem
     {
     public:
-        Key(Octave* parent, unsigned char n);
+        Key(Octave* _parent, unsigned char n);
         virtual ~Key();
 
         void setOn(bool on);
         void setEnabled(bool enabled);
 
-        Octave* parent;
-        unsigned char note;
-        bool isSharp;
-        bool isEnabled;
+        Octave* _parent;
+        unsigned char _note;
+        bool _isSharp;
+        bool _isEnabled;
 
     protected:
         virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -62,8 +62,8 @@ public:
         Octave(unsigned char o);
         virtual ~Octave();
 
-        Key* keys[12];
-        unsigned char octave;
+        Key* _keys[12];
+        unsigned char _octave;
     };
 
     static int KeyWidth, KeyHeight;
@@ -78,15 +78,14 @@ public:
 
 private:
     Ui::Keyboard *ui;
-    int keywidth, keyheight, octavecount;
-    bool selectedNotes[128];
-    bool sendnotes;
-    QGraphicsScene* scene;
-    Octave* octaves[10];
+    bool _selectedNotes[128];
+    bool _sendnotes;
+    QGraphicsScene* _scene;
+    Octave* _octaves[10];
 
     unsigned char keyToNote(int key);
 
-    static unsigned char characterNoteMapping[];
+    static unsigned char _characterNoteMapping[];
 };
 
 #endif // KEYBOARD_H

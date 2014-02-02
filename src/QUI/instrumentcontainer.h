@@ -39,6 +39,7 @@ public:
     explicit InstrumentContainer(QWidget *parent = 0);
     ~InstrumentContainer();
 
+    void resetInstruments();
     InstrumentWindow* addInstrument(Part* p);
 
 private:

@@ -40,15 +40,17 @@ public:
     void select();
     void unselect();
 
+    int channelIndex() { return this->_channelIndex; }
+
 protected slots:
     void onToggleCollapse();
 
 private:
     Ui::ChannelWindow *ui;
-    ChannelContainer* container;
-    bool collapsed;
-    bool selected;
-    int channelIndex;
+    ChannelContainer* _container;
+    bool _collapsed;
+    bool _selected;
+    int _channelIndex;
 };
 
 #endif // CHANNELWINDOW_H

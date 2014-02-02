@@ -223,7 +223,12 @@
         <height>0</height>
        </size>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3"/>
+      <property name="maximumSize">
+       <size>
+        <width>340</width>
+        <height>16777215</height>
+       </size>
+      </property>
      </widget>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -238,7 +243,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="ChannelContainer" name="widget" native="true"/>
+         <widget class="ChannelContainer" name="channels" native="true"/>
         </item>
        </layout>
       </widget>

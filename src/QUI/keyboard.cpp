@@ -31,7 +31,7 @@
 using namespace std;
 
 Keyboard::Key::Key(Octave* o, unsigned char n)
-    : QGraphicsPolygonItem(o), parent(o), note(n), isEnabled(true)
+    : QGraphicsPolygonItem(o), _parent(o), _note(n), _isEnabled(true)
 {
     this->setAcceptHoverEvents(true);
     QPolygon p;
@@ -50,7 +50,7 @@ Keyboard::Key::Key(Octave* o, unsigned char n)
           << QPoint(a * Keyboard::KeyWidth + 0, Keyboard::KeyHeight);
         this->setBrush(QBrush(Qt::white));
         this->setZValue(1);
-        this->isSharp = false;
+        this->_isSharp = false;
     }
     else
     {
@@ -65,7 +65,7 @@ Keyboard::Key::Key(Octave* o, unsigned char n)
           << QPoint(a * Keyboard::KeyWidth + ((Keyboard::KeyWidth/3) * 2), Keyboard::KeyHeight * 0.6);
         this->setBrush(QBrush(Qt::black));
         this->setZValue(2);
-        this->isSharp = true;
+        this->_isSharp = true;
     }
     this->setPolygon(p);
 }
@@ -75,18 +75,18 @@ Keyboard::Key::~Key()
 
 void Keyboard::Key::setOn(bool on)
 {
-    if (this->isEnabled)
+    if (this->_isEnabled)
     {
         if (on)
         {
-            if (this->isSharp)
+            if (this->_isSharp)
                 this->setBrush(QBrush(QColor(0, 0, 155)));
             else
                 this->setBrush(QBrush(QColor(200, 210, 255)));
         }
         else
         {
-            if (this->isSharp)
+            if (this->_isSharp)
                 this->setBrush(QBrush(Qt::black));
             else
                 this->setBrush(QBrush(Qt::white));
@@ -97,17 +97,17 @@ void Keyboard::Key::setOn(bool on)
 
 void Keyboard::Key::setEnabled(bool enabled)
 {
-    this->isEnabled = enabled;
-    if (this->isEnabled == false)
+    this->_isEnabled = enabled;
+    if (this->_isEnabled == false)
     {
-        if (this->isSharp)
+        if (this->_isSharp)
             this->setBrush(QBrush(Qt::gray));
         else
             this->setBrush(QBrush(Qt::lightGray));
     }
     else
     {
-        if (this->isSharp)
+        if (this->_isSharp)
             this->setBrush(QBrush(Qt::black));
         else
             this->setBrush(QBrush(Qt::white));
@@ -117,24 +117,24 @@ void Keyboard::Key::setEnabled(bool enabled)
 
 void Keyboard::Key::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    Master::getInstance().noteOn(0, this->note, 100);
+    Master::getInstance().noteOn(0, this->_note, 100);
     this->setOn(true);
 }
 
 void Keyboard::Key::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    Master::getInstance().noteOff(0, this->note);
+    Master::getInstance().noteOff(0, this->_note);
     this->setOn(false);
 }
 
 Keyboard::Octave::Octave(unsigned char o)
-    : QGraphicsItemGroup(), octave(o)
+    : QGraphicsItemGroup(), _octave(o)
 {
     this->setHandlesChildEvents(false);
     for (int i = 0; i < 12; i++)
     {
-        this->keys[i] = new Key(this, o * 12 + i);
-        this->addToGroup(this->keys[i]);
+        this->_keys[i] = new Key(this, o * 12 + i);
+        this->addToGroup(this->_keys[i]);
     }
 }
 
@@ -146,45 +146,44 @@ int Keyboard::KeyHeight = 100;
 
 Keyboard::Keyboard(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Keyboard),
-    keywidth(21), keyheight(90), octavecount(9), sendnotes(false)
+    ui(new Ui::Keyboard), _sendnotes(false)
 {
     ui->setupUi(this);
 
     this->ui->graphicsView->setMouseTracking(true);
     this->ui->graphicsView->viewport()->setMouseTracking(true);
 
-    this->scene = new QGraphicsScene();
+    this->_scene = new QGraphicsScene();
     for (int i = 0; i < 10; i++)
     {
-        this->octaves[i] = new Octave(i);
-        this->scene->addItem(this->octaves[i]);
-        this->octaves[i]->setPos(Keyboard::KeyWidth * 7 * i, 0);
+        this->_octaves[i] = new Octave(i);
+        this->_scene->addItem(this->_octaves[i]);
+        this->_octaves[i]->setPos(Keyboard::KeyWidth * 7 * i, 0);
     }
 
-    this->ui->graphicsView->setScene(this->scene);
+    this->ui->graphicsView->setScene(this->_scene);
 
     for (int i = 0; i < 128; i++)
-        this->selectedNotes[i] = false;
+        this->_selectedNotes[i] = false;
 
     int startoctave = 48;
-    Keyboard::characterNoteMapping['Z'] = startoctave+0;
-     Keyboard::characterNoteMapping['S'] = startoctave+1;
-    Keyboard::characterNoteMapping['X'] = startoctave+2;
-     Keyboard::characterNoteMapping['D'] = startoctave+3;
-    Keyboard::characterNoteMapping['C'] = startoctave+4;
-    Keyboard::characterNoteMapping['V'] = startoctave+5;
-     Keyboard::characterNoteMapping['G'] = startoctave+6;
-    Keyboard::characterNoteMapping['B'] = startoctave+7;
-     Keyboard::characterNoteMapping['H'] = startoctave+8;
-    Keyboard::characterNoteMapping['N'] = startoctave+9;
-     Keyboard::characterNoteMapping['J'] = startoctave+10;
-    Keyboard::characterNoteMapping['M'] = startoctave+11;
-    Keyboard::characterNoteMapping[','] = startoctave+12;
-     Keyboard::characterNoteMapping['L'] = startoctave+13;
-    Keyboard::characterNoteMapping['.'] = startoctave+14;
-     Keyboard::characterNoteMapping[';'] = startoctave+15;
-    Keyboard::characterNoteMapping['/'] = startoctave+16;
+    Keyboard::_characterNoteMapping['Z'] = startoctave+0;
+     Keyboard::_characterNoteMapping['S'] = startoctave+1;
+    Keyboard::_characterNoteMapping['X'] = startoctave+2;
+     Keyboard::_characterNoteMapping['D'] = startoctave+3;
+    Keyboard::_characterNoteMapping['C'] = startoctave+4;
+    Keyboard::_characterNoteMapping['V'] = startoctave+5;
+     Keyboard::_characterNoteMapping['G'] = startoctave+6;
+    Keyboard::_characterNoteMapping['B'] = startoctave+7;
+     Keyboard::_characterNoteMapping['H'] = startoctave+8;
+    Keyboard::_characterNoteMapping['N'] = startoctave+9;
+     Keyboard::_characterNoteMapping['J'] = startoctave+10;
+    Keyboard::_characterNoteMapping['M'] = startoctave+11;
+    Keyboard::_characterNoteMapping[','] = startoctave+12;
+     Keyboard::_characterNoteMapping['L'] = startoctave+13;
+    Keyboard::_characterNoteMapping['.'] = startoctave+14;
+     Keyboard::_characterNoteMapping[';'] = startoctave+15;
+    Keyboard::_characterNoteMapping['/'] = startoctave+16;
 }
 
 Keyboard::~Keyboard()
@@ -194,21 +193,21 @@ Keyboard::~Keyboard()
 
 void Keyboard::selectCharacter(char c, bool on)
 {
-    unsigned char note = Keyboard::characterNoteMapping[c];
+    unsigned char note = Keyboard::_characterNoteMapping[c];
     if (note != 0)
     {
         int key = note % 12;
         int octave = (note - key) / 12;
         if (octave < 10 && key < 12)
-            this->octaves[(note - (note % 12)) / 12]->keys[note % 12]->setOn(on);
-        if (this->selectedNotes[note] != on)
+            this->_octaves[(note - (note % 12)) / 12]->_keys[note % 12]->setOn(on);
+        if (this->_selectedNotes[note] != on)
         {
             if (on)
                 Master::getInstance().noteOn(0, note, 100);
             else
                 Master::getInstance().noteOff(0, note);
 
-            this->selectedNotes[note] = on;
+            this->_selectedNotes[note] = on;
         }
     }
 }
@@ -218,7 +217,7 @@ void Keyboard::setNoteOn(unsigned char note, bool on)
     int key = note % 12;
     int octave = (note - key) / 12;
     if (octave < 10 && key < 12)
-        this->octaves[(note - (note % 12)) / 12]->keys[note % 12]->setOn(on);
+        this->_octaves[(note - (note % 12)) / 12]->_keys[note % 12]->setOn(on);
 }
 
 void Keyboard::setNoteEnabled(unsigned char note, bool enabled)
@@ -226,7 +225,7 @@ void Keyboard::setNoteEnabled(unsigned char note, bool enabled)
     int key = note % 12;
     int octave = (note - key) / 12;
     if (octave < 10 && key < 12)
-        this->octaves[octave]->keys[key]->setEnabled(enabled);
+        this->_octaves[octave]->_keys[key]->setEnabled(enabled);
 }
 
-unsigned char Keyboard::characterNoteMapping[128] = { 0 };
+unsigned char Keyboard::_characterNoteMapping[128] = { 0 };

@@ -37,7 +37,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void updateUi();
+    void SelectChannel(int channel);
+    void SelectPart(int part);
 
 protected slots:
     void OnMasterGainChanged(int value);
@@ -46,10 +47,11 @@ protected slots:
     void OnSelectMidiDevice();
     void OnShowOptionalAudioDevice();
     void OnSelectAudioDevice();
+    void OnSelectChannel(int channel);
 
 private:
     Ui::MainWindow *ui;
-    QTimer vutimer;
+    QTimer _vutimer;
 
     bool eventFilter(QObject* watched, QEvent* event);
     void keyPressEvent(QKeyEvent* event);

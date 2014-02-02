@@ -44,10 +44,13 @@ public:
     ChannelWindow* addChannel(int index);
     void selectMe(ChannelWindow* part);
 
+signals:
+    void selectChannel(int channel);
+
 private:
     Ui::ChannelContainer *ui;
 
-    ChannelWindow* selectedChannel;
+    ChannelWindow* _selectedChannel;
     int _vscrollOffset;
     int _vscale;
 };

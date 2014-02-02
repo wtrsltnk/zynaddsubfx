@@ -35,7 +35,7 @@ class InstrumentWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit InstrumentWindow(Part* part, InstrumentContainer* c, QWidget *parent = 0);
+    explicit InstrumentWindow(Part* _part, InstrumentContainer* c, QWidget *parent = 0);
     ~InstrumentWindow();
 
 protected slots:
@@ -46,8 +46,8 @@ protected slots:
 
 private:
     Ui::InstrumentWindow *ui;
-    InstrumentContainer* container;
-    Part* part;
+    InstrumentContainer* _container;
+    Part* _part;
 };
 
 #endif // INSTRUMENTWINDOW_H

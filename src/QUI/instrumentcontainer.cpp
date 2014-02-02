@@ -35,13 +35,21 @@ InstrumentContainer::~InstrumentContainer()
     delete ui;
 }
 
+void InstrumentContainer::resetInstruments()
+{
+    while (ui->scrollArea->widget()->layout()->count() > 2)
+    {
+        QLayoutItem* part = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-2);
+        ui->scrollArea->widget()->layout()->removeItem(part);
+        delete part->widget();
+        delete part;
+    }
+}
+
 InstrumentWindow* InstrumentContainer::addInstrument(Part* p)
 {
     InstrumentWindow* Instrument = new InstrumentWindow(p, this, ui->scrollArea);
-    QLayoutItem* spacer = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-1);
-    ui->scrollArea->widget()->layout()->removeItem(spacer);
-    ui->scrollArea->widget()->layout()->addWidget(Instrument);
-    ui->scrollArea->widget()->layout()->addItem(spacer);
+    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-1, Instrument);
 
     return Instrument;
 }

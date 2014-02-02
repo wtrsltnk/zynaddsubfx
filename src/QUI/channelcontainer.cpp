@@ -28,7 +28,7 @@
 ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelContainer),
-    selectedChannel(0)
+    _selectedChannel(0)
 {
     ui->setupUi(this);
 
@@ -53,19 +53,17 @@ ChannelContainer::~ChannelContainer()
 ChannelWindow* ChannelContainer::addChannel(int index)
 {
     ChannelWindow* channel = new ChannelWindow(index, this, ui->scrollArea);
-    QLayoutItem* spacer = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-1);
-    ui->scrollArea->widget()->layout()->removeItem(spacer);
-    ui->scrollArea->widget()->layout()->addWidget(channel);
-    ui->scrollArea->widget()->layout()->addItem(spacer);
+    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-1, channel);
 
     return channel;
 }
 
-void ChannelContainer::selectMe(ChannelWindow* part)
+void ChannelContainer::selectMe(ChannelWindow* channel)
 {
-    if (this->selectedChannel != 0 && this->selectedChannel != part)
-        this->selectedChannel->unselect();
+    if (this->_selectedChannel != 0 && this->_selectedChannel != channel)
+        this->_selectedChannel->unselect();
 
-    this->selectedChannel = part;
-    this->selectedChannel->select();
+    this->_selectedChannel = channel;
+    this->_selectedChannel->select();
+    this->selectChannel(channel->channelIndex());
 }

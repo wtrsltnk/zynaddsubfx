@@ -25,17 +25,16 @@
 ChannelWindow::ChannelWindow(int index, ChannelContainer* c, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelWindow),
-    container(c),
-    collapsed(true),
-    channelIndex(index)
+    _container(c),
+    _collapsed(true),
+    _channelIndex(index)
 {
     ui->setupUi(this);
 
     QString str = "CHNL ";
-    str += str.number(this->channelIndex);
+    str += str.number(this->_channelIndex);
     ui->lblChannel->setText(str);
     connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
-    this->onToggleCollapse();
 }
 
 ChannelWindow::~ChannelWindow()
@@ -45,10 +44,10 @@ ChannelWindow::~ChannelWindow()
 
 void ChannelWindow::onToggleCollapse()
 {
-    this->container->selectMe(this);
-    this->collapsed = !this->collapsed;
+    this->_container->selectMe(this);
+    this->_collapsed = !this->_collapsed;
 
-    if (this->collapsed)
+    if (this->_collapsed)
     {
         this->setMinimumHeight(60);
         this->setMaximumHeight(60);
@@ -64,12 +63,12 @@ void ChannelWindow::onToggleCollapse()
 
 void ChannelWindow::select()
 {
-    this->selected = true;
+    this->_selected = true;
     this->setStyleSheet("background-color:#666;");
 }
 
 void ChannelWindow::unselect()
 {
-    this->selected = false;
+    this->_selected = false;
     this->setStyleSheet("background-color:#444;");
 }

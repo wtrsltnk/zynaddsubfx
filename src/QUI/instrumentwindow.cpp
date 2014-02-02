@@ -26,16 +26,16 @@
 InstrumentWindow::InstrumentWindow(Part* p, InstrumentContainer* c, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::InstrumentWindow),
-    container(c),
-    part(p)
+    _container(c),
+    _part(p)
 {
     ui->setupUi(this);
     this->ui->content->hide();
 
-    this->ui->chkActive->setChecked(part->Penabled);
-    this->ui->lblName->setText(QString((const char*)part->Pname));
-    this->ui->dialVolume->setValue(part->Pvolume);
-    this->ui->dialPan->setValue(part->Ppanning);
+    this->ui->chkActive->setChecked(_part->Penabled);
+    this->ui->lblName->setText(QString((const char*)_part->Pname));
+    this->ui->dialVolume->setValue(_part->Pvolume);
+    this->ui->dialPan->setValue(_part->Ppanning);
 
     this->setStyleSheet("background-color:#666;");
     connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
@@ -66,15 +66,15 @@ void InstrumentWindow::onToggleCollapse()
 
 void InstrumentWindow::onChangeVolume(int value)
 {
-    this->part->setPvolume(value);
+    this->_part->setPvolume(value);
 }
 
 void InstrumentWindow::onChangePan(int value)
 {
-    this->part->setPpanning(value);
+    this->_part->setPpanning(value);
 }
 
 void InstrumentWindow::onChangeEnabled(int value)
 {
-    this->part->Penabled = value;
+    this->_part->Penabled = value;
 }

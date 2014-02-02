@@ -57,21 +57,16 @@ MainWindow::MainWindow(QWidget *parent) :
     this->ui->vu->installEventFilter(this);
 
     connect(this->ui->masterGain, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
-    connect(&this->vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
+    connect(&this->_vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
 
-    this->vutimer.setInterval(1000/40);
-    this->vutimer.start();
+    this->_vutimer.setInterval(1000/40);
+    this->_vutimer.start();
 
     Part* part = Master::getInstance().part[0];
     part->Pminkey = 24;
     part->Pmaxkey = 108;
 
-    for (int k = 0; k < part->Pminkey; k++)
-        this->ui->keyboard->setNoteEnabled(k, false);
-    for (int k = part->Pmaxkey; k < 127; k++)
-        this->ui->keyboard->setNoteEnabled(k, false);
-
-    this->ui->instruments->addInstrument(part);
+    connect(this->ui->channels, SIGNAL(selectChannel(int)), this, SLOT(OnSelectChannel(int)));
 }
 
 MainWindow::~MainWindow()
@@ -79,9 +74,34 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::updateUi()
+void MainWindow::OnSelectChannel(int channel)
 {
+    this->SelectChannel(channel);
+}
 
+void MainWindow::SelectChannel(int channel)
+{
+    this->ui->instruments->resetInstruments();
+    for (int i = 0;i < NUM_MIDI_PARTS; i++)
+    {
+        Part* part = Master::getInstance().part[i];
+        if (part->Prcvchn == channel)
+        {
+            this->ui->instruments->addInstrument(part);
+        }
+    }
+}
+
+void MainWindow::SelectPart(int index)
+{
+    Part* part = Master::getInstance().part[index];
+
+    for (int k = 0; k < part->Pminkey; k++)
+        this->ui->keyboard->setNoteEnabled(k, false);
+    for (int k = part->Pmaxkey; k < 128; k++)
+        this->ui->keyboard->setNoteEnabled(k, false);
+
+    this->ui->instruments->addInstrument(part);
 }
 
 void MainWindow::OnMasterGainChanged(int value)
