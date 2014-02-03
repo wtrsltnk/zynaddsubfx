@@ -2,9 +2,8 @@
   ZynAddSubFX - a software synthesizer
 
   keyboard.cpp - Keyboard widget for running notes to the synth
-  Copyright (c) 2002-2009 Nasca Octavian Paul
   Copyright (C) 2014 Wouter Saaltink
-  Author: Wouter Saaltink, Nasca Octavian Paul
+  Author: Wouter Saaltink
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of version 2 of the GNU General Public License

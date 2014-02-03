@@ -21,6 +21,7 @@
 */
 #include "instrumentwindow.h"
 #include "ui_instrumentwindow.h"
+#include "kitwindow.h"
 #include "../Misc/Master.h"
 
 InstrumentWindow::InstrumentWindow(Part* p, InstrumentContainer* c, QWidget *parent) :
@@ -36,6 +37,15 @@ InstrumentWindow::InstrumentWindow(Part* p, InstrumentContainer* c, QWidget *par
     this->ui->lblName->setText(QString((const char*)_part->Pname));
     this->ui->dialVolume->setValue(_part->Pvolume);
     this->ui->dialPan->setValue(_part->Ppanning);
+
+    for (int i = 0; i < NUM_KIT_ITEMS; i++)
+    {
+        if (_part->kit[i].Padenabled)
+        {
+            KitWindow* kit = new KitWindow(_part, i, this);
+            this->ui->content->layout()->addWidget(kit);
+        }
+    }
 
     this->setStyleSheet("background-color:#666;");
     connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
