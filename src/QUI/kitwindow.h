@@ -37,8 +37,15 @@ public:
     explicit KitWindow(Part* part, int kitindex, QWidget *parent = 0);
     ~KitWindow();
 
+    static QColor KitColors[NUM_KIT_ITEMS];
+
+    QIcon getIcon();
+    void updateUI();
+
+signals:
+    void keyRangeChanged();
+
 protected slots:
-    void OnEnabledChanged(int state);
     void OnAdEnabledChanged(int state);
     void OnSubEnabledChanged(int state);
     void OnPadEnabledChanged(int state);

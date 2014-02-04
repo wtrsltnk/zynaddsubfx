@@ -22,24 +22,28 @@
 #include "kitwindow.h"
 #include "ui_kitwindow.h"
 
+QColor KitWindow::KitColors[NUM_KIT_ITEMS] = {
+    Qt::red,
+    Qt::blue,
+    Qt::green,
+    Qt::yellow,
+    Qt::darkYellow,
+    Qt::darkBlue,
+    Qt::darkCyan,
+    Qt::darkGreen,
+    Qt::darkMagenta,
+    Qt::darkRed
+};
+
 KitWindow::KitWindow(Part* part, int kitindex, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::KitWindow),
-    _part(part),
-    _kitindex(kitindex)
+    _part(part), _kitindex(kitindex)
 {
     ui->setupUi(this);
 
-    this->ui->chkEnabledName->setChecked(this->_part->kit[this->_kitindex].Penabled);
-    this->ui->chkEnabledName->setText(QString((char*)this->_part->kit[this->_kitindex].Pname));
-    this->ui->chkAd->setChecked(this->_part->kit[this->_kitindex].Padenabled);
-    this->ui->chkSub->setChecked(this->_part->kit[this->_kitindex].Psubenabled);
-    this->ui->chkPad->setChecked(this->_part->kit[this->_kitindex].Ppadenabled);
-    this->ui->chkMute->setChecked(this->_part->kit[this->_kitindex].Pmuted);
-    this->ui->minKeyrange->setValue(this->_part->kit[this->_kitindex].Pminkey);
-    this->ui->maxKeyrange->setValue(this->_part->kit[this->_kitindex].Pmaxkey);
+    this->updateUI();
 
-    connect(this->ui->chkEnabledName, SIGNAL(stateChanged(int)), this, SLOT(OnEnabledChanged(int)));
     connect(this->ui->chkAd, SIGNAL(stateChanged(int)), this, SLOT(OnAdEnabledChanged(int)));
     connect(this->ui->chkSub, SIGNAL(stateChanged(int)), this, SLOT(OnSubEnabledChanged(int)));
     connect(this->ui->chkPad, SIGNAL(stateChanged(int)), this, SLOT(OnPadEnabledChanged(int)));
@@ -53,9 +57,21 @@ KitWindow::~KitWindow()
     delete ui;
 }
 
-void KitWindow::OnEnabledChanged(int state)
+QIcon KitWindow::getIcon()
 {
-    this->_part->kit[this->_kitindex].Penabled = state;
+    QPixmap pixmap(100, 100);
+    pixmap.fill(KitWindow::KitColors[this->_kitindex]);
+    return QIcon(pixmap);
+}
+
+void KitWindow::updateUI()
+{
+    this->ui->chkAd->setChecked(this->_part->kit[this->_kitindex].Padenabled);
+    this->ui->chkSub->setChecked(this->_part->kit[this->_kitindex].Psubenabled);
+    this->ui->chkPad->setChecked(this->_part->kit[this->_kitindex].Ppadenabled);
+    this->ui->chkMute->setChecked(this->_part->kit[this->_kitindex].Pmuted);
+    this->ui->minKeyrange->setValue(this->_part->kit[this->_kitindex].Pminkey);
+    this->ui->maxKeyrange->setValue(this->_part->kit[this->_kitindex].Pmaxkey);
 }
 
 void KitWindow::OnAdEnabledChanged(int state)
@@ -81,9 +97,21 @@ void KitWindow::OnMuteChanged(int state)
 void KitWindow::OnMinKeyrangeChanged(int value)
 {
     this->_part->kit[this->_kitindex].Pminkey = value;
+    if (this->_part->Pkitmode == 2)
+    {
+        if (this->_kitindex > 0)
+            this->_part->kit[this->_kitindex - 1].Pmaxkey = value;
+    }
+    this->keyRangeChanged();
 }
 
 void KitWindow::OnMaxKeyrangeChanged(int value)
 {
     this->_part->kit[this->_kitindex].Pmaxkey = value;
+    if (this->_part->Pkitmode == 2)
+    {
+        if (this->_kitindex < NUM_KIT_ITEMS - 1)
+            this->_part->kit[this->_kitindex + 1].Pminkey = value;
+    }
+    this->keyRangeChanged();
 }

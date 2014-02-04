@@ -24,6 +24,8 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QTextDocument>
+#include <QTextOption>
 #include <iostream>
 #include "../Misc/Master.h"
 
@@ -50,6 +52,10 @@ Keyboard::Key::Key(Octave* o, unsigned char n)
         this->setBrush(QBrush(Qt::white));
         this->setZValue(1);
         this->_isSharp = false;
+        QString txt = QString("%1%2").arg(QString('A' + a), QString::number(o->_octave));
+        QGraphicsTextItem* t = new QGraphicsTextItem(txt);
+        t->setPos(a * Keyboard::KeyWidth, Keyboard::KeyHeight);
+        o->addToGroup(t);
     }
     else
     {
@@ -132,8 +138,13 @@ Keyboard::Octave::Octave(unsigned char o)
     this->setHandlesChildEvents(false);
     for (int i = 0; i < 12; i++)
     {
-        this->_keys[i] = new Key(this, o * 12 + i);
-        this->addToGroup(this->_keys[i]);
+        if (o * 12 + i < 128)
+        {
+            this->_keys[i] = new Key(this, o * 12 + i);
+            this->addToGroup(this->_keys[i]);
+        }
+        else
+            this->_keys[i] = 0;
     }
 }
 
@@ -141,7 +152,7 @@ Keyboard::Octave::~Octave()
 { }
 
 int Keyboard::KeyWidth = 24;
-int Keyboard::KeyHeight = 100;
+int Keyboard::KeyHeight = 92;
 
 Keyboard::Keyboard(QWidget *parent) :
     QWidget(parent),
@@ -153,7 +164,7 @@ Keyboard::Keyboard(QWidget *parent) :
     this->ui->graphicsView->viewport()->setMouseTracking(true);
 
     this->_scene = new QGraphicsScene();
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAX_OCTAVES; i++)
     {
         this->_octaves[i] = new Octave(i);
         this->_scene->addItem(this->_octaves[i]);
@@ -193,11 +204,11 @@ Keyboard::~Keyboard()
 void Keyboard::selectCharacter(char c, bool on)
 {
     unsigned char note = Keyboard::_characterNoteMapping[c];
-    if (note != 0)
+    if (note >= 0 && note < 128)
     {
         int key = note % 12;
         int octave = (note - key) / 12;
-        if (octave < 10 && key < 12)
+        if (octave < MAX_OCTAVES && key < 12)
             this->_octaves[(note - (note % 12)) / 12]->_keys[note % 12]->setOn(on);
         if (this->_selectedNotes[note] != on)
         {
@@ -213,18 +224,35 @@ void Keyboard::selectCharacter(char c, bool on)
 
 void Keyboard::setNoteOn(unsigned char note, bool on)
 {
-    int key = note % 12;
-    int octave = (note - key) / 12;
-    if (octave < 10 && key < 12)
-        this->_octaves[(note - (note % 12)) / 12]->_keys[note % 12]->setOn(on);
+    if (note >= 0 && note < 128)
+    {
+        int key = note % 12;
+        int octave = (note - key) / 12;
+        if (octave < MAX_OCTAVES && key < 12)
+            this->_octaves[(note - (note % 12)) / 12]->_keys[note % 12]->setOn(on);
+    }
 }
 
 void Keyboard::setNoteEnabled(unsigned char note, bool enabled)
 {
-    int key = note % 12;
-    int octave = (note - key) / 12;
-    if (octave < 10 && key < 12)
-        this->_octaves[octave]->_keys[key]->setEnabled(enabled);
+    if (note >= 0 && note < 128)
+    {
+        int key = note % 12;
+        int octave = (note - key) / 12;
+        if (octave < MAX_OCTAVES && key < 12)
+            this->_octaves[octave]->_keys[key]->setEnabled(enabled);
+    }
+}
+
+void Keyboard::setNoteColor(unsigned char note, const QColor& color)
+{
+    if (note >= 0 && note < 128)
+    {
+        int key = note % 12;
+        int octave = (note - key) / 12;
+        if (octave < MAX_OCTAVES && key < 12)
+            this->_octaves[octave]->_keys[key]->setPen(QPen(color));
+    }
 }
 
 unsigned char Keyboard::_characterNoteMapping[128] = { 0 };

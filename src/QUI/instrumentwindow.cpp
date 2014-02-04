@@ -21,38 +21,35 @@
 */
 #include "instrumentwindow.h"
 #include "ui_instrumentwindow.h"
-#include "kitwindow.h"
 #include "../Misc/Master.h"
 
-InstrumentWindow::InstrumentWindow(Part* p, InstrumentContainer* c, QWidget *parent) :
+InstrumentWindow::InstrumentWindow(int partindex, InstrumentContainer* c, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::InstrumentWindow),
     _container(c),
-    _part(p)
+    _part(Master::getInstance().part[partindex]), _partIndex(partindex)
 {
-    ui->setupUi(this);
-    this->ui->content->hide();
-
-    this->ui->chkActive->setChecked(_part->Penabled);
-    this->ui->lblName->setText(QString((const char*)_part->Pname));
-    this->ui->dialVolume->setValue(_part->Pvolume);
-    this->ui->dialPan->setValue(_part->Ppanning);
-
     for (int i = 0; i < NUM_KIT_ITEMS; i++)
-    {
-        if (_part->kit[i].Padenabled)
-        {
-            KitWindow* kit = new KitWindow(_part, i, this);
-            this->ui->content->layout()->addWidget(kit);
-        }
-    }
+        this->_kitWindows[i] = 0;
+
+    ui->setupUi(this);
+
+    this->ui->content->hide();
+    this->ui->kits->removeItem(0);
+    this->updateUI();
 
     this->setStyleSheet("background-color:#666;");
-    connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
+    this->ui->chkActive->setChecked(_part->Penabled);
+    this->ui->lblName->setText(QString((const char*)_part->Pname));
+    this->ui->cmbKitmode->addItem("No kit");
+    this->ui->cmbKitmode->addItem("Multi instrument per note");
+    this->ui->cmbKitmode->addItem("Single instrument per note");
 
-    connect(this->ui->dialVolume, SIGNAL(valueChanged(int)), this, SLOT(onChangeVolume(int)));
-    connect(this->ui->dialPan, SIGNAL(valueChanged(int)), this, SLOT(onChangePan(int)));
+    connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
     connect(this->ui->chkActive, SIGNAL(stateChanged(int)), this, SLOT(onChangeEnabled(int)));
+    connect(this->ui->btnAddItem, SIGNAL(clicked()), this, SLOT(onAddKititem()));
+    connect(this->ui->btnRemoveItem, SIGNAL(clicked()), this, SLOT(onRemoveKititem()));
+    connect(this->ui->cmbKitmode, SIGNAL(currentIndexChanged(int)), this, SLOT(onKitModeChanged(int)));
 }
 
 InstrumentWindow::~InstrumentWindow()
@@ -60,8 +57,40 @@ InstrumentWindow::~InstrumentWindow()
     delete ui;
 }
 
+void InstrumentWindow::updateUI()
+{
+    for (int i = 0; i < NUM_KIT_ITEMS; i++)
+    {
+        if (this->_part->kit[i].Penabled)
+        {
+            if (this->_kitWindows[i] == 0)
+            {
+                this->_kitWindows[i] = new KitWindow(this->_part, i);
+                this->ui->kits->addItem(this->_kitWindows[i], this->_kitWindows[i]->getIcon(), "Item:");
+                connect(this->_kitWindows[i], SIGNAL(keyRangeChanged()), this, SLOT(onKeyRangeChanged()));
+            }
+            this->ui->kits->setItemText(i,
+                        QString("Item: %1 [%2-%3]").arg(
+                            QString((char*)this->_part->kit[i].Pname),
+                            QString::number(this->_part->kit[i].Pminkey),
+                            QString::number(this->_part->kit[i].Pmaxkey)));
+        }
+        else
+        {
+            if (this->_kitWindows[i] != 0)
+            {
+                int remove = this->ui->kits->indexOf(this->_kitWindows[i]);
+                this->ui->kits->removeItem(remove);
+                delete this->_kitWindows[i];
+                this->_kitWindows[i] = 0;
+            }
+        }
+    }
+}
+
 void InstrumentWindow::onToggleCollapse()
 {
+    this->_container->selectMe(this);
     if (this->ui->content->isVisible())
     {
         this->ui->content->hide();
@@ -74,17 +103,97 @@ void InstrumentWindow::onToggleCollapse()
     }
 }
 
-void InstrumentWindow::onChangeVolume(int value)
-{
-    this->_part->setPvolume(value);
-}
-
-void InstrumentWindow::onChangePan(int value)
-{
-    this->_part->setPpanning(value);
-}
-
 void InstrumentWindow::onChangeEnabled(int value)
 {
     this->_part->Penabled = value;
+}
+
+void InstrumentWindow::onAddKititem()
+{
+    for (int i = 0; i < NUM_KIT_ITEMS; i++)
+    {
+        if (this->_part->kit[i].Penabled == false)
+        {
+            this->_part->setkititemstatus(i, true);
+
+            if (this->_part->Pkitmode == 2 && i > 0)
+            {
+                int len = (this->_part->kit[i-1].Pmaxkey - this->_part->kit[i-1].Pminkey);
+                int half = len / 2;
+                this->_part->kit[i-1].Pmaxkey = this->_part->kit[i-1].Pminkey + half;
+                this->_part->kit[i].Pminkey = this->_part->kit[i-1].Pminkey + half;
+                this->_part->kit[i].Pmaxkey = this->_part->kit[i-1].Pminkey + len;
+                if (this->_kitWindows[i-1] != 0)
+                    this->_kitWindows[i-1]->updateUI();
+            }
+            break;
+        }
+    }
+    this->_container->selectMe(this);
+    this->updateUI();
+}
+
+void InstrumentWindow::onRemoveKititem()
+{
+    for (int i = NUM_KIT_ITEMS - 1; i > 0; i--)
+    {
+        if (this->_part->kit[i].Penabled)
+        {
+            this->_part->setkititemstatus(i, 0);
+
+            if (this->_part->Pkitmode == 2)
+            {
+                this->_part->kit[i-1].Pmaxkey = this->_part->kit[i].Pmaxkey;
+                if (this->_kitWindows[i-1] != 0)
+                    this->_kitWindows[i-1]->updateUI();
+            }
+            break;
+        }
+    }
+    this->_container->selectMe(this);
+    this->updateUI();
+}
+
+void InstrumentWindow::onKeyRangeChanged()
+{
+    for (int i = 0; i < NUM_KIT_ITEMS; i++)
+    {
+        if (this->_part->kit[i].Penabled == false)
+        {
+            if (this->_kitWindows[i] != 0)
+            {
+                this->_kitWindows[i]->updateUI();
+            }
+        }
+    }
+    this->_container->selectMe(this);
+    this->updateUI();
+}
+
+void InstrumentWindow::onKitModeChanged(int value)
+{
+    this->_part->Pkitmode = value;
+    if (value == 0)
+    {
+        this->ui->btnAddItem->setEnabled(false);
+        this->ui->btnRemoveItem->setEnabled(false);
+    }
+    else
+    {
+        this->ui->btnAddItem->setEnabled(true);
+        this->ui->btnRemoveItem->setEnabled(true);
+    }
+}
+
+void InstrumentWindow::select()
+{
+}
+
+void InstrumentWindow::unselect()
+{
+}
+
+int InstrumentWindow::partIndex()
+{
+    return this->_partIndex;
 }

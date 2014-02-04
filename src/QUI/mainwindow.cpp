@@ -36,6 +36,7 @@
 #include "channelwindow.h"
 #include "instrumentwindow.h"
 #include "keyboard.h"
+#include "kitwindow.h"
 
 using namespace std;
 
@@ -62,11 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->_vutimer.setInterval(1000/40);
     this->_vutimer.start();
 
-    Part* part = Master::getInstance().part[0];
-    part->Pminkey = 24;
-    part->Pmaxkey = 108;
-
     connect(this->ui->channels, SIGNAL(selectChannel(int)), this, SLOT(OnSelectChannel(int)));
+    connect(this->ui->instruments, SIGNAL(selectInstrument(int)), this, SLOT(OnSelectPart(int)));
 }
 
 MainWindow::~MainWindow()
@@ -88,20 +86,38 @@ void MainWindow::SelectChannel(int channel)
         Part* part = Master::getInstance().part[i];
         if (part->Prcvchn == channel)
         {
-            this->ui->instruments->addInstrument(part);
+            this->ui->instruments->addInstrument(i);
             this->SelectPart(i);
         }
     }
+}
+
+void MainWindow::OnSelectPart(int part)
+{
+    this->SelectPart(part);
 }
 
 void MainWindow::SelectPart(int index)
 {
     Part* part = Master::getInstance().part[index];
 
-    for (int k = 0; k < part->Pminkey; k++)
+    for (int k = 0; k < 128; k++)
         this->ui->keyboard->setNoteEnabled(k, false);
-    for (int k = part->Pmaxkey; k < 128; k++)
-        this->ui->keyboard->setNoteEnabled(k, false);
+
+    for (int i = (NUM_KIT_ITEMS-1); i >= 0; i--)
+    {
+        if (part->kit[i].Penabled)
+        {
+            for (int k = 0; k < 128; k++)
+            {
+                if (k >= part->kit[i].Pminkey && k <= part->kit[i].Pmaxkey)
+                {
+                    this->ui->keyboard->setNoteEnabled(k, true);
+                    this->ui->keyboard->setNoteColor(k, KitWindow::KitColors[i]);
+                }
+            }
+        }
+    }
 }
 
 void MainWindow::OnMasterGainChanged(int value)

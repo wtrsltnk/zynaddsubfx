@@ -132,7 +132,7 @@ void Part::defaultsinstrument()
         kit[n].Padenabled  = 0;
         kit[n].Psubenabled = 0;
         kit[n].Ppadenabled = 0;
-        ZERO(kit[n].Pname, PART_MAX_NAME_LEN);
+        strcpy((char*)kit[n].Pname, PART_DEFAULT_NAME);
         kit[n].Psendtoparteffect = 0;
         if(n != 0)
             setkititemstatus(n, 0);
@@ -1070,7 +1070,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
         kit[kititem].adpars   = NULL;
         kit[kititem].subpars  = NULL;
         kit[kititem].padpars  = NULL;
-        kit[kititem].Pname[0] = '\0';
+        strcpy((char*)kit[kititem].Pname, PART_DEFAULT_NAME);
     }
     else {
         if(kit[kititem].adpars == NULL)

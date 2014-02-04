@@ -30,6 +30,8 @@ namespace Ui {
 class Keyboard;
 }
 
+#define MAX_OCTAVES 12
+
 class Keyboard : public QWidget
 {
     Q_OBJECT
@@ -75,13 +77,14 @@ public:
     void selectCharacter(char c, bool on);
     void setNoteOn(unsigned char note, bool on);
     void setNoteEnabled(unsigned char note, bool enabled);
+    void setNoteColor(unsigned char note, const QColor& color);
 
 private:
     Ui::Keyboard *ui;
     bool _selectedNotes[128];
     bool _sendnotes;
     QGraphicsScene* _scene;
-    Octave* _octaves[10];
+    Octave* _octaves[MAX_OCTAVES];
 
     unsigned char keyToNote(int key);
 

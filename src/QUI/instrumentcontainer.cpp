@@ -46,10 +46,20 @@ void InstrumentContainer::resetInstruments()
     }
 }
 
-InstrumentWindow* InstrumentContainer::addInstrument(Part* p)
+InstrumentWindow* InstrumentContainer::addInstrument(int partindex)
 {
-    InstrumentWindow* Instrument = new InstrumentWindow(p, this, ui->scrollArea);
-    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-1, Instrument);
+    InstrumentWindow* Instrument = new InstrumentWindow(partindex, this, ui->scrollArea);
+    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-2, Instrument);
 
     return Instrument;
+}
+
+void InstrumentContainer::selectMe(InstrumentWindow* instrument)
+{
+    if (this->_selectedInstrument != 0 && this->_selectedInstrument != instrument)
+        this->_selectedInstrument->unselect();
+
+    this->_selectedInstrument = instrument;
+    this->_selectedInstrument->select();
+    this->selectInstrument(instrument->partIndex());
 }

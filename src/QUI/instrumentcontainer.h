@@ -40,10 +40,16 @@ public:
     ~InstrumentContainer();
 
     void resetInstruments();
-    InstrumentWindow* addInstrument(Part* p);
+    InstrumentWindow* addInstrument(int partindex);
+
+    void selectMe(InstrumentWindow* instrument);
+
+signals:
+    void selectInstrument(int instrument);
 
 private:
     Ui::InstrumentContainer *ui;
+    InstrumentWindow* _selectedInstrument;
 };
 
 #endif // INSTRUMENTCONTAINER_H
