@@ -48,10 +48,11 @@ void InstrumentContainer::resetInstruments()
 
 InstrumentWindow* InstrumentContainer::addInstrument(int partindex)
 {
-    InstrumentWindow* Instrument = new InstrumentWindow(partindex, this, ui->scrollArea);
-    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-2, Instrument);
+    InstrumentWindow* instrument = new InstrumentWindow(partindex, this, ui->scrollArea);
+    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-2, instrument);
+    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->setAlignment(instrument, Qt::AlignTop);
 
-    return Instrument;
+    return instrument;
 }
 
 void InstrumentContainer::selectMe(InstrumentWindow* instrument)

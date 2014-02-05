@@ -1,9 +1,11 @@
 set(zynmusicstudio_qui_SRCS
+    zynapplication.cpp
     mainwindow.cpp
     channelwindow.cpp
     channelcontainer.cpp
     instrumentwindow.cpp
     instrumentcontainer.cpp
+    instrumentcontrol.cpp
     keyboard.cpp
     kitwindow.cpp
     )
@@ -13,6 +15,7 @@ set(zynmusicstudio_qui_HEADERS
     channelcontainer.h
     instrumentwindow.h
     instrumentcontainer.h
+    instrumentcontrol.h
     keyboard.h
     kitwindow.h
     )
@@ -22,6 +25,7 @@ set(zynmusicstudio_qui_FORMS
     channelcontainer.ui
     instrumentwindow.ui
     instrumentcontainer.ui
+    instrumentcontrol.ui
     keyboard.ui
     kitwindow.ui
     )

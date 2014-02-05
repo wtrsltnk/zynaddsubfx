@@ -109,6 +109,18 @@ void EffectMgr::changeeffect(int _nefx)
         filterpars = efx->filterpars;
 }
 
+const char* EffectMgr::FilterTitles[] = {
+    "Empty",
+    "Reverb",
+    "Echo",
+    "Chorus",
+    "Phaser",
+    "Alienwah",
+    "Distorsion",
+    "EQ",
+    "DynamicFilter"
+};
+
 //Obtain the effect number
 int EffectMgr::geteffect(void)
 {

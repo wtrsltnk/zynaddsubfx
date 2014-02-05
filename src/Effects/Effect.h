@@ -30,7 +30,8 @@
 
 class FilterParams;
 
-/**this class is inherited by the all effects(Reverb, Echo, ..)*/
+/**
+ * this class is inherited by the all effects(Reverb, Echo, ..)*/
 class Effect
 {
     public:
@@ -49,16 +50,19 @@ class Effect
          * Choose a preset
          * @param npreset number of chosen preset*/
         virtual void setpreset(unsigned char npreset) = 0;
-        /**Change parameter npar to value
+        /**
+         * Change parameter npar to value
          * @param npar chosen parameter
          * @param value chosen new value*/
         virtual void changepar(int npar, unsigned char value) = 0;
-        /**Get the value of parameter npar
+        /**
+         * Get the value of parameter npar
          * @param npar chosen parameter
          * @return the value of the parameter in an unsigned char or 0 if it
          * does not exist*/
         virtual unsigned char getpar(int npar) const = 0;
-        /**Output result of effect based on the given buffers
+        /**
+         * Output result of effect based on the given buffers
          *
          * This method should result in the effect generating its results
          * and placing them into the efxoutl and efxoutr buffers.
@@ -69,7 +73,8 @@ class Effect
          */
         void out(float *const smpsl, float *const smpsr);
         virtual void out(const Stereo<float *> &smp) = 0;
-        /**Reset the state of the effect*/
+        /**
+         * Reset the state of the effect*/
         virtual void cleanup(void) {}
         virtual float getfreqresponse(float freq) { return freq; }
 

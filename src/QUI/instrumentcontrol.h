@@ -1,7 +1,7 @@
 /*
   ZynAddSubFX - a software synthesizer
 
-  mainwindow.h - Mainwindow voor Zyn Music Studio
+  instrumentcontrol.h - Instrument widget for controlling instrument volume and effects
   Copyright (C) 2014 Wouter Saaltink
   Author: Wouter Saaltink
 
@@ -19,53 +19,33 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 */
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef INSTRUMENTCONTROL_H
+#define INSTRUMENTCONTROL_H
 
 #include <QWidget>
-#include <QTimer>
 #include <QPushButton>
 
 namespace Ui {
-class MainWindow;
+class InstrumentControl;
 }
 
-class MainWindow : public QWidget
+class InstrumentControl : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-    void SelectChannel(int channel);
-    void SelectPart(int part);
+    explicit InstrumentControl(int partindex, QWidget *parent = 0);
+    ~InstrumentControl();
 
 protected slots:
-    void OnMasterGainChanged(int value);
-    void OnVuTimer();
-    void OnShowOptionalMidiDevice();
-    void OnSelectMidiDevice();
-    void OnShowOptionalAudioDevice();
-    void OnSelectAudioDevice();
-    void OnSelectChannel(int channel);
-    void OnSelectPart(int part);
+    void onVolumeChanged(int value);
+    void onPanChanged(int value);
+    void onSysEffectChanged(int value);
 
 private:
-    Ui::MainWindow *ui;
-    QTimer _vutimer;
-    int _selectedChannel;
+    Ui::InstrumentControl *ui;
     QPushButton* _effectButtons;
-
-    bool eventFilter(QObject* watched, QEvent* event);
-    void keyPressEvent(QKeyEvent* event);
-    void keyReleaseEvent(QKeyEvent* event);
-
-    float dbl;
-    float dbr;
-    float rmsdbl;
-    float rmsdbr;
-
+    int _partindex;
 };
 
-#endif // MAINWINDOW_H
+#endif // INSTRUMENTCONTROL_H

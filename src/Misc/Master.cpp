@@ -556,7 +556,6 @@ void Master::setPkeyshift(char Pkeyshift_)
     keyshift  = (int)Pkeyshift - 64;
 }
 
-
 void Master::setPsysefxvol(int Ppart, int Pefx, char Pvol)
 {
     Psysefxvol[Pefx][Ppart] = Pvol;

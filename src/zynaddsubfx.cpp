@@ -76,7 +76,7 @@ using namespace std;
 
 pthread_t thr4;
 Master   *master;
-SYNTH_T  *synth;
+Settings  *synth;
 int       swaplr = 0; //1 for left-right swapping
 
 int Pexitprogram = 0;     //if the UI set this to 1, the program will exit
@@ -176,7 +176,7 @@ void exitprogram()
 
 int main(int argc, char *argv[])
 {
-    synth = new SYNTH_T;
+    synth = new Settings;
     config.init();
     dump.startnow();
     int noui = 0;

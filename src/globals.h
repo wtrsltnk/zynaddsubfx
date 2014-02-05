@@ -85,7 +85,7 @@
 /*
  * Number of part's insertion effects
  */
-#define NUM_PART_EFX 3
+#define NUM_PART_EFX 4
 
 /*
  * Maximum number of the instrument on a part
@@ -211,8 +211,8 @@ enum LegatoMsg {
 #endif
 
 //temporary include for synth->{samplerate/buffersize} members
-struct SYNTH_T {
-    SYNTH_T(void)
+struct Settings {
+    Settings(void)
         :samplerate(44100), buffersize(256), oscilsize(1024)
     {
         alias();
@@ -255,5 +255,5 @@ struct SYNTH_T {
     float numRandom(void) const; //defined in Util.cpp for now
 };
 
-extern SYNTH_T *synth;
+extern Settings *synth;
 #endif

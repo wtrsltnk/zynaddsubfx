@@ -76,6 +76,7 @@ class EffectMgr:public Presets
 
         FilterParams *filterpars;
 
+        static const char* FilterTitles[];
     private:
         int     nefx;
         Effect *efx;

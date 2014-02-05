@@ -28,6 +28,7 @@
 #include <iostream>
 #include "../Misc/Master.h"
 #include "../Misc/Part.h"
+#include "../Effects/EffectMgr.h"
 #include "../Nio/InMgr.h"
 #include "../Nio/OutMgr.h"
 #include "../Nio/EngineMgr.h"
@@ -35,6 +36,7 @@
 #include "../Nio/AudioOut.h"
 #include "channelwindow.h"
 #include "instrumentwindow.h"
+#include "instrumentcontrol.h"
 #include "keyboard.h"
 #include "kitwindow.h"
 
@@ -46,19 +48,34 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->ui->masterGain->setMinimum(0);
-    this->ui->masterGain->setMaximum(100);
-    this->ui->masterGain->setValue(Master::getInstance().Pvolume);
+    this->_effectButtons = new QPushButton[NUM_SYS_EFX];
+    for (int i = 0; i < NUM_SYS_EFX; i++)
+    {
+        this->_effectButtons[i].setText(EffectMgr::FilterTitles[Master::getInstance().sysefx[i]->geteffect()]);
+        this->ui->syseffects->layout()->addWidget(&this->_effectButtons[i]);
+    }
+    this->ui->sysmaster->setValue(Master::getInstance().Pvolume);
+
+    for (int i = 0; i < NUM_MIDI_PARTS; i++)
+    {
+        if (Master::getInstance().part[i]->Penabled)
+        {
+            InstrumentControl* instrument = new InstrumentControl(i);
+            this->ui->busses->layout()->addWidget(instrument);
+            this->ui->busses->layout()->setAlignment(instrument, Qt::AlignLeft);
+        }
+    }
 
     this->ui->btnMidi->setText(InMgr::getInstance().getSource().c_str());
     connect(this->ui->btnMidi, SIGNAL(clicked()), this, SLOT(OnShowOptionalMidiDevice()));
     this->ui->btnAudio->setText(OutMgr::getInstance().getDriver().c_str());
     connect(this->ui->btnAudio, SIGNAL(clicked()), this, SLOT(OnShowOptionalAudioDevice()));
 
-    this->ui->vu->installEventFilter(this);
+    this->ui->sysuvL->installEventFilter(this);
+    this->ui->sysuvR->installEventFilter(this);
 
-    connect(this->ui->masterGain, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
     connect(&this->_vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
+    connect(this->ui->sysmaster, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
 
     this->_vutimer.setInterval(1000/40);
     this->_vutimer.start();
@@ -69,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    for (int i = 0; i < NUM_SYS_EFX; i++)
+        this->ui->syseffects->layout()->removeWidget(&this->_effectButtons[i]);
+    delete []this->_effectButtons;
     delete ui;
 }
 
@@ -127,76 +147,36 @@ void MainWindow::OnMasterGainChanged(int value)
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 {
-    // This part is copied from MasterUI.fl by Nasca Octavian Paul
-    static float olddbl = 0;
-    static float olddbr = 0;
-    static float oldrmsdbl = 0;
-    static float oldrmsdbr = 0;
-    if (watched == ui->vu && event->type() == QEvent::Paint)
+    if (watched == ui->sysuvL && event->type() == QEvent::Paint)
     {
+        int lx=ui->sysuvL->width(); int ly=ui->sysuvL->height();
+
+        int idbl=(int) (this->dbl*ly);
+        int irmsdbl=(int) (this->rmsdbl*ly);
+
         QPainter painter;
-        painter.begin(ui->vu);
-        vuData data = Master::getInstance().getVuData();
+        painter.begin(ui->sysuvL);
 
-        int ox=0; int oy=0; int lx=ui->vu->width(); int ly=ui->vu->height();
+        painter.fillRect(0,ly-idbl,lx,idbl, QBrush(Qt::green, Qt::Dense7Pattern));
+        painter.fillRect(0,0,lx,ly-idbl, QBrush(Qt::white, Qt::Dense7Pattern));
+        painter.fillRect(0,ly-irmsdbl-1,lx,3, QBrush(Qt::yellow, Qt::SolidPattern));
 
-        float dbl=rap2dB(data.outpeakl);
-        float dbr=rap2dB(data.outpeakr);
-        float rmsdbl=rap2dB(data.rmspeakl);
-        float rmsdbr=rap2dB(data.rmspeakr);
-        #define MIN_DB (-48)
+        painter.end();
+        return true;
+    }
+    if (watched == ui->sysuvR && event->type() == QEvent::Paint)
+    {
+        int lx=ui->sysuvR->width(); int ly=ui->sysuvR->height();
 
-        dbl=(MIN_DB-dbl)/MIN_DB;
-        if (dbl<0.0) dbl=0.0;
-          else if (dbl>1.0)dbl=1.0;
+        int idbr=(int) (this->dbr*ly);
+        int irmsdbr=(int) (this->rmsdbr*ly);
 
-        dbr=(MIN_DB-dbr)/MIN_DB;
-        if (dbr<0.0) dbr=0.0;
-          else if (dbr>1.0) dbr=1.0;
+        QPainter painter;
+        painter.begin(ui->sysuvR);
 
-        dbl=dbl*0.4+olddbl*0.6;
-        dbr=dbr*0.4+olddbr*0.6;
-
-        olddbl=dbl;
-        olddbr=dbr;
-
-        #define VULENX (lx)
-        #define VULENY (ly/2-2)
-
-        dbl*=VULENX;dbr*=VULENX;
-
-        int idbl=(int) dbl;
-        int idbr=(int) dbr;
-
-        //compute RMS - start
-        rmsdbl=(MIN_DB-rmsdbl)/MIN_DB;
-        if (rmsdbl<0.0) rmsdbl=0.0;
-          else if (rmsdbl>1.0) rmsdbl=1.0;
-
-        rmsdbr=(MIN_DB-rmsdbr)/MIN_DB;
-        if (rmsdbr<0.0) rmsdbr=0.0;
-          else if (rmsdbr>1.0) rmsdbr=1.0;
-
-        rmsdbl=rmsdbl*0.4+oldrmsdbl*0.6;
-        rmsdbr=rmsdbr*0.4+oldrmsdbr*0.6;
-
-        oldrmsdbl=rmsdbl;
-        oldrmsdbr=rmsdbr;
-
-        rmsdbl*=VULENX;rmsdbr*=VULENX;
-
-        int irmsdbl=(int) rmsdbl;
-        int irmsdbr=(int) rmsdbr;
-        //compute RMS - end
-
-        painter.fillRect(ox,oy,idbr,VULENY, QBrush(Qt::green, Qt::Dense7Pattern));
-        painter.fillRect(ox,oy+ly/2,idbl,VULENY, QBrush(Qt::green, Qt::Dense7Pattern));
-
-        painter.fillRect(ox+idbr,oy,VULENX-idbr,VULENY, QBrush(Qt::white, Qt::Dense7Pattern));
-        painter.fillRect(ox+idbl,oy+ly/2,VULENX-idbl,VULENY, QBrush(Qt::white, Qt::Dense7Pattern));
-
-        painter.fillRect(ox+irmsdbr-1,oy,3,VULENY, QBrush(Qt::yellow, Qt::SolidPattern));
-        painter.fillRect(ox+irmsdbl-1,oy+ly/2,3,VULENY, QBrush(Qt::yellow, Qt::SolidPattern));
+        painter.fillRect(0,ly-idbr,lx,idbr, QBrush(Qt::green, Qt::Dense7Pattern));
+        painter.fillRect(0,0,lx,ly-idbr, QBrush(Qt::white, Qt::Dense7Pattern));
+        painter.fillRect(0,ly-irmsdbr-1,lx,3, QBrush(Qt::yellow, Qt::SolidPattern));
 
         painter.end();
         return true;
@@ -218,7 +198,50 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event)
 
 void MainWindow::OnVuTimer()
 {
-    this->ui->vu->repaint();
+    // This part is copied from MasterUI.fl by Nasca Octavian Paul
+    static float olddbl = 0;
+    static float olddbr = 0;
+    static float oldrmsdbl = 0;
+    static float oldrmsdbr = 0;
+#define MIN_DB (-48)
+
+    vuData data = Master::getInstance().getVuData();
+
+    this->dbl=rap2dB(data.outpeakl);
+    this->dbr=rap2dB(data.outpeakr);
+    this->dbl=(MIN_DB-this->dbl)/MIN_DB;
+    if (this->dbl<0.0) this->dbl=0.0;
+      else if (this->dbl>1.0)this->dbl=1.0;
+
+    this->dbr=(MIN_DB-this->dbr)/MIN_DB;
+    if (this->dbr<0.0) this->dbr=0.0;
+      else if (this->dbr>1.0) this->dbr=1.0;
+
+    this->dbl=this->dbl*0.4+olddbl*0.6;
+    this->dbr=this->dbr*0.4+olddbr*0.6;
+
+    olddbl=this->dbl;
+    olddbr=this->dbr;
+
+    //compute RMS - start
+    this->rmsdbl=rap2dB(data.rmspeakl);
+    this->rmsdbr=rap2dB(data.rmspeakr);
+    this->rmsdbl=(MIN_DB-this->rmsdbl)/MIN_DB;
+    if (this->rmsdbl<0.0) this->rmsdbl=0.0;
+      else if (this->rmsdbl>1.0) this->rmsdbl=1.0;
+
+    this->rmsdbr=(MIN_DB-this->rmsdbr)/MIN_DB;
+    if (this->rmsdbr<0.0) this->rmsdbr=0.0;
+      else if (this->rmsdbr>1.0) this->rmsdbr=1.0;
+
+    this->rmsdbl=this->rmsdbl*0.4+oldrmsdbl*0.6;
+    this->rmsdbr=this->rmsdbr*0.4+oldrmsdbr*0.6;
+
+    oldrmsdbl=rmsdbl;
+    oldrmsdbr=rmsdbr;
+
+    this->ui->sysuvL->repaint();
+    this->ui->sysuvR->repaint();
 }
 
 void MainWindow::OnShowOptionalMidiDevice()
