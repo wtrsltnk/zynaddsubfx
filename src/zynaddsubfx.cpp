@@ -59,7 +59,7 @@ extern Dump dump;
 QApplication *app;
 
 #elif defined FLTK_GUI
-#include "UI/MasterUI.h"
+#include <UI/MasterUI.h>
 #elif defined NTK_GUI
 #include "UI/MasterUI.h"
 #include <FL/Fl_Shared_Image.H>

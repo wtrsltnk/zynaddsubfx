@@ -4,8 +4,6 @@ message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_
 find_package(FFTW REQUIRED)
 find_package(MXML REQUIRED)
 find_package(PTHREAD REQUIRED)
-find_package(Alsa)
-find_package(PORTAUDIO)
 set(FLTK_SKIP_OPENGL true)
 find_package(FLTK)
 
@@ -297,7 +295,6 @@ target_link_libraries(zynaddsubfx
     zynaddsubfx_sequence
     ${GUI_LIBRARIES}
     ${NIO_LIBRARIES}
-    ${AUDIO_LIBRARIES}
     )
 
 if(DssiEnable)
@@ -324,7 +321,6 @@ target_link_libraries(zynmusicstudio
     zynmusicstudio_qui
     zynaddsubfx_sequence
     ${NIO_LIBRARIES}
-    ${AUDIO_LIBRARIES}
     )
 
 qt5_use_modules(zynmusicstudio Widgets)
