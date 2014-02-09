@@ -34,8 +34,7 @@ InstrumentWindow::InstrumentWindow(int partindex, InstrumentContainer* c, QWidge
 
     ui->setupUi(this);
 
-    this->ui->content->hide();
-    this->ui->kits->removeItem(0);
+    this->ui->kits->clear();
     this->updateUI();
 
     this->setStyleSheet("background-color:#666;");
@@ -66,21 +65,16 @@ void InstrumentWindow::updateUI()
             if (this->_kitWindows[i] == 0)
             {
                 this->_kitWindows[i] = new KitWindow(this->_part, i);
-                this->ui->kits->addItem(this->_kitWindows[i], this->_kitWindows[i]->getIcon(), "Item:");
+                this->ui->kits->addTab(this->_kitWindows[i], this->_kitWindows[i]->getIcon(), "est");
                 connect(this->_kitWindows[i], SIGNAL(keyRangeChanged()), this, SLOT(onKeyRangeChanged()));
             }
-            this->ui->kits->setItemText(i,
-                        QString("Item: %1 [%2-%3]").arg(
-                            QString((char*)this->_part->kit[i].Pname),
-                            QString::number(this->_part->kit[i].Pminkey),
-                            QString::number(this->_part->kit[i].Pmaxkey)));
         }
         else
         {
             if (this->_kitWindows[i] != 0)
             {
-                int remove = this->ui->kits->indexOf(this->_kitWindows[i]);
-                this->ui->kits->removeItem(remove);
+                int remove = this->ui->kits->layout()->indexOf(this->_kitWindows[i]);
+                this->ui->kits->layout()->removeItem(this->ui->kits->layout()->itemAt(remove));
                 delete this->_kitWindows[i];
                 this->_kitWindows[i] = 0;
             }
@@ -90,7 +84,7 @@ void InstrumentWindow::updateUI()
 
 void InstrumentWindow::onToggleCollapse()
 {
-    this->_container->selectMe(this);
+    this->_container->selectInstrument(this);
     if (this->ui->content->isVisible())
     {
         this->ui->content->hide();
@@ -129,7 +123,7 @@ void InstrumentWindow::onAddKititem()
             break;
         }
     }
-    this->_container->selectMe(this);
+    this->_container->selectInstrument(this);
     this->updateUI();
 }
 
@@ -150,7 +144,7 @@ void InstrumentWindow::onRemoveKititem()
             break;
         }
     }
-    this->_container->selectMe(this);
+    this->_container->selectInstrument(this);
     this->updateUI();
 }
 
@@ -166,7 +160,7 @@ void InstrumentWindow::onKeyRangeChanged()
             }
         }
     }
-    this->_container->selectMe(this);
+    this->_container->selectInstrument(this);
     this->updateUI();
 }
 

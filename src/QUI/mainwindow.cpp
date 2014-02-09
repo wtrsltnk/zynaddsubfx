@@ -105,7 +105,7 @@ void MainWindow::OnSelectChannel(int channel)
 
 void MainWindow::SelectChannel(int channel)
 {
-    this->ui->instruments->resetInstruments();
+    this->ui->instruments->clearInstruments();
     for (int i = 0;i < NUM_MIDI_PARTS; i++)
     {
         Part* part = Master::getInstance().part[i];

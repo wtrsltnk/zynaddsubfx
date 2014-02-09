@@ -59,7 +59,7 @@ KitWindow::~KitWindow()
 
 QIcon KitWindow::getIcon()
 {
-    QPixmap pixmap(100, 100);
+    QPixmap pixmap(16, 16);
     pixmap.fill(KitWindow::KitColors[this->_kitindex]);
     return QIcon(pixmap);
 }

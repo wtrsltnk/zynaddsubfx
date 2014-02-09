@@ -34,17 +34,6 @@ namespace Ui {
 class ChannelWindow;
 }
 
-class ChannelClip : public QGraphicsPixmapItem
-{
-public:
-    ChannelClip(MidiClip* clip);
-    virtual ~ChannelClip();
-
-    QPixmap getPixmapFromClip();
-
-    MidiClip* _clip;
-};
-
 class ChannelWindow : public QWidget
 {
     Q_OBJECT
@@ -53,28 +42,26 @@ public:
     explicit ChannelWindow(int index, ChannelContainer* c, QWidget *parent = 0);
     ~ChannelWindow();
 
+public:
     void select();
     void unselect();
 
-    void collapse();
-    void expand();
-
     int channelIndex() { return this->_channelIndex; }
 
+signals:
+    void onRemoveChannel(int index);
+
 protected slots:
-    void onToggleCollapse();
-    void onUpdateCursor();
+    void onSelectChannelEvent();
+    void onRemoveChannelEvent();
 
 private:
     Ui::ChannelWindow *ui;
     ChannelContainer* _container;
-    bool _collapsed;
     bool _selected;
     int _channelIndex;
-    QGraphicsScene _scene;
-    QGraphicsRectItem* _cursor;
-    QGraphicsItemGroup* _clips;
-    QTimer _updateCursor;
+
+    virtual void resizeEvent(QResizeEvent* event);
 };
 
 #endif // CHANNELWINDOW_H

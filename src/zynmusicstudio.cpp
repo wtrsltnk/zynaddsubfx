@@ -34,6 +34,7 @@
 
 #include "QUI/zynapplication.h"
 #include "Misc/Master.h"
+#include "Misc/Part.h"
 #include "Misc/Util.h"
 #include "Nio/Nio.h"
 #include "Sequence/sequence.h"
@@ -97,14 +98,18 @@ int main(int argc, char *argv[])
     synth->buffersize = config.cfg.SoundBufferSize;
     synth->oscilsize  = config.cfg.OscilSize;
 
+    initprogram();
+
+    Master::getInstance().partonoff(1, 1);
+//    Master::getInstance().part[1]->defaults();
+    Master::getInstance().part[1]->Prcvchn = 1;
     MidiClip* clip = new MidiClip();
+    clip->Pchannel = 1;
     clip->addNote(80, 64, 1.0, 1.0);
     clip->addNote(86, 64, 2.0, 0.5);
     clip->addNote(80, 64, 2.5, 1.0);
     Sequence::getInstance().Pclips.push_back(clip);
     Nio::preferedSampleRate(synth->samplerate);
-
-    initprogram();
 
     //Run the Nio system
     if (Nio::start())

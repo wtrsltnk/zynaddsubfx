@@ -39,10 +39,9 @@ public:
     explicit InstrumentContainer(QWidget *parent = 0);
     ~InstrumentContainer();
 
-    void resetInstruments();
+    void clearInstruments();
     InstrumentWindow* addInstrument(int partindex);
-
-    void selectMe(InstrumentWindow* instrument);
+    void selectInstrument(InstrumentWindow* instrument);
 
 signals:
     void selectInstrument(int instrument);

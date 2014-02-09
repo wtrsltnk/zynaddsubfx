@@ -23,10 +23,26 @@
 #define CHANNELCONTAINER_H
 
 #include <QWidget>
+#include <QChildEvent>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
+#include "../globals.h"
+#include "../Sequence/midiclip.h"
 
 namespace Ui {
 class ChannelContainer;
 }
+
+class ChannelClip : public QGraphicsPixmapItem
+{
+public:
+    ChannelClip(MidiClip* clip);
+    virtual ~ChannelClip();
+
+    QPixmap getPixmapFromClip();
+
+    MidiClip* _clip;
+};
 
 class ChannelWindow;
 
@@ -41,18 +57,28 @@ public:
     int vscrollOffset();
     int vscale();
 
-    ChannelWindow* addChannel(int index);
-    void selectMe(ChannelWindow* part);
+    void selectChannel(ChannelWindow* part);
+    void updateMinHeight();
+    void updateClips();
+
+protected slots:
+    void onAddChannel();
+    void onRemoveChannel(int index);
+    void onHScrollChannel(int value);
 
 signals:
     void selectChannel(int channel);
 
 private:
     Ui::ChannelContainer *ui;
-
+    ChannelWindow* _channels[NUM_MIDI_CHANNELS];
     ChannelWindow* _selectedChannel;
+    QGraphicsScene _clips;
     int _vscrollOffset;
     int _vscale;
+    int _lastHScroll;
+
+    virtual void resizeEvent(QResizeEvent* event);
 };
 
 #endif // CHANNELCONTAINER_H

@@ -35,27 +35,28 @@ InstrumentContainer::~InstrumentContainer()
     delete ui;
 }
 
-void InstrumentContainer::resetInstruments()
+void InstrumentContainer::clearInstruments()
 {
-    while (ui->scrollArea->widget()->layout()->count() > 2)
+    QLayoutItem* part = ui->scrollArea->widget()->layout()->itemAt(0);
+    while (part != 0)
     {
-        QLayoutItem* part = ui->scrollArea->widget()->layout()->itemAt(ui->scrollArea->widget()->layout()->count()-2);
         ui->scrollArea->widget()->layout()->removeItem(part);
         delete part->widget();
         delete part;
+        part = ui->scrollArea->widget()->layout()->itemAt(0);
     }
 }
 
 InstrumentWindow* InstrumentContainer::addInstrument(int partindex)
 {
     InstrumentWindow* instrument = new InstrumentWindow(partindex, this, ui->scrollArea);
-    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->insertWidget(ui->scrollArea->widget()->layout()->count()-2, instrument);
-    ((QVBoxLayout*)ui->scrollArea->widget()->layout())->setAlignment(instrument, Qt::AlignTop);
+    ui->scrollArea->widget()->layout()->addWidget(instrument);
+    ui->scrollArea->widget()->layout()->setAlignment(instrument, Qt::AlignTop);
 
     return instrument;
 }
 
-void InstrumentContainer::selectMe(InstrumentWindow* instrument)
+void InstrumentContainer::selectInstrument(InstrumentWindow* instrument)
 {
     if (this->_selectedInstrument != 0 && this->_selectedInstrument != instrument)
         this->_selectedInstrument->unselect();
