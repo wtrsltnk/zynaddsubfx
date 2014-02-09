@@ -152,7 +152,7 @@ Keyboard::Octave::~Octave()
 { }
 
 int Keyboard::KeyWidth = 24;
-int Keyboard::KeyHeight = 92;
+int Keyboard::KeyHeight = 72;
 
 Keyboard::Keyboard(QWidget *parent) :
     QWidget(parent),

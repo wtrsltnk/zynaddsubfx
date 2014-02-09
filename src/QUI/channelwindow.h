@@ -23,11 +23,27 @@
 #define CHANNELWINDOW_H
 
 #include <QWidget>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsItemGroup>
+#include <QTimer>
 #include "channelcontainer.h"
+#include "../Sequence/midiclip.h"
 
 namespace Ui {
 class ChannelWindow;
 }
+
+class ChannelClip : public QGraphicsPixmapItem
+{
+public:
+    ChannelClip(MidiClip* clip);
+    virtual ~ChannelClip();
+
+    QPixmap getPixmapFromClip();
+
+    MidiClip* _clip;
+};
 
 class ChannelWindow : public QWidget
 {
@@ -40,10 +56,14 @@ public:
     void select();
     void unselect();
 
+    void collapse();
+    void expand();
+
     int channelIndex() { return this->_channelIndex; }
 
 protected slots:
     void onToggleCollapse();
+    void onUpdateCursor();
 
 private:
     Ui::ChannelWindow *ui;
@@ -51,6 +71,10 @@ private:
     bool _collapsed;
     bool _selected;
     int _channelIndex;
+    QGraphicsScene _scene;
+    QGraphicsRectItem* _cursor;
+    QGraphicsItemGroup* _clips;
+    QTimer _updateCursor;
 };
 
 #endif // CHANNELWINDOW_H

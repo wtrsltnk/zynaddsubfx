@@ -36,6 +36,8 @@
 #include "Misc/Master.h"
 #include "Misc/Util.h"
 #include "Nio/Nio.h"
+#include "Sequence/sequence.h"
+#include "Sequence/midiclip.h"
 
 using namespace std;
 
@@ -95,6 +97,11 @@ int main(int argc, char *argv[])
     synth->buffersize = config.cfg.SoundBufferSize;
     synth->oscilsize  = config.cfg.OscilSize;
 
+    MidiClip* clip = new MidiClip();
+    clip->addNote(80, 64, 1.0, 1.0);
+    clip->addNote(86, 64, 2.0, 0.5);
+    clip->addNote(80, 64, 2.5, 1.0);
+    Sequence::getInstance().Pclips.push_back(clip);
     Nio::preferedSampleRate(synth->samplerate);
 
     initprogram();

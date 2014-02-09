@@ -22,8 +22,8 @@
 */
 
 #include "Master.h"
-
 #include "Part.h"
+#include "../Sequence/sequence.h"
 
 #include "../Params/LFOParams.h"
 #include "../Effects/EffectMgr.h"
@@ -328,6 +328,8 @@ void Master::partonoff(int npart, int what)
  */
 void Master::AudioOut(float *outl, float *outr)
 {
+    time_t tm = time(NULL);
+
     //Swaps the Left channel with Right Channel
     if(swaplr)
         swap(outl, outr);
@@ -335,6 +337,10 @@ void Master::AudioOut(float *outl, float *outr)
     //clean up the output samples (should not be needed?)
     memset(outl, 0, synth->bufferbytes);
     memset(outr, 0, synth->bufferbytes);
+
+    // When the sequences is paused, we should not make any sound
+    if (Sequence::getInstance().Status() == Sequence::Paused)
+        return;
 
     //Compute part samples and store them part[npart]->partoutl,partoutr
     for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart) {
@@ -480,6 +486,8 @@ void Master::AudioOut(float *outl, float *outr)
 
     //update the LFO's time
     LFOParams::time++;
+
+    Sequence::getInstance().AddFrames(config.cfg.SoundBufferSize);
 
     dump.inctick();
 }

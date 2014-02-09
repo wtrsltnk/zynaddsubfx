@@ -34,6 +34,7 @@
 #include "../Nio/EngineMgr.h"
 #include "../Nio/MidiIn.h"
 #include "../Nio/AudioOut.h"
+#include "../Sequence/sequence.h"
 #include "channelwindow.h"
 #include "instrumentwindow.h"
 #include "instrumentcontrol.h"
@@ -82,6 +83,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(this->ui->channels, SIGNAL(selectChannel(int)), this, SLOT(OnSelectChannel(int)));
     connect(this->ui->instruments, SIGNAL(selectInstrument(int)), this, SLOT(OnSelectPart(int)));
+
+    connect(this->ui->btnPlay, SIGNAL(clicked()), this, SLOT(onPlay()));
+    connect(this->ui->btnPause, SIGNAL(clicked()), this, SLOT(onPause()));
+    connect(this->ui->btnStop, SIGNAL(clicked()), this, SLOT(onStop()));
 }
 
 MainWindow::~MainWindow()
@@ -143,6 +148,21 @@ void MainWindow::SelectPart(int index)
 void MainWindow::OnMasterGainChanged(int value)
 {
     Master::getInstance().setPvolume(value);
+}
+
+void MainWindow::onPlay()
+{
+    Sequence::getInstance().Start();
+}
+
+void MainWindow::onPause()
+{
+    Sequence::getInstance().Pause();
+}
+
+void MainWindow::onStop()
+{
+    Sequence::getInstance().Stop();
 }
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)

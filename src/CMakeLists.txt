@@ -272,6 +272,7 @@ add_subdirectory(Params)
 add_subdirectory(DSP)
 add_subdirectory(Nio)
 add_subdirectory(QUI)
+add_subdirectory(Sequence)
 
 add_library(zynaddsubfx_core STATIC
     ${zynaddsubfx_dsp_SRCS}
@@ -293,6 +294,7 @@ add_executable(zynaddsubfx zynaddsubfx.cpp)
 target_link_libraries(zynaddsubfx
     zynaddsubfx_core
     zynaddsubfx_nio
+    zynaddsubfx_sequence
     ${GUI_LIBRARIES}
     ${NIO_LIBRARIES}
     ${AUDIO_LIBRARIES}
@@ -308,7 +310,7 @@ if(DssiEnable)
         ${OS_LIBRARIES}
         )
     if(${CMAKE_SIZEOF_VOID_P} EQUAL "8")
-        install(TARGETS zynaddsubfx_dssi LIBRARY DESTINATION lib64/dssi/)
+        install(TARGETS zynadd	subfx_dssi LIBRARY DESTINATION lib64/dssi/)
     else()
         install(TARGETS zynaddsubfx_dssi LIBRARY DESTINATION lib/dssi/)
     endif()
@@ -320,6 +322,7 @@ target_link_libraries(zynmusicstudio
     zynaddsubfx_core
     zynaddsubfx_nio
     zynmusicstudio_qui
+    zynaddsubfx_sequence
     ${NIO_LIBRARIES}
     ${AUDIO_LIBRARIES}
     )

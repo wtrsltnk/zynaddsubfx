@@ -50,6 +50,9 @@ protected slots:
     void OnSelectAudioDevice();
     void OnSelectChannel(int channel);
     void OnSelectPart(int part);
+    void onPlay();
+    void onPause();
+    void onStop();
 
 private:
     Ui::MainWindow *ui;
