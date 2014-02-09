@@ -1,6 +1,8 @@
 message(STATUS "Checking Include Path" $ENV{CMAKE_INCLUDE_PATH} ${CMAKE_INCLUDE_PATH})
 message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_PATH})
 
+add_definitions(-DVERSION="${VERSION}")
+
 find_package(FFTW REQUIRED)
 find_package(MXML REQUIRED)
 find_package(PTHREAD REQUIRED)
@@ -8,49 +10,6 @@ set(FLTK_SKIP_OPENGL true)
 find_package(FLTK)
 
 set(GuiModule fltk CACHE STRING "GUI module, either fltk, ntk or off")
-set(AlsaEnable ${ALSA_FOUND} CACHE BOOL
-    "Enable support for Advanced Linux Sound Architecture")
-set(JackEnable ${JACK_FOUND} CACHE BOOL
-    "Enable support for JACK Audio Connection toolKit")
-set(PaEnable ${PORTAUDIO_FOUND} CACHE BOOL
-    "Enable support for Port Audio System")
-set(LashEnable ${LASH_FOUND} CACHE BOOL
-    "Enable LASH Audio Session Handler")
-set(DssiEnable ${DSSI_FOUND} CACHE BOOL
-    "Enable DSSI Plugin compilation")
-set(LibloEnable ${LIBLO_FOUND} CACHE BOOL
-    "Enable Liblo")
-
-add_definitions(-DVERSION="${VERSION}")
-
-message(STATUS "Building on a '${CMAKE_SYSTEM_NAME}' System")
-
-if(JackEnable)
-    set(DefaultOutput jack CACHE STRING
-        "Default Output module: [null, alsa, jack, pa]")
-    if(AlsaEnable)
-        set(DefaultInput alsa CACHE STRING
-            "Default Input module: [null, alsa, jack, pa]")
-    else()
-        set(DefaultInput jack CACHE STRING
-            "Default Input module: [null, alsa, jack, pa]")
-    endif()
-elseif(AlsaEnable)
-    set(DefaultOutput alsa CACHE STRING
-        "Default Output module: [null, alsa, jack, pa]")
-    set(DefaultInput alsa CACHE STRING
-        "Default Input module: [null, alsa, jack, pa]")
-elseif(PaEnable)
-    set(DefaultOutput pa CACHE STRING
-        "Default Output module: [null, alsa, jack, pa]")
-else()
-    set(DefaultOutput null CACHE STRING
-        "Default Output module: [null, alsa, jack, pa]")
-    set(DefaultInput null CACHE STRING
-        "Default Input module: [null, alsa, jack, pa]")
-endif()
-
-
 
 if(GuiModule STREQUAL ntk AND NTK_FOUND)
     set(NtkGui TRUE)
@@ -63,115 +22,6 @@ else()
     add_definitions(-DDISABLE_GUI)
     message(STATUS "GUI module defaulting to off")
 endif()
-
-
-if(MSVC)
-    if(CMAKE_CL_64)
-        add_definitions(-D_AMD64_)
-    endif(CMAKE_CL_64)
-    add_definitions(-D__WINDOWS_MM__)
-    set(OS_LIBRARIES "winmm.lib")
-else(MSVC)
-    option(BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
-    option(BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
-    option(BuildForDebug "Include gdb debugging support" OFF)
-
-    set(CMAKE_BUILD_TYPE "Release")
-
-    set(BuildOptions_x86_64AMD
-        "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
-        CACHE STRING "X86_64 compiler options"
-    )
-
-    set(BuildOptions_X86_64Core2
-        "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
-        CACHE STRING "X86_64 compiler options"
-    )
-
-    set(BuildOptionsBasic
-        "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-        CACHE STRING "basic X86 complier options"
-    )
-
-    set(BuildOptionsDebug
-        "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
-endif(MSVC)
-
-if(AlsaEnable)
-    list(APPEND AUDIO_LIBRARIES ${ASOUND_LIBRARY})
-    list(APPEND AUDIO_LIBRARY_DIRS ${ASOUND_LIBRARY_DIRS})
-    add_definitions(-DALSA=1)
-    message(STATUS "Compiling with alsa")
-endif(AlsaEnable)
-
-if(JackEnable)
-    list(APPEND AUDIO_LIBRARIES ${JACK_LIBRARIES})
-    list(APPEND AUDIO_LIBRARY_DIRS ${JACK_LIBRARY_DIRS})
-    add_definitions(-DJACK=1)
-    message(STATUS "Compiling with jack")
-endif(JackEnable)
-
-if(PaEnable)
-    include_directories(${PORTAUDIO_INCLUDE_DIR})
-    list(APPEND AUDIO_LIBRARIES ${PORTAUDIO_LIBRARIES})
-    list(APPEND AUDIO_LIBRARY_DIRS ${PORTAUDIO_LIBRARY_DIRS})
-    add_definitions(-DPORTAUDIO=1)
-    message(STATUS "Compiling with portaudio")
-endif(PaEnable)
-
-if(LashEnable)
-    include_directories(${LASH_INCLUDE_DIRS})
-    list(APPEND AUDIO_LIBRARIES ${LASH_LIBRARIES})
-    list(APPEND AUDIO_LIBRARY_DIRS ${LASH_LIBRARY_DIRS})
-    add_definitions(-DLASH=1)
-    message(STATUS "Compiling with lash")
-endif(LashEnable)
-
-if(LibloEnable)
-    include_directories(${LIBLO_INCLUDE_DIRS})
-    list(APPEND AUDIO_LIBRARIES ${LIBLO_LIBRARIES})
-    list(APPEND AUDIO_LIBRARY_DIRS ${LIBLO_LIBRARY_DIRS})
-    add_definitions(-DUSE_NSM=1)
-    message(STATUS "Compiling with liblo")
-endif(LibloEnable)
-
-include_directories(
-    ${MXML_INCLUDE_DIR}
-    )
-
-if(MSVC)
-else(MSVC)
-    add_definitions(
-         -g #TODO #todo put in a better location
-         -Wall
-         -Wextra
-         )
-    if(NOT AVOID_ASM)
-        message(STATUS "Compiling with x86 opcode support")
-        add_definitions(-DASM_F2I_YES)
-    endif()
-
-    if(BuildForDebug)
-        set(CMAKE_BUILD_TYPE "Debug")
-        set(CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
-        message(STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
-    else(BuildForDebug)
-        set(CMAKE_BUILD_TYPE "Release")
-        if(BuildForAMD_X86_64)
-            set(CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_x86_64AMD})
-        else(BuildForAMD_X86_64)
-            if(BuildForCore2_X86_64)
-                set(CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
-            else(BuildForCore2_X86_64)
-                set(CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
-            endif(BuildForCore2_X86_64)
-        endif(BuildForAMD_X86_64)
-        message(STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
-    endif(BuildForDebug)
-
-    add_definitions(-fPIC)
-
-endif(MSVC)
 
 if(FLTK_FOUND)
     mark_as_advanced(FORCE FLTK_BASE_LIBRARY)
@@ -238,6 +88,76 @@ if(NtkGui)
 
     add_subdirectory(UI)
 endif()
+
+message(STATUS "Building on a '${CMAKE_SYSTEM_NAME}' System")
+
+if(MSVC)
+    if(CMAKE_CL_64)
+        add_definitions(-D_AMD64_)
+    endif(CMAKE_CL_64)
+    add_definitions(-D__WINDOWS_MM__)
+    set(OS_LIBRARIES "winmm.lib")
+else(MSVC)
+    option(BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
+    option(BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
+    option(BuildForDebug "Include gdb debugging support" OFF)
+
+    set(CMAKE_BUILD_TYPE "Release")
+
+    set(BuildOptions_x86_64AMD
+        "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+        CACHE STRING "X86_64 compiler options"
+    )
+
+    set(BuildOptions_X86_64Core2
+        "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+        CACHE STRING "X86_64 compiler options"
+    )
+
+    set(BuildOptionsBasic
+        "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+        CACHE STRING "basic X86 complier options"
+    )
+
+    set(BuildOptionsDebug
+        "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
+endif(MSVC)
+
+include_directories(
+    ${MXML_INCLUDE_DIR}
+    )
+
+if(MSVC)
+else(MSVC)
+    add_definitions(
+         -g #TODO #todo put in a better location
+         -Wall
+         -Wextra
+         )
+    if(NOT AVOID_ASM)
+        message(STATUS "Compiling with x86 opcode support")
+        add_definitions(-DASM_F2I_YES)
+    endif()
+
+    if(BuildForDebug)
+        set(CMAKE_BUILD_TYPE "Debug")
+        set(CMAKE_CXX_FLAGS_DEBUG ${BuildOptionsDebug})
+        message(STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_DEBUG}")
+    else(BuildForDebug)
+        set(CMAKE_BUILD_TYPE "Release")
+        if(BuildForAMD_X86_64)
+            set(CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_x86_64AMD})
+        else(BuildForAMD_X86_64)
+            if(BuildForCore2_X86_64)
+                set(CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
+            else(BuildForCore2_X86_64)
+                set(CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+            endif(BuildForCore2_X86_64)
+        endif(BuildForAMD_X86_64)
+        message(STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
+    endif(BuildForDebug)
+    add_definitions(-fPIC)
+endif(MSVC)
 
 link_directories(
     ${AUDIO_LIBRARY_DIRS}
