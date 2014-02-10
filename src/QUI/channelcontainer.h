@@ -23,26 +23,14 @@
 #define CHANNELCONTAINER_H
 
 #include <QWidget>
-#include <QChildEvent>
-#include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include "../globals.h"
-#include "../Sequence/midiclip.h"
+#include "channelclip.h"
 
 namespace Ui {
 class ChannelContainer;
 }
 
-class ChannelClip : public QGraphicsPixmapItem
-{
-public:
-    ChannelClip(MidiClip* clip);
-    virtual ~ChannelClip();
-
-    QPixmap getPixmapFromClip();
-
-    MidiClip* _clip;
-};
 
 class ChannelWindow;
 
@@ -77,8 +65,10 @@ private:
     int _vscrollOffset;
     int _vscale;
     int _lastHScroll;
+    std::vector<ChannelClip*> _channelClips;
 
     virtual void resizeEvent(QResizeEvent* event);
+    virtual bool eventFilter(QObject* watched, QEvent* event);
 };
 
 #endif // CHANNELCONTAINER_H

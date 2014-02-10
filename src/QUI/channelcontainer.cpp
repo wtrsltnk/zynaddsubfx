@@ -29,36 +29,6 @@
 
 using namespace std;
 
-ChannelClip::ChannelClip(MidiClip *clip)
-    : _clip(clip)
-{
-    QPixmap p = this->getPixmapFromClip();
-    this->setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
-}
-
-ChannelClip::~ChannelClip()
-{ }
-
-QPixmap ChannelClip::getPixmapFromClip()
-{
-    double len = 0;
-    unsigned char minrange = 0, maxrange = 0;
-    this->_clip->getSize(len, minrange, maxrange);
-    minrange -= 15;
-    maxrange += 15;
-    QPixmap p(100 * len, (maxrange - minrange) * 10);
-    p.fill(QColor::fromRgb(255, 0, 0));
-
-    QPainter painter(&p);
-    for (std::vector<MidiClip::Note*>::iterator i = this->_clip->Pnotes.begin(); i != this->_clip->Pnotes.end(); ++i)
-    {
-        MidiClip::Note* n = (MidiClip::Note*)*i;
-        painter.fillRect(n->start * 100, p.height() - ((n->note - minrange) * 10) - 5, n->length * 100, 10, Qt::SolidPattern);
-    }
-    painter.end();
-    return p;
-}
-
 ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelContainer),
@@ -84,6 +54,8 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     connect(this->ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(onHScrollChannel(int)));
     connect(this->ui->btnAddChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
     this->ui->clips->setScene(&this->_clips);
+    this->ui->clips->installEventFilter(this);
+    this->ui->clips->setBackgroundBrush(QBrush(QColor(0, 48, 64)));
 
     this->updateClips();
 }
@@ -98,16 +70,41 @@ void ChannelContainer::resizeEvent(QResizeEvent* event)
     this->updateClips();
 }
 
+bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == this->ui->clips && event->type() == QEvent::MouseButtonPress)
+    {
+        for (std::vector<ChannelClip*>::iterator i = this->_channelClips.begin(); i != this->_channelClips.end(); ++i)
+        {
+            ChannelClip* clip = ((ChannelClip*)*i);
+            if (clip != 0)
+                clip->unselect();
+        }
+        return true;
+    }
+    return false;
+}
+
 void ChannelContainer::updateClips()
 {
-    this->_clips.clear();
-    this->_clips.addRect(0, 0, 10, 10, QPen(Qt::black), QBrush(Qt::black));
+    // TODO optimze this, not very smart!
+    while (this->_channelClips.empty() == false)
+    {
+        ChannelClip* cclip = this->_channelClips.back();
+        this->_channelClips.pop_back();
+        this->_clips.removeItem(cclip);
+        delete cclip;
+    }
+    this->_clips.addRect(0, 0, 10, 10, QPen(Qt::white), QBrush(Qt::white));
     for (int i = 0; i < Sequence::getInstance().Pclips.size(); i++)
     {
         MidiClip* clip = Sequence::getInstance().Pclips[i];
         ChannelClip* cclip = new ChannelClip(clip);
-        cclip->setPos(clip->Pstart, this->_channels[clip->Pchannel]->height() * clip->Pchannel);
+        int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
+        cclip->setPos(clip->Pstart * 100, this->_channels[clip->Pchannel]->height() * index);
+        cclip->setHeight(this->_channels[clip->Pchannel]->height());
         this->_clips.addItem(cclip);
+        this->_channelClips.push_back(cclip);
     }
 }
 

@@ -3,6 +3,7 @@ set(zynmusicstudio_qui_SRCS
     mainwindow.cpp
     channelwindow.cpp
     channelcontainer.cpp
+    channelclip.cpp
     instrumentwindow.cpp
     instrumentcontainer.cpp
     instrumentcontrol.cpp
@@ -13,6 +14,7 @@ set(zynmusicstudio_qui_HEADERS
     mainwindow.h
     channelwindow.h
     channelcontainer.h
+    channelclip.h
     instrumentwindow.h
     instrumentcontainer.h
     instrumentcontrol.h

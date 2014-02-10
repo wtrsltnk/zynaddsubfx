@@ -105,6 +105,7 @@ int main(int argc, char *argv[])
     Master::getInstance().part[1]->Prcvchn = 1;
     MidiClip* clip = new MidiClip();
     clip->Pchannel = 1;
+    clip->Pstart = 4;
     clip->addNote(80, 64, 1.0, 1.0);
     clip->addNote(86, 64, 2.0, 0.5);
     clip->addNote(80, 64, 2.5, 1.0);
