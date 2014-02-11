@@ -24,6 +24,7 @@
 
 #include <QWidget>
 #include <QGraphicsScene>
+#include <QGraphicsItemGroup>
 #include "../globals.h"
 #include "channelclip.h"
 

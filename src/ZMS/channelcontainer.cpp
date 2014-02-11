@@ -56,8 +56,6 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     this->ui->clips->setScene(&this->_clips);
     this->ui->clips->installEventFilter(this);
     this->ui->clips->setBackgroundBrush(QBrush(QColor(0, 48, 64)));
-
-    this->updateClips();
 }
 
 ChannelContainer::~ChannelContainer()
