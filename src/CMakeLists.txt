@@ -1,95 +1,32 @@
 message(STATUS "Checking Include Path" $ENV{CMAKE_INCLUDE_PATH} ${CMAKE_INCLUDE_PATH})
 message(STATUS "Checking Library Path" $ENV{CMAKE_LIBRARY_PATH} ${CMAKE_LIBRARY_PATH})
+message(STATUS "Building on a '${CMAKE_SYSTEM_NAME} v${CMAKE_SYSTEM_VERSION}' System and an '${CMAKE_SYSTEM_PROCESSOR}' CPU")
 
-add_definitions(-DVERSION="${VERSION}")
+option(ZASFEnable "Build ZynAddSybFX executable" ON)
+option(DssiEnable "Build DSSI plugin" OFF)
+option(ZMSEnable "Build ZynMusicStudio executable" ON)
 
 find_package(FFTW REQUIRED)
 find_package(MXML REQUIRED)
 find_package(PTHREAD REQUIRED)
-set(FLTK_SKIP_OPENGL true)
-find_package(FLTK)
 
-set(GuiModule fltk CACHE STRING "GUI module, either fltk, ntk or off")
+link_directories(
+    ${FFTW_LIBRARY_DIRS}
+    ${MXML_LIBRARY_DIRS}
+    ${PTHREAD_LIBRARY_DIRS}
+    )
 
-if(GuiModule STREQUAL ntk AND NTK_FOUND)
-    set(NtkGui TRUE)
-elseif(GuiModule STREQUAL fltk AND FLTK_FOUND)
-    set(FltkGui TRUE)
-elseif(GuiModule STREQUAL off)
-    add_definitions(-DDISABLE_GUI)
-else()
-    set(GuiModule off CACHE STRING "GUI module, either fltk, qt or off")
-    add_definitions(-DDISABLE_GUI)
-    message(STATUS "GUI module defaulting to off")
-endif()
+include_directories(
+    ${FFTW_INCLUDE_DIR}
+    ${MXML_INCLUDE_DIR}
+    ${PTHREAD_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    )
 
-if(FLTK_FOUND)
-    mark_as_advanced(FORCE FLTK_BASE_LIBRARY)
-    mark_as_advanced(FORCE FLTK_CONFIG_SCRIPT)
-    mark_as_advanced(FORCE FLTK_DIR)
-    mark_as_advanced(FORCE FLTK_FLUID_EXECUTABLE)
-    mark_as_advanced(FORCE FLTK_FORMS_LIBRARY)
-    mark_as_advanced(FORCE FLTK_GL_LIBRARY)
-    mark_as_advanced(FORCE FLTK_IMAGES_LIBRARY)
-    mark_as_advanced(FORCE FLTK_INCLUDE_DIR)
-    mark_as_advanced(FORCE FLTK_MATH_LIBRARY)
-endif(FLTK_FOUND)
-
-if(NTK_FOUND)
-    mark_as_advanced(FORCE NTK_BASE_LIBRARY)
-    mark_as_advanced(FORCE NTK_CONFIG_SCRIPT)
-    mark_as_advanced(FORCE NTK_DIR)
-    mark_as_advanced(FORCE FLTK_FLUID_EXECUTABLE)
-    mark_as_advanced(FORCE NTK_FORMS_LIBRARY)
-    mark_as_advanced(FORCE NTK_GL_LIBRARY)
-    mark_as_advanced(FORCE NTK_IMAGES_LIBRARY)
-    mark_as_advanced(FORCE NTK_INCLUDE_DIR)
-    mark_as_advanced(FORCE NTK_MATH_LIBRARY)
-endif(NTK_FOUND)
-
-if(FltkGui)
-    find_program(FLTK_CONFIG fltk-config)
-    if(FLTK_CONFIG)
-        execute_process(COMMAND ${FLTK_CONFIG} --use-images --ldflags OUTPUT_VARIABLE FLTK_LDFLAGS)
-        string(STRIP ${FLTK_LDFLAGS} FLTK_LIBRARIES)
-    endif()
-
-    message(STATUS ${FLTK_LDFLAGS})
-
-    set(GUI_LIBRARIES ${FLTK_LIBRARIES} ${FLTK_LIBRARIES} ${OPENGL_LIBRARIES} zynaddsubfx_gui)
-
-    add_definitions(-DFLTK_GUI)
-    message(STATUS "Will build FLTK gui")
-
-    include_directories(
-        ${FLTK_INCLUDE_DIR}
-        "${CMAKE_CURRENT_SOURCE_DIR}/UI"
-        "${CMAKE_CURRENT_BINARY_DIR}/UI"
-        )
-
-    add_subdirectory(UI)
-endif()
-
-if(NtkGui)
-    find_program(FLTK_FLUID_EXECUTABLE ntk-fluid)
-
-    message(STATUS ${NTK_LDFLAGS} ${NTK_IMAGES_LDFLAGS})
-
-    set(GUI_LIBRARIES ${NTK_LIBRARIES} ${NTK_IMAGES_LIBRARIES} ${OPENGL_LIBRARIES} zynaddsubfx_gui)
-
-    add_definitions(-DNTK_GUI)
-    message(STATUS "Will build NTK gui")
-
-    include_directories(
-        ${NTK_INCLUDE_DIRS}
-        "${CMAKE_CURRENT_SOURCE_DIR}/UI"
-        "${CMAKE_CURRENT_BINARY_DIR}/UI"
-        )
-
-    add_subdirectory(UI)
-endif()
-
-message(STATUS "Building on a '${CMAKE_SYSTEM_NAME}' System")
+add_definitions(-DVERSION="${VERSION}")
+add_definitions(-DPIXMAP_PATH="${CMAKE_INSTALL_PREFIX}/share/zynaddsubfx/pixmaps/")
+add_definitions(-DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(MSVC)
     if(CMAKE_CL_64)
@@ -120,15 +57,9 @@ else(MSVC)
     )
 
     set(BuildOptionsDebug
-        "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
-endif(MSVC)
-
-include_directories(
-    ${MXML_INCLUDE_DIR}
+        "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags"
     )
 
-if(MSVC)
-else(MSVC)
     add_definitions(
          -g #TODO #todo put in a better location
          -Wall
@@ -159,38 +90,14 @@ else(MSVC)
     add_definitions(-fPIC)
 endif(MSVC)
 
-link_directories(
-    ${AUDIO_LIBRARY_DIRS}
-    ${FFTW_LIBRARY_DIRS}
-    ${MXML_LIBRARY_DIRS}
-    ${FLTK_LIBRARY_DIRS}
-    ${NTK_LIBRARY_DIRS}
-    )
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    QUI
-    )
-
-set(NONGUI_LIBRARIES
-    zynaddsubfx_misc
-    zynaddsubfx_synth
-    zynaddsubfx_effect
-    zynaddsubfx_params
-    zynaddsubfx_dsp
-    zynaddsubfx_nio
-    )
-
-
+#####################################################################################
+### BEGIN : Core ZynAddSubFx code
+#   - needed for all executables and libraries in this cmakelists
 add_subdirectory(Misc)
 add_subdirectory(Synth)
 add_subdirectory(Effects)
 add_subdirectory(Params)
 add_subdirectory(DSP)
-add_subdirectory(Nio)
-add_subdirectory(QUI)
-add_subdirectory(Sequence)
 
 add_library(zynaddsubfx_core STATIC
     ${zynaddsubfx_dsp_SRCS}
@@ -203,21 +110,67 @@ add_library(zynaddsubfx_core STATIC
 target_link_libraries(zynaddsubfx_core
     ${FFTW_LIBRARIES}
     ${MXML_LIBRARIES}
-    ${OS_LIBRARIES}
     ${PTHREAD_LIBRARIES}
+    ${OS_LIBRARIES}
     )
 
-add_executable(zynaddsubfx zynaddsubfx.cpp)
+add_subdirectory(Nio)
+### END : Core ZynAddSubFx code
+#####################################################################################
 
-target_link_libraries(zynaddsubfx
-    zynaddsubfx_core
-    zynaddsubfx_nio
-    zynaddsubfx_sequence
-    ${GUI_LIBRARIES}
-    ${NIO_LIBRARIES}
-    )
 
+#####################################################################################
+### BEGIN : Gui ZynAddSubFx code
+#   - needed for gui executables of zynaddsubfx
+if(ZASFEnable)
+    message(STATUS "Building ZynAddSubFx executable")
+    add_subdirectory(UI)
+    add_definitions(${UI_DEFINITIONS})
+    include_directories(${UI_INCLUDE_DIRS})
+
+    add_executable(zynaddsubfx zynaddsubfx.cpp)
+
+    target_link_libraries(zynaddsubfx
+        zynaddsubfx_core
+        zynaddsubfx_nio
+        zynaddsubfx_sequence
+        ${UI_LIBRARIES}
+        ${NIO_LIBRARIES}
+        )
+endif(ZASFEnable)
+### END : Gui ZynAddSubFx code
+#####################################################################################
+
+
+#####################################################################################
+### BEGIN : ZynMusicStudio code (ZMS)
+#   - needed for zynmusicstudio executable
+if(ZMSEnable)
+    message(STATUS "Building ZynMusicStudio executable")
+    add_subdirectory(ZMS)
+    add_subdirectory(Sequence)
+
+    include_directories(${ZMS_INCLUDE_DIRS})
+
+    add_executable(zynmusicstudio zynmusicstudio.cpp)
+
+    target_link_libraries(zynmusicstudio
+        zynaddsubfx_core
+        zynaddsubfx_nio
+        zynmusicstudio_zms
+        zynaddsubfx_sequence
+        ${NIO_LIBRARIES}
+        )
+endif(ZMSEnable)
+### END : ZynMusicStudio code (ZMS)
+#####################################################################################
+
+
+#####################################################################################
+### BEGIN : Dssi ZynAddSubFx code (ZASF)
+#   - needed for dssi plugin of zynaddsubfx
 if(DssiEnable)
+    message(STATUS "Building Dssi plugin")
     add_library(zynaddsubfx_dssi SHARED
         Output/DSSIaudiooutput.cpp
         )
@@ -227,20 +180,10 @@ if(DssiEnable)
         ${OS_LIBRARIES}
         )
     if(${CMAKE_SIZEOF_VOID_P} EQUAL "8")
-        install(TARGETS zynadd	subfx_dssi LIBRARY DESTINATION lib64/dssi/)
+        install(TARGETS zynaddsubfx_dssi LIBRARY DESTINATION lib64/dssi/)
     else()
         install(TARGETS zynaddsubfx_dssi LIBRARY DESTINATION lib/dssi/)
     endif()
-endif()
-
-add_executable(zynmusicstudio zynmusicstudio.cpp)
-
-target_link_libraries(zynmusicstudio
-    zynaddsubfx_core
-    zynaddsubfx_nio
-    zynmusicstudio_qui
-    zynaddsubfx_sequence
-    ${NIO_LIBRARIES}
-    )
-
-qt5_use_modules(zynmusicstudio Widgets)
+endif(DssiEnable)
+### END : Dssi ZynAddSubFx code (ZASF)
+#####################################################################################

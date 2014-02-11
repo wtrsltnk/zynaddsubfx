@@ -1,9 +1,3 @@
-#Defaults:
-#         - Wave Output (enabled with the record function)
-#         - Null Output
-#         - Null Output Running by default
-#         - Managed with OutMgr
-
 add_definitions(-DOUT_DEFAULT="NULL")
 add_definitions(-DIN_DEFAULT="NULL")
 

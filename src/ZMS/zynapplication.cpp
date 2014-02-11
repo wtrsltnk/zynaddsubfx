@@ -20,7 +20,7 @@
 
 */
 #include "zynapplication.h"
-#include "QUI/mainwindow.h"
+#include "mainwindow.h"
 #include <QApplication>
 #include <QStyleFactory>
 #include <QPalette>

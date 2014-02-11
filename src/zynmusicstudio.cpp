@@ -32,7 +32,7 @@
 #include <Windows.h>
 #endif
 
-#include "QUI/zynapplication.h"
+#include "ZMS/zynapplication.h"
 #include "Misc/Master.h"
 #include "Misc/Part.h"
 #include "Misc/Util.h"
@@ -101,15 +101,24 @@ int main(int argc, char *argv[])
     initprogram();
 
     Master::getInstance().partonoff(1, 1);
-//    Master::getInstance().part[1]->defaults();
     Master::getInstance().part[1]->Prcvchn = 1;
-    MidiClip* clip = new MidiClip();
-    clip->Pchannel = 1;
-    clip->Pstart = 4;
-    clip->addNote(80, 64, 1.0, 1.0);
-    clip->addNote(86, 64, 2.0, 0.5);
-    clip->addNote(80, 64, 2.5, 1.0);
-    Sequence::getInstance().Pclips.push_back(clip);
+
+    MidiClip* clip1 = new MidiClip();
+    clip1->Pchannel = 0;
+    clip1->Pstart = 1;
+    clip1->addNote(80, 64, 1.0, 1.0);
+    clip1->addNote(86, 64, 2.0, 0.5);
+    clip1->addNote(80, 64, 2.5, 1.0);
+    Sequence::getInstance().Pclips.push_back(clip1);
+
+    MidiClip* clip2 = new MidiClip();
+    clip2->Pchannel = 1;
+    clip2->Pstart = 4;
+    clip2->addNote(80, 64, 1.0, 1.0);
+    clip2->addNote(86, 64, 2.0, 0.5);
+    clip2->addNote(80, 64, 2.5, 1.0);
+    Sequence::getInstance().Pclips.push_back(clip2);
+
     Nio::preferedSampleRate(synth->samplerate);
 
     //Run the Nio system

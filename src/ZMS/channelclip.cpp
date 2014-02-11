@@ -105,11 +105,12 @@ void ChannelClip::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (this->_drag)
     {
         int diff = event->pos().x() - this->_dragStart.x();
-        if (abs(diff) > 50)
+//        if (abs(diff) > 50)
         {
             this->setPos(this->pos().x() + (diff  - (diff % 50)), this->pos().y());
             this->_dragStart = QPointF(this->_dragStart.x() + (diff  - (diff % 50)), this->_dragStart.y());
             this->_clip->Pstart = this->pos().x() / 100;
+            if (this->_clip->Pstart < 0) this->_clip->Pstart = 0;
         }
     }
 }

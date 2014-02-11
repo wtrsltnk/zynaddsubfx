@@ -111,7 +111,9 @@ inline void sprng(prng_t p)
 /*
  * The random generator (0.0f..1.0f)
  */
+#ifndef INT32_MAX
 # define INT32_MAX      (2147483647)
+#endif // INT32_MAX
 #define RND (prng() / (INT32_MAX * 1.0f))
 
 //Linear Interpolation
