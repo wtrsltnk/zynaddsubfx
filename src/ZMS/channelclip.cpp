@@ -96,8 +96,11 @@ void ChannelClip::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 void ChannelClip::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     this->select();
-    this->_drag = true;
-    this->_dragStart = event->pos();
+    if (event->buttons() &= Qt::LeftButton)
+    {
+        this->_drag = true;
+        this->_dragStart = event->pos();
+    }
 }
 
 void ChannelClip::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

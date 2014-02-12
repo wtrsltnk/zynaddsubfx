@@ -62,7 +62,8 @@ private:
     Ui::ChannelContainer *ui;
     ChannelWindow* _channels[NUM_MIDI_CHANNELS];
     ChannelWindow* _selectedChannel;
-    QGraphicsScene _clips;
+    QGraphicsScene* _clips;
+    QGraphicsItemGroup* _group;
     int _vscrollOffset;
     int _vscale;
     int _lastHScroll;

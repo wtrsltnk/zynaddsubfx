@@ -56,7 +56,7 @@ protected slots:
 
 private:
     Ui::MainWindow *ui;
-    QTimer _vutimer;
+    QTimer* _vutimer;
     int _selectedChannel;
     QPushButton* _effectButtons;
 

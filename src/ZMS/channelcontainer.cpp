@@ -33,7 +33,10 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelContainer),
     _selectedChannel(0),
-    _lastHScroll(0)
+    _vscrollOffset(0),
+    _vscale(25),
+    _lastHScroll(0),
+    _clips(0)
 {
     ui->setupUi(this);
 
@@ -53,13 +56,25 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
 
     connect(this->ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(onHScrollChannel(int)));
     connect(this->ui->btnAddChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
-    this->ui->clips->setScene(&this->_clips);
+    this->_clips = new QGraphicsScene();
+    this->ui->clips->setScene(this->_clips);
     this->ui->clips->installEventFilter(this);
-    this->ui->clips->setBackgroundBrush(QBrush(QColor(0, 48, 64)));
+    this->ui->clips->setBackgroundBrush(QBrush(QColor(35, 35, 35)));
+
+    this->_group = new QGraphicsItemGroup();
+    this->_group->setFiltersChildEvents(false);
+    this->_group->setHandlesChildEvents(false);
+    this->_clips->addItem(this->_group);
+
+    this->ui->scale->installEventFilter(this);
 }
 
 ChannelContainer::~ChannelContainer()
 {
+    this->_clips->removeItem(this->_group);
+    delete this->_group;
+    this->ui->clips->setScene(0);
+    delete this->_clips;
     delete ui;
 }
 
@@ -80,28 +95,56 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
         }
         return true;
     }
+    if (watched == this->ui->scale && event->type() == QEvent::Paint)
+    {
+        QPainter p(this->ui->scale);
+        p.setPen(QPen(this->palette().brightText().color()));
+        p.setFont(QFont("Verdana", 10));
+        for (int x = 0; (x * this->_vscale) < 1000; x++)
+        {
+            if (x % 4)
+                p.drawLine((x * this->_vscale) + this->_vscrollOffset,
+                           this->ui->top->height()/2,
+                           (x * this->_vscale) + this->_vscrollOffset,
+                           this->ui->top->height());
+            else
+            {
+                p.drawLine((x * this->_vscale) + this->_vscrollOffset,
+                           0,
+                           (x * this->_vscale) + this->_vscrollOffset,
+                           this->ui->top->height());
+                p.drawText((x * this->_vscale) + this->_vscrollOffset+2,
+                           p.fontInfo().pointSize(),
+                           QString::number(x+1));
+            }
+        }
+        return true;
+    }
     return false;
 }
 
 void ChannelContainer::updateClips()
 {
+    if (this->_clips == 0)
+        return;
+
     // TODO optimze this, not very smart!
     while (this->_channelClips.empty() == false)
     {
         ChannelClip* cclip = this->_channelClips.back();
         this->_channelClips.pop_back();
-        this->_clips.removeItem(cclip);
+        this->_group->removeFromGroup(cclip);
         delete cclip;
     }
-    this->_clips.addRect(0, 0, 10, 10, QPen(Qt::white), QBrush(Qt::white));
+    this->_clips->addRect(0, 0, 10, 10, QPen(QColor::fromRgb(255, 255, 255, 0)), QBrush(QColor::fromRgb(255, 255, 255, 0)));
     for (int i = 0; i < Sequence::getInstance().Pclips.size(); i++)
     {
         MidiClip* clip = Sequence::getInstance().Pclips[i];
         ChannelClip* cclip = new ChannelClip(clip);
         int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
-        cclip->setPos(clip->Pstart * 100, this->_channels[clip->Pchannel]->height() * index);
-        cclip->setHeight(this->_channels[clip->Pchannel]->height());
-        this->_clips.addItem(cclip);
+        cclip->setPos(clip->Pstart * 100, this->_channels[clip->Pchannel]->height() * index + 4);
+        cclip->setHeight(this->_channels[clip->Pchannel]->height() - 8);
+        this->_group->addToGroup(cclip);
         this->_channelClips.push_back(cclip);
     }
 }
@@ -147,7 +190,11 @@ void ChannelContainer::onRemoveChannel(int index)
 
 void ChannelContainer::onHScrollChannel(int value)
 {
-    this->ui->clips->scroll(this->_lastHScroll - value, 0);
+    this->_vscrollOffset = -(value * 10);
+
+    this->_group->moveBy((this->_lastHScroll - value) * 10, 0);
+    this->ui->scale->update();
+
     this->_lastHScroll = value;
 }
 

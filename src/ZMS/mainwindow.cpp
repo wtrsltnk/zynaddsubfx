@@ -75,14 +75,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->ui->sysuvL->installEventFilter(this);
     this->ui->sysuvR->installEventFilter(this);
 
-    connect(&this->_vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
-    connect(this->ui->sysmaster, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
-
-    this->_vutimer.setInterval(1000/40);
-    this->_vutimer.start();
+    this->_vutimer = new QTimer();
+    this->_vutimer->setInterval(1000/40);
+    this->_vutimer->start();
+    connect(this->_vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
 
     connect(this->ui->channels, SIGNAL(selectChannel(int)), this, SLOT(OnSelectChannel(int)));
     connect(this->ui->instruments, SIGNAL(selectInstrument(int)), this, SLOT(OnSelectPart(int)));
+    connect(this->ui->sysmaster, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
 
     connect(this->ui->btnPlay, SIGNAL(clicked()), this, SLOT(onPlay()));
     connect(this->ui->btnPause, SIGNAL(clicked()), this, SLOT(onPause()));
@@ -91,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete this->_vutimer;
     for (int i = 0; i < NUM_SYS_EFX; i++)
         this->ui->syseffects->layout()->removeWidget(&this->_effectButtons[i]);
     delete []this->_effectButtons;
@@ -177,9 +178,9 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
         QPainter painter;
         painter.begin(ui->sysuvL);
 
-        painter.fillRect(0,ly-idbl,lx,idbl, QBrush(Qt::green, Qt::Dense7Pattern));
+        painter.fillRect(0,ly-idbl,lx,idbl, QBrush(QColor::fromRgb(0, 191, 255), Qt::Dense7Pattern));
         painter.fillRect(0,0,lx,ly-idbl, QBrush(Qt::white, Qt::Dense7Pattern));
-        painter.fillRect(0,ly-irmsdbl-1,lx,3, QBrush(Qt::yellow, Qt::SolidPattern));
+        painter.fillRect(0,ly-irmsdbl-1,lx,3, QBrush(QColor::fromRgb(0, 143, 191), Qt::SolidPattern));
 
         painter.end();
         return true;
@@ -194,9 +195,9 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
         QPainter painter;
         painter.begin(ui->sysuvR);
 
-        painter.fillRect(0,ly-idbr,lx,idbr, QBrush(Qt::green, Qt::Dense7Pattern));
+        painter.fillRect(0,ly-idbr,lx,idbr, QBrush(QColor::fromRgb(0, 191, 255), Qt::Dense7Pattern));
         painter.fillRect(0,0,lx,ly-idbr, QBrush(Qt::white, Qt::Dense7Pattern));
-        painter.fillRect(0,ly-irmsdbr-1,lx,3, QBrush(Qt::yellow, Qt::SolidPattern));
+        painter.fillRect(0,ly-irmsdbr-1,lx,3, QBrush(QColor::fromRgb(0, 143, 191), Qt::SolidPattern));
 
         painter.end();
         return true;

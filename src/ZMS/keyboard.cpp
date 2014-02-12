@@ -85,9 +85,9 @@ void Keyboard::Key::setOn(bool on)
         if (on)
         {
             if (this->_isSharp)
-                this->setBrush(QBrush(QColor(0, 0, 155)));
+                this->setBrush(QBrush(QColor::fromRgb(0, 48, 64)));
             else
-                this->setBrush(QBrush(QColor(200, 210, 255)));
+                this->setBrush(QBrush(QColor::fromRgb(0, 172, 229)));
         }
         else
         {

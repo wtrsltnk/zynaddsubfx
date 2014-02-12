@@ -30,11 +30,12 @@ ZynApplication::ZynApplication(int argc, char *argv[]) :
 {
     this->setStyle(QStyleFactory::create("Fusion"));
     QPalette p = this->palette();
-    p.setColor(QPalette::Window, QColor(53,53,53));
-    p.setColor(QPalette::Button, QColor(53,53,53));
-    p.setColor(QPalette::Highlight, QColor(142,45,197));
-    p.setColor(QPalette::ButtonText, QColor(255,255,255));
-    p.setColor(QPalette::WindowText, QColor(255,255,255));
+    p.setColor(QPalette::Window, QColor(53, 53, 53));
+    p.setColor(QPalette::Button, QColor(53, 53, 53));
+    p.setColor(QPalette::Highlight, QColor(0, 143, 191));
+    p.setColor(QPalette::ButtonText, QColor(255, 255, 255));
+    p.setColor(QPalette::WindowText, QColor(255, 255, 255));
+    p.setColor(QPalette::WindowText, QColor(255, 255, 255));
     this->setPalette(p);
 }
 

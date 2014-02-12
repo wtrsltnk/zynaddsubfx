@@ -53,6 +53,14 @@ InstrumentWindow::InstrumentWindow(int partindex, InstrumentContainer* c, QWidge
 
 InstrumentWindow::~InstrumentWindow()
 {
+    for (int i = 0; i < NUM_KIT_ITEMS; i++)
+    {
+        if (this->_kitWindows[i] != 0)
+        {
+            this->ui->kits->removeTab(this->ui->kits->indexOf(this->_kitWindows[i]));
+            delete this->_kitWindows[i];
+        }
+    }
     delete ui;
 }
 
