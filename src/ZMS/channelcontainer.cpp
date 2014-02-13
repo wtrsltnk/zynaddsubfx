@@ -123,19 +123,19 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
 
         int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->_vscale;
         int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->_vscale;
-        p.fillRect(x, 0, w - x, this->ui->scale->height(), QBrush(QColor::fromRgb(0, 143, 191, 155)));
+        p.fillRect(x + this->_vscrollOffset, 0, w - x, this->ui->scale->height(), QBrush(QColor::fromRgb(0, 143, 191, 155)));
 
         p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
-        p.drawLine(x, 0, x, this->ui->scale->height());
-        p.drawLine(w, 0, w, this->ui->scale->height());
+        p.drawLine(x + this->_vscrollOffset, 0, x + this->_vscrollOffset, this->ui->scale->height());
+        p.drawLine(w + this->_vscrollOffset, 0, w + this->_vscrollOffset, this->ui->scale->height());
 
         if (this->_rangeselection.draw)
         {
-            int s = this->_rangeselection.start - (this->_rangeselection.start % this->_vscale);
-            int e = this->_rangeselection.end - (this->_rangeselection.end % this->_vscale);
+            int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
+            int e = (this->_rangeselection.end - this->_vscrollOffset) - (this->_rangeselection.end % this->_vscale);
             if (e < s) { int tmp = s; s = e; e = tmp; }
             p.setPen(QPen(QColor::fromRgb(0, 191, 255), 4));
-            p.drawLine(s, this->ui->scale->height() - 2, e, this->ui->scale->height() - 2);
+            p.drawLine(s + this->_vscrollOffset, this->ui->scale->height() - 2, e + this->_vscrollOffset, this->ui->scale->height() - 2);
         }
         return true;
     }
@@ -154,8 +154,8 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
     if (watched == this->ui->scale && event->type() == QEvent::MouseButtonRelease)
     {
         this->_rangeselection.draw = false;
-        int s = this->_rangeselection.start - (this->_rangeselection.start % this->_vscale);
-        int e = this->_rangeselection.end - (this->_rangeselection.end % this->_vscale);
+        int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
+        int e = (this->_rangeselection.end - this->_vscrollOffset) - (this->_rangeselection.end % this->_vscale);
         Sequence::getInstance().SetPlayRange(
                     Sequence::getInstance().BeatsToFrames(s / this->_vscale),
                     Sequence::getInstance().BeatsToFrames(e / this->_vscale));
