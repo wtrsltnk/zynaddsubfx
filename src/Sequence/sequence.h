@@ -34,6 +34,8 @@ public:
 
     void AddFrames(long frames);
 
+    double FramesToBeats(long frames);
+
     std::vector<MidiClip*> Pclips;
 private:
     long _currentframe;

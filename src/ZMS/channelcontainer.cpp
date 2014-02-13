@@ -25,6 +25,7 @@
 #include "../Misc/Master.h"
 #include "../Misc/Part.h"
 #include "../Sequence/sequence.h"
+#include <QMouseEvent>
 #include <iostream>
 
 using namespace std;
@@ -38,6 +39,7 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     _lastHScroll(0),
     _clips(0)
 {
+    this->_rangeselection.start = this->_rangeselection.end = this->_rangeselection.draw = 0;
     ui->setupUi(this);
 
     for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
@@ -118,6 +120,41 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
                            QString::number(x+1));
             }
         }
+
+        int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->_vscale;
+        int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->_vscale;
+        p.fillRect(x, 0, w - x, this->ui->scale->height(), QBrush(QColor::fromRgb(0, 143, 191, 155)));
+
+        p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
+        p.drawLine(x, 0, x, this->ui->scale->height());
+        p.drawLine(w, 0, w, this->ui->scale->height());
+
+        if (this->_rangeselection.draw)
+        {
+            int s = this->_rangeselection.start - (this->_rangeselection.start % this->_vscale);
+            int e = this->_rangeselection.end - (this->_rangeselection.end % this->_vscale);
+            if (e < s) { int tmp = s; s = e; e = tmp; }
+            p.setPen(QPen(QColor::fromRgb(0, 191, 255), 4));
+            p.drawLine(s, this->ui->scale->height() - 2, e, this->ui->scale->height() - 2);
+        }
+        return true;
+    }
+    if (watched == this->ui->scale && event->type() == QEvent::MouseButtonPress)
+    {
+        this->_rangeselection.start = ((QMouseEvent*)event)->pos().x();
+        return true;
+    }
+    if (watched == this->ui->scale && event->type() == QEvent::MouseButtonRelease)
+    {
+        this->_rangeselection.draw = false;
+        this->ui->scale->update();
+        return true;
+    }
+    if (watched == this->ui->scale && event->type() == QEvent::MouseMove)
+    {
+        this->_rangeselection.end = ((QMouseEvent*)event)->pos().x();
+        this->_rangeselection.draw = true;
+        this->ui->scale->update();
         return true;
     }
     return false;

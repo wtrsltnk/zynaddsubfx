@@ -4,7 +4,7 @@
 #include "../Misc/Master.h"
 
 Sequence::Sequence()
-    : _currentframe(0),
+    : _currentframe(synth->samplerate * 2), // 2 seconds
       _startframe(_currentframe),
       _endframe(synth->samplerate * 5), // 5 seconds
       _bpm(120),
@@ -70,4 +70,9 @@ void Sequence::SetPlayRange(long start, unsigned long length)
 {
     this->_startframe = start;
     this->_endframe = start + length;
+}
+
+double Sequence::FramesToBeats(long frames)
+{
+    return double(frames) * ((double(this->_bpm) / 60.0) / double(synth->samplerate_f));
 }

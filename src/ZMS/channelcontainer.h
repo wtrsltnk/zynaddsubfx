@@ -69,6 +69,12 @@ private:
     int _lastHScroll;
     std::vector<ChannelClip*> _channelClips;
 
+    struct {
+        int start;
+        int end;
+        bool draw;
+    } _rangeselection;
+
     virtual void resizeEvent(QResizeEvent* event);
     virtual bool eventFilter(QObject* watched, QEvent* event);
 };
