@@ -66,13 +66,18 @@ void Sequence::Stop()
     this->Reset();
 }
 
-void Sequence::SetPlayRange(long start, unsigned long length)
+void Sequence::SetPlayRange(long start, long end)
 {
     this->_startframe = start;
-    this->_endframe = start + length;
+    this->_endframe = end;
 }
 
 double Sequence::FramesToBeats(long frames)
 {
     return double(frames) * ((double(this->_bpm) / 60.0) / double(synth->samplerate_f));
+}
+
+long Sequence::BeatsToFrames(double beats)
+{
+    return beats / ((double(this->_bpm) / 60.0) / double(synth->samplerate_f));
 }

@@ -30,11 +30,12 @@ public:
     long Cursor() { return this->_currentframe; }
     long StartPlayAt() { return this->_startframe; }
     long StopPlayAt() { return this->_endframe; }
-    void SetPlayRange(long start, unsigned long length);
+    void SetPlayRange(long start, long end);
 
     void AddFrames(long frames);
 
     double FramesToBeats(long frames);
+    long BeatsToFrames(double beats);
 
     std::vector<MidiClip*> Pclips;
 private:

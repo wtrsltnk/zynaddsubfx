@@ -144,16 +144,21 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
         this->_rangeselection.start = ((QMouseEvent*)event)->pos().x();
         return true;
     }
-    if (watched == this->ui->scale && event->type() == QEvent::MouseButtonRelease)
-    {
-        this->_rangeselection.draw = false;
-        this->ui->scale->update();
-        return true;
-    }
     if (watched == this->ui->scale && event->type() == QEvent::MouseMove)
     {
         this->_rangeselection.end = ((QMouseEvent*)event)->pos().x();
         this->_rangeselection.draw = true;
+        this->ui->scale->update();
+        return true;
+    }
+    if (watched == this->ui->scale && event->type() == QEvent::MouseButtonRelease)
+    {
+        this->_rangeselection.draw = false;
+        int s = this->_rangeselection.start - (this->_rangeselection.start % this->_vscale);
+        int e = this->_rangeselection.end - (this->_rangeselection.end % this->_vscale);
+        Sequence::getInstance().SetPlayRange(
+                    Sequence::getInstance().BeatsToFrames(s / this->_vscale),
+                    Sequence::getInstance().BeatsToFrames(e / this->_vscale));
         this->ui->scale->update();
         return true;
     }
