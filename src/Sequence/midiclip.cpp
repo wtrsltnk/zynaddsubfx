@@ -31,13 +31,12 @@ void MidiClip::addNote(unsigned char note, unsigned char velocity, double start,
 
 void MidiClip::sendNotes(long min, long max)
 {
-    double frames_per_beat = double(synth->samplerate) / (double(Sequence::getInstance().Tempo()) / 60);
     Master& m = Master::getInstance();
     for (std::vector<Note*>::iterator i = this->Pnotes.begin(); i != this->Pnotes.end(); ++i)
     {
         Note* n = *i;
-        long notestart = long(frames_per_beat * (this->Pstart + n->start));
-        long notelength = long(frames_per_beat * n->length);
+        long notestart = Sequence::getInstance().BeatsToFrames(this->Pstart + n->start);
+        long notelength = Sequence::getInstance().BeatsToFrames(n->length);
         if (notestart >= min && notestart <= max)
             m.noteOn(this->Pchannel, n->note, n->velocity);
         if (notestart + notelength > min && notestart + notelength < max)

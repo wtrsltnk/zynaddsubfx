@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QGraphicsItemGroup>
+#include <QTimer>
 #include "../globals.h"
 #include "channelclip.h"
 
@@ -46,28 +47,34 @@ public:
     int vscrollOffset();
     int vscale();
 
-    void selectChannel(ChannelWindow* part);
-    void updateMinHeight();
-    void updateClips();
+    void UpdateChannels();
+    void UpdateClips();
 
 protected slots:
-    void onAddChannel();
-    void onRemoveChannel(int index);
-    void onHScrollChannel(int value);
+    void AddChannel();
+    void RemoveChannel(int index);
+    void HScrollChannel(int value);
+    void UpdateUI();
+    void SetSelectedChannel(int channel);
+    void ChannelIsSelected();
+    void ChannelIsRemoved();
+    void ClipIsSelected();
 
 signals:
-    void selectChannel(int channel);
+    void SelectedChannelChanged(int channel);
 
 private:
     Ui::ChannelContainer *ui;
     ChannelWindow* _channels[NUM_MIDI_CHANNELS];
     ChannelWindow* _selectedChannel;
-    QGraphicsScene* _clips;
+    ChannelClip* _clips[NUM_MAX_CLIPS];
+    QGraphicsScene* _scene;
     QGraphicsItemGroup* _group;
+    QGraphicsLineItem* _cursor;
     int _vscrollOffset;
     int _vscale;
     int _lastHScroll;
-    std::vector<ChannelClip*> _channelClips;
+    QTimer* _updateTimer;
 
     struct {
         int start;
@@ -77,6 +84,9 @@ private:
 
     virtual void resizeEvent(QResizeEvent* event);
     virtual bool eventFilter(QObject* watched, QEvent* event);
+
+    void PaintTimeline();
+    void RemoveClip(int index);
 };
 
 #endif // CHANNELCONTAINER_H

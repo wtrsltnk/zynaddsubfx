@@ -38,9 +38,9 @@ public:
     ~InstrumentControl();
 
 protected slots:
-    void onVolumeChanged(int value);
-    void onPanChanged(int value);
-    void onSysEffectChanged(int value);
+    void OnVolumeChanged(int value);
+    void OnPanChanged(int value);
+    void OnSysEffectChanged(int value);
 
 private:
     Ui::InstrumentControl *ui;

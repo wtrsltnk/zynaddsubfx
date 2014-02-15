@@ -60,7 +60,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="widget_2" native="true">
+       <widget class="QWidget" name="fill2" native="true">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -90,7 +90,7 @@
           <number>2</number>
          </property>
          <item>
-          <widget class="QPushButton" name="btnAddChannel">
+          <widget class="QPushButton" name="addChannel">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -125,7 +125,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="scale" native="true"/>
+       <widget class="QWidget" name="timeline" native="true"/>
       </item>
      </layout>
     </widget>
@@ -167,7 +167,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="channelclips" native="true">
+        <widget class="QWidget" name="channelClipsContainer" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
            <number>0</number>
@@ -231,6 +231,9 @@
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
+            <property name="transformationAnchor">
+             <enum>QGraphicsView::NoAnchor</enum>
+            </property>
            </widget>
           </item>
          </layout>
@@ -241,7 +244,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="bottom" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
        <number>0</number>
@@ -259,7 +262,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="fill" native="true">
+       <widget class="QWidget" name="fill1" native="true">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -275,7 +278,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QScrollBar" name="horizontalScrollBar">
+       <widget class="QScrollBar" name="clipScroller">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>

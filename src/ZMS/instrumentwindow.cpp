@@ -35,7 +35,7 @@ InstrumentWindow::InstrumentWindow(int partindex, InstrumentContainer* c, QWidge
     ui->setupUi(this);
 
     this->ui->kits->clear();
-    this->updateUI();
+    this->UpdateUI();
 
     this->setStyleSheet("background-color:#666;");
     this->ui->chkActive->setChecked(_part->Penabled);
@@ -44,11 +44,11 @@ InstrumentWindow::InstrumentWindow(int partindex, InstrumentContainer* c, QWidge
     this->ui->cmbKitmode->addItem("Multi instrument per note");
     this->ui->cmbKitmode->addItem("Single instrument per note");
 
-    connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(onToggleCollapse()));
-    connect(this->ui->chkActive, SIGNAL(stateChanged(int)), this, SLOT(onChangeEnabled(int)));
-    connect(this->ui->btnAddItem, SIGNAL(clicked()), this, SLOT(onAddKititem()));
-    connect(this->ui->btnRemoveItem, SIGNAL(clicked()), this, SLOT(onRemoveKititem()));
-    connect(this->ui->cmbKitmode, SIGNAL(currentIndexChanged(int)), this, SLOT(onKitModeChanged(int)));
+    connect(this->ui->collapse, SIGNAL(clicked()), this, SLOT(OnToggleCollapse()));
+    connect(this->ui->chkActive, SIGNAL(stateChanged(int)), this, SLOT(OnChangeEnabled(int)));
+    connect(this->ui->btnAddItem, SIGNAL(clicked()), this, SLOT(OnAddKititem()));
+    connect(this->ui->btnRemoveItem, SIGNAL(clicked()), this, SLOT(OnRemoveKititem()));
+    connect(this->ui->cmbKitmode, SIGNAL(currentIndexChanged(int)), this, SLOT(OnKitModeChanged(int)));
 }
 
 InstrumentWindow::~InstrumentWindow()
@@ -64,7 +64,7 @@ InstrumentWindow::~InstrumentWindow()
     delete ui;
 }
 
-void InstrumentWindow::updateUI()
+void InstrumentWindow::UpdateUI()
 {
     for (int i = 0; i < NUM_KIT_ITEMS; i++)
     {
@@ -73,8 +73,8 @@ void InstrumentWindow::updateUI()
             if (this->_kitWindows[i] == 0)
             {
                 this->_kitWindows[i] = new KitWindow(this->_part, i);
-                this->ui->kits->addTab(this->_kitWindows[i], this->_kitWindows[i]->getIcon(), "est");
-                connect(this->_kitWindows[i], SIGNAL(keyRangeChanged()), this, SLOT(onKeyRangeChanged()));
+                this->ui->kits->addTab(this->_kitWindows[i], this->_kitWindows[i]->GetIcon(), "est");
+                connect(this->_kitWindows[i], SIGNAL(KeyRangeChanged()), this, SLOT(OnKeyRangeChanged()));
             }
         }
         else
@@ -90,9 +90,9 @@ void InstrumentWindow::updateUI()
     }
 }
 
-void InstrumentWindow::onToggleCollapse()
+void InstrumentWindow::OnToggleCollapse()
 {
-    this->_container->selectInstrument(this);
+    this->_container->SelectInstrument(this);
     if (this->ui->content->isVisible())
     {
         this->ui->content->hide();
@@ -105,12 +105,12 @@ void InstrumentWindow::onToggleCollapse()
     }
 }
 
-void InstrumentWindow::onChangeEnabled(int value)
+void InstrumentWindow::OnChangeEnabled(int value)
 {
     this->_part->Penabled = value;
 }
 
-void InstrumentWindow::onAddKititem()
+void InstrumentWindow::OnAddKititem()
 {
     for (int i = 0; i < NUM_KIT_ITEMS; i++)
     {
@@ -126,16 +126,16 @@ void InstrumentWindow::onAddKititem()
                 this->_part->kit[i].Pminkey = this->_part->kit[i-1].Pminkey + half;
                 this->_part->kit[i].Pmaxkey = this->_part->kit[i-1].Pminkey + len;
                 if (this->_kitWindows[i-1] != 0)
-                    this->_kitWindows[i-1]->updateUI();
+                    this->_kitWindows[i-1]->UpdateUI();
             }
             break;
         }
     }
-    this->_container->selectInstrument(this);
-    this->updateUI();
+    this->_container->SelectInstrument(this);
+    this->UpdateUI();
 }
 
-void InstrumentWindow::onRemoveKititem()
+void InstrumentWindow::OnRemoveKititem()
 {
     for (int i = NUM_KIT_ITEMS - 1; i > 0; i--)
     {
@@ -147,16 +147,16 @@ void InstrumentWindow::onRemoveKititem()
             {
                 this->_part->kit[i-1].Pmaxkey = this->_part->kit[i].Pmaxkey;
                 if (this->_kitWindows[i-1] != 0)
-                    this->_kitWindows[i-1]->updateUI();
+                    this->_kitWindows[i-1]->UpdateUI();
             }
             break;
         }
     }
-    this->_container->selectInstrument(this);
-    this->updateUI();
+    this->_container->SelectInstrument(this);
+    this->UpdateUI();
 }
 
-void InstrumentWindow::onKeyRangeChanged()
+void InstrumentWindow::OnKeyRangeChanged()
 {
     for (int i = 0; i < NUM_KIT_ITEMS; i++)
     {
@@ -164,15 +164,15 @@ void InstrumentWindow::onKeyRangeChanged()
         {
             if (this->_kitWindows[i] != 0)
             {
-                this->_kitWindows[i]->updateUI();
+                this->_kitWindows[i]->UpdateUI();
             }
         }
     }
-    this->_container->selectInstrument(this);
-    this->updateUI();
+    this->_container->SelectInstrument(this);
+    this->UpdateUI();
 }
 
-void InstrumentWindow::onKitModeChanged(int value)
+void InstrumentWindow::OnKitModeChanged(int value)
 {
     this->_part->Pkitmode = value;
     if (value == 0)
@@ -187,15 +187,15 @@ void InstrumentWindow::onKitModeChanged(int value)
     }
 }
 
-void InstrumentWindow::select()
+void InstrumentWindow::Select()
 {
 }
 
-void InstrumentWindow::unselect()
+void InstrumentWindow::Unselect()
 {
 }
 
-int InstrumentWindow::partIndex()
+int InstrumentWindow::PartIndex()
 {
     return this->_partIndex;
 }

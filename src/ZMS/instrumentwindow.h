@@ -39,20 +39,20 @@ public:
     explicit InstrumentWindow(int partindex, InstrumentContainer* c, QWidget *parent = 0);
     ~InstrumentWindow();
 
-    void select();
-    void unselect();
+    void Select();
+    void Unselect();
 
-    int partIndex();
+    int PartIndex();
 
-    void updateUI();
+    void UpdateUI();
 
 protected slots:
-    void onToggleCollapse();
-    void onChangeEnabled(int value);
-    void onAddKititem();
-    void onRemoveKititem();
-    void onKeyRangeChanged();
-    void onKitModeChanged(int value);
+    void OnToggleCollapse();
+    void OnChangeEnabled(int value);
+    void OnAddKititem();
+    void OnRemoveKititem();
+    void OnKeyRangeChanged();
+    void OnKitModeChanged(int value);
 
 private:
     Ui::InstrumentWindow *ui;

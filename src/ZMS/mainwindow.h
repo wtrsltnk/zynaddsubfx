@@ -22,7 +22,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QTimer>
 #include <QPushButton>
 
@@ -30,7 +30,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -44,15 +44,15 @@ public:
 protected slots:
     void OnMasterGainChanged(int value);
     void OnVuTimer();
-    void OnShowOptionalMidiDevice();
+    void OnShowMidiDevices();
     void OnSelectMidiDevice();
-    void OnShowOptionalAudioDevice();
+    void OnShowAudioDevices();
     void OnSelectAudioDevice();
     void OnSelectChannel(int channel);
     void OnSelectPart(int part);
-    void onPlay();
-    void onPause();
-    void onStop();
+    void OnPlay();
+    void OnPause();
+    void OnStop();
 
 private:
     Ui::MainWindow *ui;

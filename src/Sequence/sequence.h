@@ -1,6 +1,7 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 
+#include "../globals.h"
 #include <vector>
 
 class MidiClip;
@@ -37,7 +38,7 @@ public:
     double FramesToBeats(long frames);
     long BeatsToFrames(double beats);
 
-    std::vector<MidiClip*> Pclips;
+    MidiClip* Pclips[NUM_MAX_CLIPS];
 private:
     long _currentframe;
     long _startframe;

@@ -44,7 +44,7 @@
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -68,9 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     this->ui->btnMidi->setText(InMgr::getInstance().getSource().c_str());
-    connect(this->ui->btnMidi, SIGNAL(clicked()), this, SLOT(OnShowOptionalMidiDevice()));
+    connect(this->ui->btnMidi, SIGNAL(clicked()), this, SLOT(OnShowMidiDevices()));
     this->ui->btnAudio->setText(OutMgr::getInstance().getDriver().c_str());
-    connect(this->ui->btnAudio, SIGNAL(clicked()), this, SLOT(OnShowOptionalAudioDevice()));
+    connect(this->ui->btnAudio, SIGNAL(clicked()), this, SLOT(OnShowAudioDevices()));
 
     this->ui->sysuvL->installEventFilter(this);
     this->ui->sysuvR->installEventFilter(this);
@@ -80,13 +80,22 @@ MainWindow::MainWindow(QWidget *parent) :
     this->_vutimer->start();
     connect(this->_vutimer, SIGNAL(timeout()), this, SLOT(OnVuTimer()));
 
-    connect(this->ui->channels, SIGNAL(selectChannel(int)), this, SLOT(OnSelectChannel(int)));
-    connect(this->ui->instruments, SIGNAL(selectInstrument(int)), this, SLOT(OnSelectPart(int)));
+    connect(this->ui->channels, SIGNAL(SelectedChannelChanged(int)), this, SLOT(OnSelectChannel(int)));
+    connect(this->ui->instruments, SIGNAL(SelectInstrument(int)), this, SLOT(OnSelectPart(int)));
     connect(this->ui->sysmaster, SIGNAL(valueChanged(int)), this, SLOT(OnMasterGainChanged(int)));
 
-    connect(this->ui->btnPlay, SIGNAL(clicked()), this, SLOT(onPlay()));
-    connect(this->ui->btnPause, SIGNAL(clicked()), this, SLOT(onPause()));
-    connect(this->ui->btnStop, SIGNAL(clicked()), this, SLOT(onStop()));
+    connect(this->ui->btnPlay, SIGNAL(clicked()), this, SLOT(OnPlay()));
+    connect(this->ui->btnPause, SIGNAL(clicked()), this, SLOT(OnPause()));
+    connect(this->ui->btnStop, SIGNAL(clicked()), this, SLOT(OnStop()));
+
+    connect(this->ui->actionInstruments, SIGNAL(toggled(bool)), this->ui->instrumentDock, SLOT(setVisible(bool)));
+    connect(this->ui->instrumentDock, SIGNAL(visibilityChanged(bool)), this->ui->actionInstruments, SLOT(setChecked(bool)));
+
+    connect(this->ui->actionKeyboard, SIGNAL(toggled(bool)), this->ui->keyboardDock, SLOT(setVisible(bool)));
+    connect(this->ui->keyboardDock, SIGNAL(visibilityChanged(bool)), this->ui->actionKeyboard, SLOT(setChecked(bool)));
+
+    connect(this->ui->actionMaster, SIGNAL(toggled(bool)), this->ui->masterDock, SLOT(setVisible(bool)));
+    connect(this->ui->masterDock, SIGNAL(visibilityChanged(bool)), this->ui->actionMaster, SLOT(setChecked(bool)));
 }
 
 MainWindow::~MainWindow()
@@ -106,13 +115,13 @@ void MainWindow::OnSelectChannel(int channel)
 
 void MainWindow::SelectChannel(int channel)
 {
-    this->ui->instruments->clearInstruments();
+    this->ui->instruments->ClearInstruments();
     for (int i = 0;i < NUM_MIDI_PARTS; i++)
     {
         Part* part = Master::getInstance().part[i];
         if (part->Prcvchn == channel)
         {
-            this->ui->instruments->addInstrument(i);
+            this->ui->instruments->AddInstrument(i);
             this->SelectPart(i);
         }
     }
@@ -128,7 +137,7 @@ void MainWindow::SelectPart(int index)
     Part* part = Master::getInstance().part[index];
 
     for (int k = 0; k < 128; k++)
-        this->ui->keyboard->setNoteEnabled(k, false);
+        this->ui->keyboard->SetNoteEnabled(k, false);
 
     for (int i = (NUM_KIT_ITEMS-1); i >= 0; i--)
     {
@@ -138,8 +147,8 @@ void MainWindow::SelectPart(int index)
             {
                 if (k >= part->kit[i].Pminkey && k <= part->kit[i].Pmaxkey)
                 {
-                    this->ui->keyboard->setNoteEnabled(k, true);
-                    this->ui->keyboard->setNoteColor(k, KitWindow::KitColors[i]);
+                    this->ui->keyboard->SetNoteEnabled(k, true);
+                    this->ui->keyboard->SetNoteColor(k, KitWindow::KitColors[i]);
                 }
             }
         }
@@ -151,17 +160,17 @@ void MainWindow::OnMasterGainChanged(int value)
     Master::getInstance().setPvolume(value);
 }
 
-void MainWindow::onPlay()
+void MainWindow::OnPlay()
 {
     Sequence::getInstance().Start();
 }
 
-void MainWindow::onPause()
+void MainWindow::OnPause()
 {
     Sequence::getInstance().Pause();
 }
 
-void MainWindow::onStop()
+void MainWindow::OnStop()
 {
     Sequence::getInstance().Stop();
 }
@@ -208,13 +217,13 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->isAutoRepeat() == false)
-        this->ui->keyboard->selectCharacter(char(event->key()), true);
+        this->ui->keyboard->SelectCharacter(char(event->key()), true);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
 {
     if (event->isAutoRepeat() == false)
-        this->ui->keyboard->selectCharacter(char(event->key()), false);
+        this->ui->keyboard->SelectCharacter(char(event->key()), false);
 }
 
 void MainWindow::OnVuTimer()
@@ -265,7 +274,7 @@ void MainWindow::OnVuTimer()
     this->ui->sysuvR->repaint();
 }
 
-void MainWindow::OnShowOptionalMidiDevice()
+void MainWindow::OnShowMidiDevices()
 {
     QMenu m;
     std::list<Engine *> en = EngineMgr::getInstance().engines;
@@ -289,7 +298,7 @@ void MainWindow::OnSelectMidiDevice()
         this->ui->btnMidi->setText(sel);
 }
 
-void MainWindow::OnShowOptionalAudioDevice()
+void MainWindow::OnShowAudioDevices()
 {
     QMenu m;
     std::list<Engine *> en = EngineMgr::getInstance().engines;

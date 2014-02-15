@@ -5,11 +5,15 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <cmath>
+#include <iostream>
+#include "../Sequence/sequence.h"
 
-ChannelClip::ChannelClip(MidiClip *clip)
+using namespace std;
+
+ChannelClip::ChannelClip(int clip)
     : _clip(clip), _drag(false)
 {
-    QPixmap p = this->getPixmapFromClip();
+    QPixmap p = this->GetPixmapFromClip();
     this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
     this->_notes.setPos(0, 22);
     this->addToGroup(&this->_notes);
@@ -29,41 +33,44 @@ ChannelClip::ChannelClip(MidiClip *clip)
     this->_border.setRect(0, 0, p.width(), 128);
     this->addToGroup(&this->_border);
 
-    this->unselect();
+    this->Unselect();
 }
 
 ChannelClip::~ChannelClip()
 { }
 
-void ChannelClip::select()
+void ChannelClip::Select()
 {
     this->_border.setPen(QPen(Qt::red));
     this->setOpacity(1.0);
 }
 
-void ChannelClip::unselect()
+void ChannelClip::Unselect()
 {
     this->_border.setPen(QPen(QColor::fromRgb(0, 172, 229)));
     this->setOpacity(0.6);
 }
 
-QPixmap ChannelClip::getPixmapFromClip()
+QPixmap ChannelClip::GetPixmapFromClip()
 {
+    MidiClip* clip = Sequence::getInstance().Pclips[this->_clip];
     double len = 0;
     unsigned char minrange = 0, maxrange = 0;
-    this->_clip->getSize(len, minrange, maxrange);
+
+    clip->getSize(len, minrange, maxrange);
     minrange -= 15;
     maxrange += 15;
-    QPixmap p(100 * len, (maxrange - minrange) * 10);
+
+    QPixmap p(len * 25, (maxrange - minrange) * 10);
     p.fill(QColor::fromRgb(0, 143, 191));
 
     QPainter painter(&p);
-    for (std::vector<MidiClip::Note*>::iterator i = this->_clip->Pnotes.begin(); i != this->_clip->Pnotes.end(); ++i)
+    for (std::vector<MidiClip::Note*>::iterator i = clip->Pnotes.begin(); i != clip->Pnotes.end(); ++i)
     {
         MidiClip::Note* n = (MidiClip::Note*)*i;
-        painter.fillRect(n->start * 100,
+        painter.fillRect(n->start * 25,
                          p.height() - ((n->note - minrange) * 10) - 5,
-                         n->length * 100,
+                         n->length * 25,
                          10,
                          QColor::fromRgb(0, 48, 64));
     }
@@ -71,31 +78,16 @@ QPixmap ChannelClip::getPixmapFromClip()
     return p;
 }
 
-void ChannelClip::setHeight(int height)
+void ChannelClip::SetHeight(int height)
 {
     this->_border.setRect(this->_border.rect().x(), this->_border.rect().y(), this->_border.rect().width(), height);
     double scale = double(height - 20) / 128.0;
     this->_notes.setTransform(QTransform::fromScale(1.0, scale));
 }
 
-void ChannelClip::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-
-}
-
-void ChannelClip::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-{
-
-}
-
-void ChannelClip::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-
-}
-
 void ChannelClip::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    this->select();
+    this->Select();
     if (event->buttons() &= Qt::LeftButton)
     {
         this->_drag = true;
@@ -121,3 +113,12 @@ void ChannelClip::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     // todo : open this clip in a pianoroll
 }
+
+void ChannelClip::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{ }
+
+void ChannelClip::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{ }
+
+void ChannelClip::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{ }

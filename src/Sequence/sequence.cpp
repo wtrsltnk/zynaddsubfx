@@ -39,8 +39,9 @@ void Sequence::AddFrames(long frames)
         }
 
         // Send alle notes from all clips between our calculated min/max frame
-        for (std::vector<MidiClip*>::iterator i = this->Pclips.begin(); i != this->Pclips.end(); ++i)
-            ((MidiClip*)*i)->sendNotes(min, this->_currentframe);
+        for (int i = 0; i < NUM_MAX_CLIPS; i++)
+            if (this->Pclips[i] != 0)
+                this->Pclips[i]->sendNotes(min, this->_currentframe);
     }
 }
 

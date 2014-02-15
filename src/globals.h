@@ -62,6 +62,11 @@
 #define NUM_MIDI_CHANNELS 16
 
 /*
+ * Number of clips
+ */
+#define NUM_MAX_CLIPS 256
+
+/*
  * The number of voices of additive synth for a single note
  */
 #define NUM_VOICES 8

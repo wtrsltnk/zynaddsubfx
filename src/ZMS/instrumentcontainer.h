@@ -39,12 +39,12 @@ public:
     explicit InstrumentContainer(QWidget *parent = 0);
     ~InstrumentContainer();
 
-    void clearInstruments();
-    InstrumentWindow* addInstrument(int partindex);
-    void selectInstrument(InstrumentWindow* instrument);
+    void ClearInstruments();
+    InstrumentWindow* AddInstrument(int partindex);
+    void SelectInstrument(InstrumentWindow* instrument);
 
 signals:
-    void selectInstrument(int instrument);
+    void SelectInstrument(int instrument);
 
 private:
     Ui::InstrumentContainer *ui;

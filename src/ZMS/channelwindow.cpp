@@ -38,9 +38,9 @@ ChannelWindow::ChannelWindow(int index, ChannelContainer* c, QWidget *parent) :
     ui->setupUi(this);
 
     this->ui->btnSelect->setText(QString::number(this->_channelIndex + 1));
-    this->unselect();
-    connect(this->ui->btnSelect, SIGNAL(clicked()), this, SLOT(onSelectChannelEvent()));
-    connect(this->ui->btnRemove, SIGNAL(clicked()), this, SLOT(onRemoveChannelEvent()));
+
+    connect(this->ui->btnSelect, SIGNAL(clicked()), this, SIGNAL(ThisChannelIsSelected()));
+    connect(this->ui->btnRemove, SIGNAL(clicked()), this, SIGNAL(ThisChannelIsRemoved()));
 }
 
 ChannelWindow::~ChannelWindow()
@@ -50,25 +50,5 @@ ChannelWindow::~ChannelWindow()
 
 void ChannelWindow::resizeEvent(QResizeEvent* event)
 {
-    this->_container->updateClips();
-}
-
-void ChannelWindow::select()
-{
-    this->_selected = true;
-}
-
-void ChannelWindow::unselect()
-{
-    this->_selected = false;
-}
-
-void ChannelWindow::onSelectChannelEvent()
-{
-    this->_container->selectChannel(this->_channelIndex);
-}
-
-void ChannelWindow::onRemoveChannelEvent()
-{
-    this->onRemoveChannel(this->_channelIndex);
+    this->_container->UpdateClips();
 }

@@ -43,22 +43,15 @@ public:
     ~ChannelWindow();
 
 public:
-    void select();
-    void unselect();
-
-    int channelIndex() { return this->_channelIndex; }
+    int ChannelIndex() { return this->_channelIndex; }
 
 signals:
-    void onRemoveChannel(int index);
-
-protected slots:
-    void onSelectChannelEvent();
-    void onRemoveChannelEvent();
+    void ThisChannelIsSelected();
+    void ThisChannelIsRemoved();
 
 private:
     Ui::ChannelWindow *ui;
     ChannelContainer* _container;
-    bool _selected;
     int _channelIndex;
 
     virtual void resizeEvent(QResizeEvent* event);

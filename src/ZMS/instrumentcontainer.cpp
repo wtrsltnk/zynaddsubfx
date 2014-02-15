@@ -35,7 +35,7 @@ InstrumentContainer::~InstrumentContainer()
     delete ui;
 }
 
-void InstrumentContainer::clearInstruments()
+void InstrumentContainer::ClearInstruments()
 {
     QLayoutItem* part = ui->scrollArea->widget()->layout()->itemAt(0);
     while (part != 0)
@@ -47,7 +47,7 @@ void InstrumentContainer::clearInstruments()
     }
 }
 
-InstrumentWindow* InstrumentContainer::addInstrument(int partindex)
+InstrumentWindow* InstrumentContainer::AddInstrument(int partindex)
 {
     InstrumentWindow* instrument = new InstrumentWindow(partindex, this, ui->scrollArea);
     ui->scrollArea->widget()->layout()->addWidget(instrument);
@@ -56,12 +56,12 @@ InstrumentWindow* InstrumentContainer::addInstrument(int partindex)
     return instrument;
 }
 
-void InstrumentContainer::selectInstrument(InstrumentWindow* instrument)
+void InstrumentContainer::SelectInstrument(InstrumentWindow* instrument)
 {
     if (this->_selectedInstrument != 0 && this->_selectedInstrument != instrument)
-        this->_selectedInstrument->unselect();
+        this->_selectedInstrument->Unselect();
 
     this->_selectedInstrument = instrument;
-    this->_selectedInstrument->select();
-    this->selectInstrument(instrument->partIndex());
+    this->_selectedInstrument->Select();
+    this->SelectInstrument(instrument->PartIndex());
 }

@@ -39,11 +39,11 @@ public:
 
     static QColor KitColors[NUM_KIT_ITEMS];
 
-    QIcon getIcon();
-    void updateUI();
+    QIcon GetIcon();
+    void UpdateUI();
 
 signals:
-    void keyRangeChanged();
+    void KeyRangeChanged();
 
 protected slots:
     void OnAdEnabledChanged(int state);

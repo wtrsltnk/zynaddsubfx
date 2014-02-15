@@ -44,8 +44,8 @@ public:
         Key(Octave* _parent, unsigned char n);
         virtual ~Key();
 
-        void setOn(bool on);
-        void setEnabled(bool enabled);
+        void SetOn(bool on);
+        void SetEnabled(bool enabled);
 
         Octave* _parent;
         unsigned char _note;
@@ -74,10 +74,10 @@ public:
     explicit Keyboard(QWidget *parent = 0);
     ~Keyboard();
 
-    void selectCharacter(char c, bool on);
-    void setNoteOn(unsigned char note, bool on);
-    void setNoteEnabled(unsigned char note, bool enabled);
-    void setNoteColor(unsigned char note, const QColor& color);
+    void SelectCharacter(char c, bool on);
+    void SetNoteOn(unsigned char note, bool on);
+    void SetNoteEnabled(unsigned char note, bool enabled);
+    void SetNoteColor(unsigned char note, const QColor& color);
 
 private:
     Ui::Keyboard *ui;

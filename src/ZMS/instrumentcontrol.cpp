@@ -41,12 +41,12 @@ InstrumentControl::InstrumentControl(int partindex, QWidget *parent) :
     this->ui->busMaster->setValue(Master::getInstance().part[this->_partindex]->Pvolume);
     this->ui->busPan->setValue(Master::getInstance().part[this->_partindex]->Ppanning);
 
-    connect(this->ui->busMaster, SIGNAL(valueChanged(int)), this, SLOT(onVolumeChanged(int)));
-    connect(this->ui->busPan, SIGNAL(valueChanged(int)), this, SLOT(onPanChanged(int)));
-    connect(this->ui->sysEffect0, SIGNAL(valueChanged(int)), this, SLOT(onSysEffectChanged(int)));
-    connect(this->ui->sysEffect1, SIGNAL(valueChanged(int)), this, SLOT(onSysEffectChanged(int)));
-    connect(this->ui->sysEffect2, SIGNAL(valueChanged(int)), this, SLOT(onSysEffectChanged(int)));
-    connect(this->ui->sysEffect3, SIGNAL(valueChanged(int)), this, SLOT(onSysEffectChanged(int)));
+    connect(this->ui->busMaster, SIGNAL(valueChanged(int)), this, SLOT(OnVolumeChanged(int)));
+    connect(this->ui->busPan, SIGNAL(valueChanged(int)), this, SLOT(OnPanChanged(int)));
+    connect(this->ui->sysEffect0, SIGNAL(valueChanged(int)), this, SLOT(OnSysEffectChanged(int)));
+    connect(this->ui->sysEffect1, SIGNAL(valueChanged(int)), this, SLOT(OnSysEffectChanged(int)));
+    connect(this->ui->sysEffect2, SIGNAL(valueChanged(int)), this, SLOT(OnSysEffectChanged(int)));
+    connect(this->ui->sysEffect3, SIGNAL(valueChanged(int)), this, SLOT(OnSysEffectChanged(int)));
 }
 
 InstrumentControl::~InstrumentControl()
@@ -57,17 +57,17 @@ InstrumentControl::~InstrumentControl()
     delete ui;
 }
 
-void InstrumentControl::onVolumeChanged(int value)
+void InstrumentControl::OnVolumeChanged(int value)
 {
     Master::getInstance().part[this->_partindex]->setPvolume(value);
 }
 
-void InstrumentControl::onPanChanged(int value)
+void InstrumentControl::OnPanChanged(int value)
 {
     Master::getInstance().part[this->_partindex]->setPpanning(value);
 }
 
-void InstrumentControl::onSysEffectChanged(int value)
+void InstrumentControl::OnSysEffectChanged(int value)
 {
     if (sender() == this->ui->sysEffect0)
         Master::getInstance().setPsysefxvol(this->_partindex, 0, value);

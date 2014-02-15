@@ -37,121 +37,88 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     _vscrollOffset(0),
     _vscale(25),
     _lastHScroll(0),
-    _clips(0)
+    _scene(0)
 {
     this->_rangeselection.start = this->_rangeselection.end = this->_rangeselection.draw = 0;
-    ui->setupUi(this);
 
     for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-    {
-        if (((Part*)Master::getInstance().part[i])->Prcvchn == i &&
-                ((Part*)Master::getInstance().part[i])->Penabled)
-        {
-            this->_channels[i] = new ChannelWindow(i, this);
-            connect(this->_channels[i], SIGNAL(onRemoveChannel(int)), this, SLOT(onRemoveChannel(int)));
-            this->ui->channels->layout()->addWidget(this->_channels[i]);
-        }
-        else
-            this->_channels[i] = 0;
-    }
-    this->updateMinHeight();
+        this->_channels[i] = 0;
+    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+        this->_clips[i] = 0;
 
-    connect(this->ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(onHScrollChannel(int)));
-    connect(this->ui->btnAddChannel, SIGNAL(clicked()), this, SLOT(onAddChannel()));
-    this->_clips = new QGraphicsScene();
-    this->ui->clips->setScene(this->_clips);
+    ui->setupUi(this);
+
+    this->ui->timeline->installEventFilter(this);
+    connect(this->ui->clipScroller, SIGNAL(valueChanged(int)), this, SLOT(HScrollChannel(int)));
+    connect(this->ui->addChannel, SIGNAL(clicked()), this, SLOT(AddChannel()));
+
+    this->_scene = new QGraphicsScene();
+    this->ui->clips->setScene(this->_scene);
     this->ui->clips->installEventFilter(this);
     this->ui->clips->setBackgroundBrush(QBrush(QColor(35, 35, 35)));
 
     this->_group = new QGraphicsItemGroup();
     this->_group->setFiltersChildEvents(false);
     this->_group->setHandlesChildEvents(false);
-    this->_clips->addItem(this->_group);
+    this->_scene->addItem(this->_group);
 
-    this->ui->scale->installEventFilter(this);
+    this->_cursor = new QGraphicsLineItem();
+    this->_cursor->setLine(0, 0, 0, this->ui->clips->height());
+    this->_scene->addItem(this->_cursor);
+
+    this->_updateTimer = new QTimer(this);
+    connect(this->_updateTimer, SIGNAL(timeout()), this, SLOT(UpdateUI()));
+    this->_updateTimer->start(10);
+
+    this->UpdateChannels();
 }
 
 ChannelContainer::~ChannelContainer()
 {
-    this->_clips->removeItem(this->_group);
+    this->_scene->removeItem(this->_group);
     delete this->_group;
     this->ui->clips->setScene(0);
-    delete this->_clips;
+    delete this->_scene;
+    delete this->_updateTimer;
     delete ui;
+}
+
+void ChannelContainer::UpdateUI()
+{
+    this->ui->timeline->update();
+    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->_vscale;
+    this->_cursor->setLine(c + this->_vscrollOffset, 0, c + this->_vscrollOffset, this->ui->clips->height());
 }
 
 void ChannelContainer::resizeEvent(QResizeEvent* event)
 {
-    this->updateClips();
+    this->UpdateClips();
 }
 
 bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == this->ui->clips && event->type() == QEvent::MouseButtonPress)
     {
-        for (std::vector<ChannelClip*>::iterator i = this->_channelClips.begin(); i != this->_channelClips.end(); ++i)
-        {
-            ChannelClip* clip = ((ChannelClip*)*i);
-            if (clip != 0)
-                clip->unselect();
-        }
         return true;
     }
-    if (watched == this->ui->scale && event->type() == QEvent::Paint)
+    if (watched == this->ui->timeline && event->type() == QEvent::Paint)
     {
-        QPainter p(this->ui->scale);
-        p.setPen(QPen(this->palette().brightText().color()));
-        p.setFont(QFont("Verdana", 10));
-        for (int x = 0; (x * this->_vscale) < 1000; x++)
-        {
-            if (x % 4)
-                p.drawLine((x * this->_vscale) + this->_vscrollOffset,
-                           this->ui->top->height()/2,
-                           (x * this->_vscale) + this->_vscrollOffset,
-                           this->ui->top->height());
-            else
-            {
-                p.drawLine((x * this->_vscale) + this->_vscrollOffset,
-                           0,
-                           (x * this->_vscale) + this->_vscrollOffset,
-                           this->ui->top->height());
-                p.drawText((x * this->_vscale) + this->_vscrollOffset+2,
-                           p.fontInfo().pointSize(),
-                           QString::number(x+1));
-            }
-        }
-
-        int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->_vscale;
-        int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->_vscale;
-        p.fillRect(x + this->_vscrollOffset, 0, w - x, this->ui->scale->height(), QBrush(QColor::fromRgb(0, 143, 191, 155)));
-
-        p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
-        p.drawLine(x + this->_vscrollOffset, 0, x + this->_vscrollOffset, this->ui->scale->height());
-        p.drawLine(w + this->_vscrollOffset, 0, w + this->_vscrollOffset, this->ui->scale->height());
-
-        if (this->_rangeselection.draw)
-        {
-            int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
-            int e = (this->_rangeselection.end - this->_vscrollOffset) - (this->_rangeselection.end % this->_vscale);
-            if (e < s) { int tmp = s; s = e; e = tmp; }
-            p.setPen(QPen(QColor::fromRgb(0, 191, 255), 4));
-            p.drawLine(s + this->_vscrollOffset, this->ui->scale->height() - 2, e + this->_vscrollOffset, this->ui->scale->height() - 2);
-        }
+        this->PaintTimeline();
         return true;
     }
-    if (watched == this->ui->scale && event->type() == QEvent::MouseButtonPress)
+    if (watched == this->ui->timeline && event->type() == QEvent::MouseButtonPress)
     {
         this->_rangeselection.start = ((QMouseEvent*)event)->pos().x();
         return true;
     }
-    if (watched == this->ui->scale && event->type() == QEvent::MouseMove)
+    if (watched == this->ui->timeline && event->type() == QEvent::MouseMove)
     {
         this->_rangeselection.end = ((QMouseEvent*)event)->pos().x();
         this->_rangeselection.draw = true;
-        this->ui->scale->update();
+        this->ui->timeline->update();
         return true;
     }
-    if (watched == this->ui->scale && event->type() == QEvent::MouseButtonRelease)
+    if (watched == this->ui->timeline && event->type() == QEvent::MouseButtonRelease)
     {
         this->_rangeselection.draw = false;
         int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
@@ -159,103 +126,235 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
         Sequence::getInstance().SetPlayRange(
                     Sequence::getInstance().BeatsToFrames(s / this->_vscale),
                     Sequence::getInstance().BeatsToFrames(e / this->_vscale));
-        this->ui->scale->update();
+        this->ui->timeline->update();
         return true;
     }
     return false;
 }
 
-void ChannelContainer::updateClips()
+void ChannelContainer::PaintTimeline()
 {
-    if (this->_clips == 0)
-        return;
+    QPainter p(this->ui->timeline);
 
-    // TODO optimze this, not very smart!
-    while (this->_channelClips.empty() == false)
+    // Draw timeline
+    p.setPen(QPen(this->palette().brightText().color()));
+    p.setFont(QFont("Verdana", 10));
+    for (int x = 0; (x * this->_vscale) < 1000; x++)
     {
-        ChannelClip* cclip = this->_channelClips.back();
-        this->_channelClips.pop_back();
-        this->_group->removeFromGroup(cclip);
-        delete cclip;
+        if (x % 4)
+            p.drawLine((x * this->_vscale) + this->_vscrollOffset,
+                       this->ui->top->height()/2,
+                       (x * this->_vscale) + this->_vscrollOffset,
+                       this->ui->top->height());
+        else
+        {
+            p.drawLine((x * this->_vscale) + this->_vscrollOffset,
+                       0,
+                       (x * this->_vscale) + this->_vscrollOffset,
+                       this->ui->top->height());
+            p.drawText((x * this->_vscale) + this->_vscrollOffset+2,
+                       p.fontInfo().pointSize(),
+                       QString::number(x+1));
+        }
     }
-    this->_clips->addRect(0, 0, 10, 10, QPen(QColor::fromRgb(255, 255, 255, 0)), QBrush(QColor::fromRgb(255, 255, 255, 0)));
-    for (int i = 0; i < Sequence::getInstance().Pclips.size(); i++)
+
+    // Draw time range
+    int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->_vscale;
+    int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->_vscale;
+    p.fillRect(x + this->_vscrollOffset, 0, w - x, this->ui->timeline->height(), QBrush(QColor::fromRgb(0, 143, 191, 155)));
+    p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
+    p.drawLine(x + this->_vscrollOffset, 0, x + this->_vscrollOffset, this->ui->timeline->height());
+    p.drawLine(w + this->_vscrollOffset, 0, w + this->_vscrollOffset, this->ui->timeline->height());
+
+    // Draw cursor
+    p.setPen(QPen(QColor::fromRgb(255, 255, 255), 2));
+    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->_vscale;
+    p.drawLine(c + this->_vscrollOffset, 0, c + this->_vscrollOffset, this->ui->timeline->height());
+
+    // Draw change timerange
+    if (this->_rangeselection.draw)
     {
-        MidiClip* clip = Sequence::getInstance().Pclips[i];
-        ChannelClip* cclip = new ChannelClip(clip);
-        int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
-        cclip->setPos(clip->Pstart * 100, this->_channels[clip->Pchannel]->height() * index + 4);
-        cclip->setHeight(this->_channels[clip->Pchannel]->height() - 8);
-        this->_group->addToGroup(cclip);
-        this->_channelClips.push_back(cclip);
+        int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
+        int e = (this->_rangeselection.end - this->_vscrollOffset) - (this->_rangeselection.end % this->_vscale);
+        if (e < s) { int tmp = s; s = e; e = tmp; }
+        p.setPen(QPen(QColor::fromRgb(0, 191, 255), 4));
+        p.drawLine(s + this->_vscrollOffset, this->ui->timeline->height() - 2, e + this->_vscrollOffset, this->ui->timeline->height() - 2);
     }
 }
 
-void ChannelContainer::onAddChannel()
+void ChannelContainer::HScrollChannel(int value)
+{
+    this->_vscrollOffset = -(value * 10);
+
+    this->_group->moveBy((this->_lastHScroll - value) * 10, 0);
+    this->ui->timeline->update();
+
+    this->_lastHScroll = value;
+}
+
+void ChannelContainer::UpdateChannels()
+{
+    int h = 0;
+    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+    {
+        for (int j = 0; j < NUM_MIDI_PARTS; j++)
+        {
+            Part* part = Master::getInstance().part[j];
+            if (part->Prcvchn == i && part->Penabled)
+            {
+                h += 150;
+                if (this->_channels[i] == 0)
+                {
+                    this->_channels[i] = new ChannelWindow(i, this);
+                    connect(this->_channels[i], SIGNAL(ThisChannelIsSelected()), this, SLOT(ChannelIsSelected()));
+                    connect(this->_channels[i], SIGNAL(ThisChannelIsRemoved()), this, SLOT(ChannelIsRemoved()));
+                }
+                if (this->ui->channels->layout()->indexOf(this->_channels[i]) < 0)
+                    this->ui->channels->layout()->addWidget(this->_channels[i]);
+            }
+        }
+    }
+    this->ui->scrollAreaWidgetContents->setMinimumHeight(h);
+    this->UpdateClips();
+}
+
+void ChannelContainer::UpdateClips()
+{
+    if (this->_scene == 0)
+        return;
+
+    //this->_clips->addRect(0, 0, 10, 10, QPen(QColor::fromRgb(255, 255, 255, 0)), QBrush(QColor::fromRgb(255, 255, 255, 0)));
+    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+    {
+        MidiClip* clip = Sequence::getInstance().Pclips[i];
+        if (clip != 0)
+        {
+            if (this->_clips[i] == 0)
+            {
+                this->_clips[i] = new ChannelClip(i);
+                this->_group->addToGroup(this->_clips[i]);
+            }
+            int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
+            this->_clips[i]->setPos(clip->Pstart * 100, this->_channels[clip->Pchannel]->height() * index + 4);
+            this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
+        }
+        else
+        {
+            if (this->_clips[i] != 0)
+            {
+                this->_group->removeFromGroup(this->_clips[i]);
+                delete this->_clips[i];
+                this->_clips[i] = 0;
+            }
+        }
+    }
+}
+
+void ChannelContainer::AddChannel()
 {
     for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
     {
         if (this->_channels[i] == 0)
         {
-            this->_channels[i] = new ChannelWindow(i, this);
-            connect(this->_channels[i], SIGNAL(onRemoveChannel(int)), this, SLOT(onRemoveChannel(int)));
-            this->ui->channels->layout()->addWidget(this->_channels[i]);
             for (int j = 0; j < NUM_MIDI_PARTS; j++)
             {
                 if (((Part*)Master::getInstance().part[j])->Penabled == false)
                 {
-                    Master::getInstance().partonoff(j, 1);
                     ((Part*)Master::getInstance().part[j])->defaults();
                     ((Part*)Master::getInstance().part[j])->Prcvchn = i;
+                    Master::getInstance().partonoff(j, 1);
                     break;
                 }
             }
             break;
         }
     }
-    this->updateMinHeight();
+    this->UpdateChannels();
 }
 
-void ChannelContainer::onRemoveChannel(int index)
+void ChannelContainer::SetSelectedChannel(int channel)
 {
+    if (channel < 0 || channel >= NUM_MIDI_CHANNELS)
+        return;
+    this->_selectedChannel = this->_channels[channel];
+    this->SelectedChannelChanged(channel);
+}
+
+void ChannelContainer::ChannelIsSelected()
+{
+    ChannelWindow* sender = dynamic_cast<ChannelWindow*>(this->sender());
+    if (sender != 0)
+    {
+        this->SetSelectedChannel(sender->ChannelIndex());
+    }
+}
+
+void ChannelContainer::RemoveChannel(int index)
+{
+    // Disable all part for this channel
     for (int j = 0; j < NUM_MIDI_PARTS; j++)
     {
-        if (((Part*)Master::getInstance().part[j])->Penabled && ((Part*)Master::getInstance().part[j])->Prcvchn == index)
+        if (((Part*)Master::getInstance().part[j])->Penabled &&
+                ((Part*)Master::getInstance().part[j])->Prcvchn == index)
             Master::getInstance().partonoff(j, 0);
     }
-    int item = ((QVBoxLayout*)ui->channels->layout())->indexOf(this->_channels[index]);
-    ((QVBoxLayout*)ui->channels->layout())->removeItem(((QVBoxLayout*)ui->channels->layout())->itemAt(item));
+    // Disable all clips for this channel
+    for (int j = 0; j < NUM_MAX_CLIPS; j++)
+    {
+        if (Sequence::getInstance().Pclips[j] != 0 && Sequence::getInstance().Pclips[j]->Pchannel == index)
+        {
+            delete Sequence::getInstance().Pclips[j];
+            Sequence::getInstance().Pclips[j] = 0;
+        }
+    }
+    int itemindex = ((QVBoxLayout*)ui->channels->layout())->indexOf(this->_channels[index]);
+    QLayoutItem* item = ((QVBoxLayout*)ui->channels->layout())->itemAt(itemindex);
+    ((QVBoxLayout*)ui->channels->layout())->removeItem(item);
+    delete item;
     delete this->_channels[index];
     this->_channels[index] = 0;
-    this->updateMinHeight();
+    this->UpdateChannels();
 }
 
-void ChannelContainer::onHScrollChannel(int value)
+void ChannelContainer::ChannelIsRemoved()
 {
-    this->_vscrollOffset = -(value * 10);
-
-    this->_group->moveBy((this->_lastHScroll - value) * 10, 0);
-    this->ui->scale->update();
-
-    this->_lastHScroll = value;
+    ChannelWindow* sender = dynamic_cast<ChannelWindow*>(this->sender());
+    if (sender != 0)
+    {
+        this->RemoveChannel(sender->ChannelIndex());
+    }
 }
 
-void ChannelContainer::selectChannel(ChannelWindow* channel)
+void ChannelContainer::RemoveClip(int index)
 {
-    if (this->_selectedChannel != 0 && this->_selectedChannel != channel)
-        this->_selectedChannel->unselect();
-
-    this->_selectedChannel = channel;
-    this->_selectedChannel->select();
-    this->selectChannel(channel->channelIndex());
+    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+    {
+        MidiClip* clip = Sequence::getInstance().Pclips[i];
+        if (clip != 0)
+        {
+            if (clip->Pchannel == index)
+            {
+                ChannelClip* cclip = this->_clips[i];
+                if (cclip != 0)
+                {
+                    delete cclip;
+                    this->_clips[i] = 0;
+                }
+            }
+        }
+    }
 }
 
-void ChannelContainer::updateMinHeight()
+void ChannelContainer::ClipIsSelected()
 {
-    int h = 0;
-    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-        if (this->_channels[i] != 0)
-            h += 150;
-    this->ui->scrollAreaWidgetContents->setMinimumHeight(h);
-    this->updateClips();
+    ChannelWindow* sender = dynamic_cast<ChannelWindow*>(this->sender());
+    if (sender != 0)
+    {
+        for (int i = 0; i < NUM_MAX_CLIPS; i++)
+        {
+            ChannelClip* clip = this->_clips[i];
+            if (clip != 0)
+                clip->Unselect();
+        }
+    }
 }

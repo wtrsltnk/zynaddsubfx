@@ -42,7 +42,7 @@ KitWindow::KitWindow(Part* part, int kitindex, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->updateUI();
+    this->UpdateUI();
 
     connect(this->ui->chkAd, SIGNAL(stateChanged(int)), this, SLOT(OnAdEnabledChanged(int)));
     connect(this->ui->chkSub, SIGNAL(stateChanged(int)), this, SLOT(OnSubEnabledChanged(int)));
@@ -57,14 +57,14 @@ KitWindow::~KitWindow()
     delete ui;
 }
 
-QIcon KitWindow::getIcon()
+QIcon KitWindow::GetIcon()
 {
     QPixmap pixmap(16, 16);
     pixmap.fill(KitWindow::KitColors[this->_kitindex]);
     return QIcon(pixmap);
 }
 
-void KitWindow::updateUI()
+void KitWindow::UpdateUI()
 {
     this->ui->chkAd->setChecked(this->_part->kit[this->_kitindex].Padenabled);
     this->ui->chkSub->setChecked(this->_part->kit[this->_kitindex].Psubenabled);
@@ -102,7 +102,7 @@ void KitWindow::OnMinKeyrangeChanged(int value)
         if (this->_kitindex > 0)
             this->_part->kit[this->_kitindex - 1].Pmaxkey = value;
     }
-    this->keyRangeChanged();
+    this->KeyRangeChanged();
 }
 
 void KitWindow::OnMaxKeyrangeChanged(int value)
@@ -113,5 +113,5 @@ void KitWindow::OnMaxKeyrangeChanged(int value)
         if (this->_kitindex < NUM_KIT_ITEMS - 1)
             this->_part->kit[this->_kitindex + 1].Pminkey = value;
     }
-    this->keyRangeChanged();
+    this->KeyRangeChanged();
 }

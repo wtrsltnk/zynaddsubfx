@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
 
     Master::getInstance().partonoff(1, 1);
     Master::getInstance().part[1]->Prcvchn = 1;
+    Master::getInstance().part[1]->setkititemstatus(0, 1);
 
     MidiClip* clip1 = new MidiClip();
     clip1->Pchannel = 0;
@@ -109,7 +110,7 @@ int main(int argc, char *argv[])
     clip1->addNote(80, 64, 1.0, 1.0);
     clip1->addNote(86, 64, 2.0, 0.5);
     clip1->addNote(80, 64, 2.5, 1.0);
-    Sequence::getInstance().Pclips.push_back(clip1);
+    Sequence::getInstance().Pclips[0] = clip1;
 
     MidiClip* clip2 = new MidiClip();
     clip2->Pchannel = 1;
@@ -117,7 +118,7 @@ int main(int argc, char *argv[])
     clip2->addNote(80, 64, 1.0, 1.0);
     clip2->addNote(86, 64, 2.0, 0.5);
     clip2->addNote(80, 64, 2.5, 1.0);
-    Sequence::getInstance().Pclips.push_back(clip2);
+    Sequence::getInstance().Pclips[1] = clip2;
 
     Nio::preferedSampleRate(synth->samplerate);
 
