@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->ui->keyboardDock->hide();
+
     this->_effectButtons = new QPushButton[NUM_SYS_EFX];
     for (int i = 0; i < NUM_SYS_EFX; i++)
     {
@@ -62,8 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
         if (Master::getInstance().part[i]->Penabled)
         {
             InstrumentControl* instrument = new InstrumentControl(i);
-            this->ui->busses->layout()->addWidget(instrument);
-            this->ui->busses->layout()->setAlignment(instrument, Qt::AlignLeft);
+            ((QVBoxLayout*)this->ui->bussesContainer->layout())->insertWidget(((QVBoxLayout*)this->ui->bussesContainer->layout())->count() - 1, instrument);
+            this->ui->bussesContainer->layout()->setAlignment(instrument, Qt::AlignLeft);
         }
     }
 
@@ -88,14 +90,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->btnPause, SIGNAL(clicked()), this, SLOT(OnPause()));
     connect(this->ui->btnStop, SIGNAL(clicked()), this, SLOT(OnStop()));
 
-    connect(this->ui->actionInstruments, SIGNAL(toggled(bool)), this->ui->instrumentDock, SLOT(setVisible(bool)));
-    connect(this->ui->instrumentDock, SIGNAL(visibilityChanged(bool)), this->ui->actionInstruments, SLOT(setChecked(bool)));
-
-    connect(this->ui->actionKeyboard, SIGNAL(toggled(bool)), this->ui->keyboardDock, SLOT(setVisible(bool)));
-    connect(this->ui->keyboardDock, SIGNAL(visibilityChanged(bool)), this->ui->actionKeyboard, SLOT(setChecked(bool)));
-
-    connect(this->ui->actionMaster, SIGNAL(toggled(bool)), this->ui->masterDock, SLOT(setVisible(bool)));
-    connect(this->ui->masterDock, SIGNAL(visibilityChanged(bool)), this->ui->actionMaster, SLOT(setChecked(bool)));
+    this->ui->toolBar->addAction(this->ui->instrumentDock->toggleViewAction());
+    this->ui->toolBar->addAction(this->ui->masterDock->toggleViewAction());
+    this->ui->toolBar->addAction(this->ui->keyboardDock->toggleViewAction());
+    this->ui->toolBar->addAction(this->ui->bussesDock->toggleViewAction());
 }
 
 MainWindow::~MainWindow()

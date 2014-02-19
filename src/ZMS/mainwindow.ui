@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <property name="dockOptions">
-   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::ForceTabbedDocks|QMainWindow::VerticalTabs</set>
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::VerticalTabs</set>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -182,31 +182,6 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="bussesTab">
-             <attribute name="title">
-              <string>Busses</string>
-             </attribute>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QWidget" name="busses" native="true">
-                <layout class="QHBoxLayout" name="busseslayout">
-                 <property name="leftMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>2</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>2</number>
-                 </property>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
            </widget>
           </item>
          </layout>
@@ -218,14 +193,20 @@
    </layout>
   </widget>
   <widget class="QDockWidget" name="keyboardDock">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="floating">
     <bool>false</bool>
    </property>
    <property name="features">
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
+   <property name="windowTitle">
+    <string>Piano</string>
+   </property>
    <attribute name="dockWidgetArea">
-    <number>8</number>
+    <number>4</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -276,8 +257,11 @@
    <property name="allowedAreas">
     <set>Qt::AllDockWidgetAreas</set>
    </property>
+   <property name="windowTitle">
+    <string>Master-panel</string>
+   </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>8</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -424,6 +408,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="instrumentDock">
+   <property name="windowTitle">
+    <string>Instrument-panel</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
@@ -473,34 +460,54 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionInstruments"/>
-   <addaction name="actionKeyboard"/>
-   <addaction name="actionMaster"/>
   </widget>
-  <action name="actionKeyboard">
-   <property name="checkable">
-    <bool>true</bool>
+  <widget class="QDockWidget" name="bussesDock">
+   <property name="windowTitle">
+    <string>Bus-panel</string>
    </property>
-   <property name="text">
-    <string>Keyboard</string>
-   </property>
-  </action>
-  <action name="actionInstruments">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Instruments</string>
-   </property>
-  </action>
-  <action name="actionMaster">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Master</string>
-   </property>
-  </action>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QScrollArea" name="busses">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="bussesContainer">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>728</width>
+          <height>144</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
