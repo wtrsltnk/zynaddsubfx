@@ -70,6 +70,8 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     connect(this->_updateTimer, SIGNAL(timeout()), this, SLOT(UpdateUI()));
     this->_updateTimer->start(10);
 
+    connect(this->ui->viewscale, SIGNAL(valueChanged(int)), this, SLOT(SetViewScale(int)));
+
     this->UpdateChannels();
 }
 
@@ -234,6 +236,8 @@ void ChannelContainer::UpdateClips()
                 this->_clips[i] = new ChannelClip(this, i);
                 this->_group->addToGroup(this->_clips[i]);
             }
+            else
+                this->_clips[i]->UpdateClip();
             int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
             this->_clips[i]->setPos(clip->Pstart * this->_vscale, this->_channels[clip->Pchannel]->height() * index + 4);
             this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
@@ -362,4 +366,11 @@ void ChannelContainer::ClipIsSelected()
                 clip->Unselect();
         }
     }
+}
+
+void ChannelContainer::SetViewScale(int scale)
+{
+    this->_vscale = scale;
+    this->update();
+    this->UpdateChannels();
 }

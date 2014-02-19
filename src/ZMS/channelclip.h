@@ -16,6 +16,8 @@ public:
     void Select();
     void Unselect();
 
+    void UpdateClip();
+
 private:
     ChannelContainer* _container;
     QGraphicsRectItem _border;

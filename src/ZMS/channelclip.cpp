@@ -62,21 +62,29 @@ QPixmap ChannelClip::GetPixmapFromClip()
     minrange -= 15;
     maxrange += 15;
 
-    QPixmap p(len * 25, (maxrange - minrange) * 10);
+    QPixmap p(len * this->_container->vscale(), (maxrange - minrange) * 10);
     p.fill(QColor::fromRgb(0, 143, 191));
 
     QPainter painter(&p);
     for (std::vector<MidiClip::Note*>::iterator i = clip->Pnotes.begin(); i != clip->Pnotes.end(); ++i)
     {
         MidiClip::Note* n = (MidiClip::Note*)*i;
-        painter.fillRect(n->start * 25,
+        painter.fillRect(n->start * this->_container->vscale(),
                          p.height() - ((n->note - minrange) * 10) - 5,
-                         n->length * 25,
+                         n->length * this->_container->vscale(),
                          10,
                          QColor::fromRgb(0, 48, 64));
     }
     painter.end();
     return p;
+}
+
+void ChannelClip::UpdateClip()
+{
+    QPixmap p = this->GetPixmapFromClip();
+    this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
+    this->_header.setRect(this->_header.rect().x(), this->_header.rect().y(), p.width(), this->_header.rect().height());
+    this->_border.setRect(this->_border.rect().x(), this->_border.rect().y(), p.width(), this->_border.rect().height());
 }
 
 void ChannelClip::SetHeight(int height)
@@ -101,7 +109,7 @@ void ChannelClip::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (this->_drag)
     {
         int x = this->mapToScene(event->pos()).x() - this->_dragStart.x();
-        this->setPos(x - (x % 100), this->y());
+        this->setPos(x - (x % (4 * this->_container->vscale())), this->y());
 
         MidiClip* c = Sequence::getInstance().Pclips[this->_clip];
         c->Pstart = this->x() / this->_container->vscale();

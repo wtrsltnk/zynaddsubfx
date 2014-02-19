@@ -60,9 +60,11 @@ protected slots:
     void ChannelIsRemoved();
     void SetSelectedClip(int clip);
     void ClipIsSelected();
+    void SetViewScale(int scale);
 
 signals:
     void SelectedChannelChanged(int channel);
+    void ViewScaleChanged(int scale);
 
 private:
     Ui::ChannelContainer *ui;
