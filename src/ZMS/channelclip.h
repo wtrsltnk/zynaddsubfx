@@ -3,11 +3,12 @@
 
 #include <QGraphicsPixmapItem>
 #include "../Sequence/midiclip.h"
+class ChannelContainer;
 
 class ChannelClip : public QGraphicsItemGroup
 {
 public:
-    ChannelClip(int clip);
+    ChannelClip(ChannelContainer* container, int clip);
     virtual ~ChannelClip();
 
     void SetHeight(int height);
@@ -16,6 +17,7 @@ public:
     void Unselect();
 
 private:
+    ChannelContainer* _container;
     QGraphicsRectItem _border;
     QGraphicsRectItem _header;
     QGraphicsSimpleTextItem _headertext;

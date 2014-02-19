@@ -154,6 +154,9 @@
             <property name="tabPosition">
              <enum>QTabWidget::West</enum>
             </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
             <widget class="QWidget" name="channeltab">
              <attribute name="title">
               <string>Channels</string>

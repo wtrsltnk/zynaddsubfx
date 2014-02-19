@@ -231,11 +231,11 @@ void ChannelContainer::UpdateClips()
         {
             if (this->_clips[i] == 0)
             {
-                this->_clips[i] = new ChannelClip(i);
+                this->_clips[i] = new ChannelClip(this, i);
                 this->_group->addToGroup(this->_clips[i]);
             }
             int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
-            this->_clips[i]->setPos(clip->Pstart * 100, this->_channels[clip->Pchannel]->height() * index + 4);
+            this->_clips[i]->setPos(clip->Pstart * this->_vscale, this->_channels[clip->Pchannel]->height() * index + 4);
             this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
         }
         else
@@ -343,6 +343,11 @@ void ChannelContainer::RemoveClip(int index)
             }
         }
     }
+}
+
+void ChannelContainer::SetSelectedClip(int clip)
+{
+    //this->_selectedClip = clip;
 }
 
 void ChannelContainer::ClipIsSelected()

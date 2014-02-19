@@ -44,8 +44,8 @@ public:
     explicit ChannelContainer(QWidget *parent = 0);
     ~ChannelContainer();
 
-    int vscrollOffset();
-    int vscale();
+    int vscrollOffset() { return this->_vscrollOffset; }
+    int vscale() { return this->_vscale; }
 
     void UpdateChannels();
     void UpdateClips();
@@ -58,6 +58,7 @@ protected slots:
     void SetSelectedChannel(int channel);
     void ChannelIsSelected();
     void ChannelIsRemoved();
+    void SetSelectedClip(int clip);
     void ClipIsSelected();
 
 signals:

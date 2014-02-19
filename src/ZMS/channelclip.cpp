@@ -1,4 +1,5 @@
 #include "channelclip.h"
+#include "channelcontainer.h"
 #include <QPen>
 #include <QBrush>
 #include <QFont>
@@ -10,8 +11,8 @@
 
 using namespace std;
 
-ChannelClip::ChannelClip(int clip)
-    : _clip(clip), _drag(false)
+ChannelClip::ChannelClip(ChannelContainer* container, int clip)
+    : _container(container), _clip(clip), _drag(false)
 {
     QPixmap p = this->GetPixmapFromClip();
     this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
@@ -101,6 +102,9 @@ void ChannelClip::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
         int x = this->mapToScene(event->pos()).x() - this->_dragStart.x();
         this->setPos(x - (x % 100), this->y());
+
+        MidiClip* c = Sequence::getInstance().Pclips[this->_clip];
+        c->Pstart = this->x() / this->_container->vscale();
     }
 }
 
