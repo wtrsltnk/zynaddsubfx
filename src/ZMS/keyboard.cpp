@@ -55,6 +55,7 @@ Keyboard::Key::Key(Octave* o, unsigned char n)
         QString txt = QString("%1%2").arg(QString('A' + a), QString::number(o->_octave));
         QGraphicsTextItem* t = new QGraphicsTextItem(txt);
         t->setPos(a * Keyboard::KeyWidth, Keyboard::KeyHeight);
+        t->setDefaultTextColor(Qt::white);
         o->addToGroup(t);
     }
     else
@@ -170,6 +171,7 @@ Keyboard::Keyboard(QWidget *parent) :
         this->_scene->addItem(this->_octaves[i]);
         this->_octaves[i]->setPos(Keyboard::KeyWidth * 7 * i, 0);
     }
+    this->_scene->setBackgroundBrush(QBrush(QColor::fromRgb(53, 53, 53)));
 
     this->ui->graphicsView->setScene(this->_scene);
 

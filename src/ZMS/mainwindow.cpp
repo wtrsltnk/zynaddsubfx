@@ -91,9 +91,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->ui->btnStop, SIGNAL(clicked()), this, SLOT(OnStop()));
 
     this->ui->toolBar->addAction(this->ui->instrumentDock->toggleViewAction());
-    this->ui->toolBar->addAction(this->ui->masterDock->toggleViewAction());
     this->ui->toolBar->addAction(this->ui->keyboardDock->toggleViewAction());
     this->ui->toolBar->addAction(this->ui->bussesDock->toggleViewAction());
+    this->ui->toolBar->addAction(this->ui->pianorollDock->toggleViewAction());
 }
 
 MainWindow::~MainWindow()
@@ -135,7 +135,7 @@ void MainWindow::SelectPart(int index)
     Part* part = Master::getInstance().part[index];
 
     for (int k = 0; k < 128; k++)
-        this->ui->keyboard->SetNoteEnabled(k, false);
+        this->ui->keyboardDockWidgetContents->SetNoteEnabled(k, false);
 
     for (int i = (NUM_KIT_ITEMS-1); i >= 0; i--)
     {
@@ -145,8 +145,8 @@ void MainWindow::SelectPart(int index)
             {
                 if (k >= part->kit[i].Pminkey && k <= part->kit[i].Pmaxkey)
                 {
-                    this->ui->keyboard->SetNoteEnabled(k, true);
-                    this->ui->keyboard->SetNoteColor(k, KitWindow::KitColors[i]);
+                    this->ui->keyboardDockWidgetContents->SetNoteEnabled(k, true);
+                    this->ui->keyboardDockWidgetContents->SetNoteColor(k, KitWindow::KitColors[i]);
                 }
             }
         }
@@ -215,13 +215,13 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->isAutoRepeat() == false)
-        this->ui->keyboard->SelectCharacter(char(event->key()), true);
+        this->ui->keyboardDockWidgetContents->SelectCharacter(char(event->key()), true);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
 {
     if (event->isAutoRepeat() == false)
-        this->ui->keyboard->SelectCharacter(char(event->key()), false);
+        this->ui->keyboardDockWidgetContents->SelectCharacter(char(event->key()), false);
 }
 
 void MainWindow::OnVuTimer()

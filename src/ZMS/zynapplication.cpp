@@ -37,6 +37,43 @@ ZynApplication::ZynApplication(int argc, char *argv[]) :
     p.setColor(QPalette::WindowText, QColor(255, 255, 255));
     p.setColor(QPalette::WindowText, QColor(255, 255, 255));
     this->setPalette(p);
+
+    this->setStyleSheet("QSlider::groove:horizontal {"
+                        "    border-radius: 3px;"
+                        "    height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */"
+                        "    background: #00607F;"
+                        "    margin: 2px 0;"
+                        "}"
+                        "QSlider::handle:horizontal {"
+                        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);"
+                        "    width: 18px;"
+                        "    margin: -2px;"
+                        "    border-radius: 3px;"
+                        "}"
+
+                        "QSlider::groove:vertical {"
+                        "    border-radius: 3px;"
+                        "    width: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */"
+                        "    background: #00607F;"
+                        "}"
+                        "QSlider::handle:vertical {"
+                        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);"
+                        "    height: 18px;"
+                        "    margin: -2px;"
+                        "    border-radius: 3px;"
+                        "}"
+
+                        "QPushButton {"
+                        "    border-radius: 3px;"
+                        "    background: #00607F;"
+                        "    margin: 2px;"
+                        "    padding: 2px 5px;"
+                        "}"
+
+                        "QPushButton:pressed {"
+                        "    background: #008FBF;"
+                        "}"
+                        );
 }
 
 int ZynApplication::exec()
