@@ -12,7 +12,7 @@
 using namespace std;
 
 ChannelClip::ChannelClip(ChannelContainer* container, int clip)
-    : _container(container), _clip(clip), _drag(false)
+    : _container(container), _clip(clip), _drag(0)
 {
     QPixmap p = this->GetPixmapFromClip();
     this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
@@ -24,13 +24,12 @@ ChannelClip::ChannelClip(ChannelContainer* container, int clip)
     this->_header.setBrush(QBrush(QColor::fromRgb(0, 96, 127)));
     this->addToGroup(&this->_header);
 
-    this->_headertext.setText("test");
+    this->_headertext.setText(Sequence::getInstance().Pclips[this->_clip]->Pname.c_str());
     this->_headertext.setPos(2, 2);
-    this->_headertext.setFont(QFont("Verdana", 12, QFont::Bold));
+    this->_headertext.setFont(QFont("Verdana", 10, QFont::Bold));
     this->_headertext.setBrush(QBrush(Qt::white));
     this->addToGroup(&this->_headertext);
 
-    this->_border.setPen(QPen(QColor::fromRgb(0, 172, 229)));
     this->_border.setRect(0, 0, p.width(), 128);
     this->addToGroup(&this->_border);
 
@@ -39,18 +38,6 @@ ChannelClip::ChannelClip(ChannelContainer* container, int clip)
 
 ChannelClip::~ChannelClip()
 { }
-
-void ChannelClip::Select()
-{
-    this->_border.setPen(QPen(Qt::red));
-    this->setOpacity(1.0);
-}
-
-void ChannelClip::Unselect()
-{
-    this->_border.setPen(QPen(QColor::fromRgb(0, 172, 229)));
-    this->setOpacity(0.6);
-}
 
 QPixmap ChannelClip::GetPixmapFromClip()
 {
@@ -79,6 +66,16 @@ QPixmap ChannelClip::GetPixmapFromClip()
     return p;
 }
 
+void ChannelClip::Select()
+{
+    this->_border.setPen(QPen(QBrush(Qt::red), 4));
+}
+
+void ChannelClip::Unselect()
+{
+    this->_border.setPen(QPen(QBrush(QColor::fromRgb(0, 172, 229)), 1));
+}
+
 void ChannelClip::UpdateClip()
 {
     QPixmap p = this->GetPixmapFromClip();
@@ -97,28 +94,54 @@ void ChannelClip::SetHeight(int height)
 void ChannelClip::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     this->Select();
-    if (event->buttons() &= Qt::LeftButton)
+    this->_container->SelectClip(this);
+
+    if (event->buttons() &= Qt::LeftButton && event->modifiers().testFlag(Qt::ControlModifier))
     {
-        this->_drag = true;
+        this->_drag = 2;
+        this->_dragStart = event->pos();
+        this->_copyClip = new QGraphicsRectItem(this->parentItem());
+        this->_copyClip->setRect(this->_border.rect());
+        this->_copyClip->setPos(this->pos());
+        this->_copyClip->setBrush(QBrush(QColor::fromRgb(255, 255, 255, 100)));
+        this->_copyClip->setPen(QPen(Qt::transparent));
+        ((QGraphicsItemGroup*)this->parentItem())->addToGroup(this->_copyClip);
+    }
+    else if (event->buttons() &= Qt::LeftButton)
+    {
+        this->_drag = 1;
         this->_dragStart = event->pos();
     }
 }
 
 void ChannelClip::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (this->_drag)
+    int x = this->mapToScene(event->pos()).x() - this->_dragStart.x() - this->boundingRect().x();
+    if (this->_drag == 1)   // normal drag
     {
-        int x = this->mapToScene(event->pos()).x() - this->_dragStart.x();
         this->setPos(x - (x % (4 * this->_container->vscale())), this->y());
 
         MidiClip* c = Sequence::getInstance().Pclips[this->_clip];
         c->Pstart = this->x() / this->_container->vscale();
     }
+    if (this->_drag == 2)
+        this->_copyClip->setPos(x - (x % (4 * this->_container->vscale())), this->y());
 }
 
 void ChannelClip::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    this->_drag = false;
+    if (this->_drag == 2)
+    {
+        int copyclip = Sequence::getInstance().CopyClip(this->_clip);
+        MidiClip* clip = Sequence::getInstance().Pclips[copyclip];
+        clip->Pstart = this->_copyClip->x() / this->_container->vscale();
+        this->_container->UpdateClips();
+
+        this->removeFromGroup(this->_copyClip);
+        delete this->_copyClip;
+        this->_copyClip = 0;
+    }
+    this->_drag = 0;
 }
 
 void ChannelClip::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

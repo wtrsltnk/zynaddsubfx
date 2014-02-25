@@ -25,6 +25,7 @@ public:
     unsigned char Pchannel; //to what midi channel it sends commands
     double Pstart; //beat number this clip starts. time can be calculated with bpm and time signature
     std::vector<Note*> Pnotes;
+    std::string Pname;
 
 };
 

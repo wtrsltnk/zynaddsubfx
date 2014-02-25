@@ -11,12 +11,13 @@ public:
     ChannelClip(ChannelContainer* container, int clip);
     virtual ~ChannelClip();
 
-    void SetHeight(int height);
-
     void Select();
     void Unselect();
 
+    void SetHeight(int height);
     void UpdateClip();
+
+    int ClipIndex() { return this->_clip; }
 
 private:
     ChannelContainer* _container;
@@ -25,7 +26,8 @@ private:
     QGraphicsSimpleTextItem _headertext;
     QGraphicsPixmapItem _notes;
     int _clip;
-    bool _drag;
+    int _drag;
+    QGraphicsRectItem* _copyClip;
     QPointF _dragStart;
 
     QPixmap GetPixmapFromClip();

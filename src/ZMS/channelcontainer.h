@@ -26,6 +26,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsItemGroup>
 #include <QTimer>
+#include <QSplitter>
 #include "../globals.h"
 #include "channelclip.h"
 
@@ -50,6 +51,8 @@ public:
     void UpdateChannels();
     void UpdateClips();
 
+    void SelectClip(ChannelClip* clip);
+
 protected slots:
     void AddChannel();
     void RemoveChannel(int index);
@@ -58,8 +61,6 @@ protected slots:
     void SetSelectedChannel(int channel);
     void ChannelIsSelected();
     void ChannelIsRemoved();
-    void SetSelectedClip(int clip);
-    void ClipIsSelected();
     void SetViewScale(int scale);
 
 signals:
@@ -71,6 +72,7 @@ private:
     ChannelWindow* _channels[NUM_MIDI_CHANNELS];
     ChannelWindow* _selectedChannel;
     ChannelClip* _clips[NUM_MAX_CLIPS];
+    QSplitter* _splitter;
     QGraphicsScene* _scene;
     QGraphicsItemGroup* _group;
     QGraphicsLineItem* _cursor;

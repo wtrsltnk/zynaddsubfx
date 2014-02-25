@@ -38,6 +38,8 @@ public:
     double FramesToBeats(long frames);
     long BeatsToFrames(double beats);
 
+    int CopyClip(int index);
+
     MidiClip* Pclips[NUM_MAX_CLIPS];
 private:
     long _currentframe;

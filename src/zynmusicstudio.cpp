@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
     clip1->addNote(80, 64, 1.0, 1.0);
     clip1->addNote(86, 64, 2.0, 0.5);
     clip1->addNote(80, 64, 2.5, 1.0);
+    clip1->Pname = "Clip 1 channel 0";
     Sequence::getInstance().Pclips[0] = clip1;
 
     MidiClip* clip2 = new MidiClip();
@@ -118,6 +119,7 @@ int main(int argc, char *argv[])
     clip2->addNote(80, 64, 1.0, 1.0);
     clip2->addNote(86, 64, 2.0, 0.5);
     clip2->addNote(80, 64, 2.5, 1.0);
+    clip2->Pname = "Clip 2 channel 1";
     Sequence::getInstance().Pclips[1] = clip2;
 
     Nio::preferedSampleRate(synth->samplerate);

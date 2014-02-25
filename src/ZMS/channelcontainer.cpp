@@ -48,6 +48,10 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
 
     ui->setupUi(this);
 
+    this->_splitter = new QSplitter(this->ui->channels);
+    this->_splitter->setOrientation(Qt::Vertical);
+    this->ui->channels->layout()->addWidget(this->_splitter);
+
     this->ui->timeline->installEventFilter(this);
     connect(this->ui->clipScroller, SIGNAL(valueChanged(int)), this, SLOT(HScrollChannel(int)));
     connect(this->ui->addChannel, SIGNAL(clicked()), this, SLOT(AddChannel()));
@@ -99,10 +103,6 @@ void ChannelContainer::resizeEvent(QResizeEvent* event)
 
 bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
 {
-    if (watched == this->ui->clips && event->type() == QEvent::MouseButtonPress)
-    {
-        return true;
-    }
     if (watched == this->ui->timeline && event->type() == QEvent::Paint)
     {
         this->PaintTimeline();
@@ -130,6 +130,17 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
                     Sequence::getInstance().BeatsToFrames(e / this->_vscale));
         this->ui->timeline->update();
         return true;
+    }
+    if (watched == this->ui->clips && event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent* mevent = (QMouseEvent*)event;
+        ChannelClip* item = dynamic_cast<ChannelClip*> (this->ui->clips->itemAt(mevent->pos()));
+        if (item == 0)
+        {
+            for (int i = 0; i < NUM_MAX_CLIPS; i++)
+                if (this->_clips[i] != 0)
+                    this->_clips[i]->Unselect();
+        }
     }
     return false;
 }
@@ -163,10 +174,10 @@ void ChannelContainer::PaintTimeline()
     // Draw time range
     int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->_vscale;
     int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->_vscale;
-    p.fillRect(x + this->_vscrollOffset, 0, w - x, this->ui->timeline->height(), QBrush(QColor::fromRgb(0, 143, 191, 155)));
+    p.fillRect(x + this->_vscrollOffset, this->ui->timeline->height()/2, w - x, this->ui->timeline->height()/2, QBrush(QColor::fromRgb(0, 143, 191, 155)));
     p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
-    p.drawLine(x + this->_vscrollOffset, 0, x + this->_vscrollOffset, this->ui->timeline->height());
-    p.drawLine(w + this->_vscrollOffset, 0, w + this->_vscrollOffset, this->ui->timeline->height());
+    p.drawLine(x + this->_vscrollOffset, this->ui->timeline->height()/2, x + this->_vscrollOffset, this->ui->timeline->height());
+    p.drawLine(w + this->_vscrollOffset, this->ui->timeline->height()/2, w + this->_vscrollOffset, this->ui->timeline->height());
 
     // Draw cursor
     p.setPen(QPen(QColor::fromRgb(255, 255, 255), 2));
@@ -211,8 +222,8 @@ void ChannelContainer::UpdateChannels()
                     connect(this->_channels[i], SIGNAL(ThisChannelIsSelected()), this, SLOT(ChannelIsSelected()));
                     connect(this->_channels[i], SIGNAL(ThisChannelIsRemoved()), this, SLOT(ChannelIsRemoved()));
                 }
-                if (this->ui->channels->layout()->indexOf(this->_channels[i]) < 0)
-                    this->ui->channels->layout()->addWidget(this->_channels[i]);
+                if (this->_splitter->indexOf(this->_channels[i]) < 0)
+                    this->_splitter->addWidget(this->_channels[i]);
             }
         }
     }
@@ -238,9 +249,17 @@ void ChannelContainer::UpdateClips()
             }
             else
                 this->_clips[i]->UpdateClip();
-            int index = this->_channels[clip->Pchannel]->parentWidget()->layout()->indexOf(this->_channels[clip->Pchannel]);
-            this->_clips[i]->setPos(clip->Pstart * this->_vscale, this->_channels[clip->Pchannel]->height() * index + 4);
-            this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
+            int height = -2;
+            for (int j = 0; j < this->_splitter->children().size(); j++)
+            {
+                height += ((QWidget*)this->_splitter->children()[j])->height() + 4;
+                if (this->_splitter->children()[j] == this->_channels[clip->Pchannel])
+                {
+                    this->_clips[i]->setPos(clip->Pstart * this->_vscale, this->_splitter->height() - height + 4);
+                    this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
+                    break;
+                }
+            }
         }
         else
         {
@@ -251,6 +270,15 @@ void ChannelContainer::UpdateClips()
                 this->_clips[i] = 0;
             }
         }
+    }
+}
+
+void ChannelContainer::SelectClip(ChannelClip* clip)
+{
+    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+    {
+        if (this->_clips[i] != 0 && this->_clips[i] != clip)
+            this->_clips[i]->Unselect();
     }
 }
 
@@ -345,25 +373,6 @@ void ChannelContainer::RemoveClip(int index)
                     this->_clips[i] = 0;
                 }
             }
-        }
-    }
-}
-
-void ChannelContainer::SetSelectedClip(int clip)
-{
-    //this->_selectedClip = clip;
-}
-
-void ChannelContainer::ClipIsSelected()
-{
-    ChannelWindow* sender = dynamic_cast<ChannelWindow*>(this->sender());
-    if (sender != 0)
-    {
-        for (int i = 0; i < NUM_MAX_CLIPS; i++)
-        {
-            ChannelClip* clip = this->_clips[i];
-            if (clip != 0)
-                clip->Unselect();
         }
     }
 }

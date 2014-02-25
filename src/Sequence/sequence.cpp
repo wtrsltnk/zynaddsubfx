@@ -82,3 +82,23 @@ long Sequence::BeatsToFrames(double beats)
 {
     return beats / ((double(this->_bpm) / 60.0) / double(synth->samplerate_f));
 }
+
+int Sequence::CopyClip(int index)
+{
+    MidiClip* mclip = this->Pclips[index];
+
+    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+    {
+        if (this->Pclips[i] == 0)
+        {
+            MidiClip* nclip = new MidiClip();
+            nclip->Pchannel = mclip->Pchannel;
+            nclip->Pname= mclip->Pname;
+            nclip->Pnotes = mclip->Pnotes;
+            nclip->Pstart = mclip->Pstart;
+            this->Pclips[i] = nclip;
+            return i;
+        }
+    }
+    return -1;
+}
