@@ -416,7 +416,13 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="pianorollDockWidgetContents"/>
+   <widget class="QWidget" name="pianorollDockWidgetContents">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="PianoRoll" name="pianoroll" native="true"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <customwidgets>
@@ -436,6 +442,12 @@
    <class>Keyboard</class>
    <extends>QWidget</extends>
    <header>keyboard.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PianoRoll</class>
+   <extends>QWidget</extends>
+   <header>pianoroll.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

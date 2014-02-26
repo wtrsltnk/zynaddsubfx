@@ -9,6 +9,7 @@ set(zynmusicstudio_zms_SRCS
     instrumentcontrol.cpp
     keyboard.cpp
     kitwindow.cpp
+    pianoroll.cpp
     )
 set(zynmusicstudio_zms_HEADERS
     mainwindow.h
@@ -20,6 +21,7 @@ set(zynmusicstudio_zms_HEADERS
     instrumentcontrol.h
     keyboard.h
     kitwindow.h
+    pianoroll.h
     )
 set(zynmusicstudio_zms_FORMS
     mainwindow.ui
@@ -30,6 +32,7 @@ set(zynmusicstudio_zms_FORMS
     instrumentcontrol.ui
     keyboard.ui
     kitwindow.ui
+    pianoroll.ui
     )
 
 # QT library
