@@ -2,6 +2,7 @@
 #define MIDICLIP_H
 
 #include <vector>
+#include <string>
 
 class MidiClip
 {

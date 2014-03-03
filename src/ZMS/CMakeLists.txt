@@ -37,21 +37,22 @@ set(zynmusicstudio_zms_FORMS
     pianoroll.ui
     )
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 # QT library
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 qt5_wrap_cpp(zynmusicstudio_zms_HEADERS_MOC ${zynmusicstudio_zms_HEADERS})
 qt5_wrap_ui(zynmusicstudio_zms_FORMS_HEADERS ${zynmusicstudio_zms_FORMS})
 
+message(STATUS "bin : ${CMAKE_CURRENT_BINARY_DIR}")
+
 # Include cmake binary directory for all MOC headers
 set(LOCAL_INCLUDE_DIRS
-    ${CMAKE_CURRENT_BINARY_DIR}
-    "${CMAKE_CURRENT_BINARY_DIR}/Gui"
+    
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     )
 
-include_directories(${LOCAL_INCLUDE_DIRS})
 set(ZMS_INCLUDE_DIRS ${LOCAL_INCLUDE_DIRS} PARENT_SCOPE)
 
 qt5_wrap_cpp(zynmusicstudio_zms_HEADERS_MOC ${zynmusicstudio_zms_HEADERS})

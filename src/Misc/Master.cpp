@@ -328,8 +328,6 @@ void Master::partonoff(int npart, int what)
  */
 void Master::AudioOut(float *outl, float *outr)
 {
-    time_t tm = time(NULL);
-
     //Swaps the Left channel with Right Channel
     if(swaplr)
         swap(outl, outr);
