@@ -10,6 +10,7 @@ set(zynmusicstudio_zms_SRCS
     keyboard.cpp
     kitwindow.cpp
     pianoroll.cpp
+    synthdata.cpp
     )
 set(zynmusicstudio_zms_HEADERS
     mainwindow.h
@@ -22,6 +23,7 @@ set(zynmusicstudio_zms_HEADERS
     keyboard.h
     kitwindow.h
     pianoroll.h
+    synthdata.h
     )
 set(zynmusicstudio_zms_FORMS
     mainwindow.ui

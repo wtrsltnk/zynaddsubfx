@@ -40,6 +40,7 @@ public:
 
     void SelectChannel(int channel);
     void SelectPart(int part);
+    void SelectClips(const QList<int>& clips);
 
 protected slots:
     void OnMasterGainChanged(int value);
@@ -50,6 +51,7 @@ protected slots:
     void OnSelectAudioDevice();
     void OnSelectChannel(int channel);
     void OnSelectPart(int part);
+    void OnSelectClips(const QList<int>& clips);
     void OnPlay();
     void OnPause();
     void OnStop();

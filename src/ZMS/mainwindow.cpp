@@ -26,6 +26,7 @@
 #include <QMenu>
 #include <QKeyEvent>
 #include <iostream>
+#include "synthdata.h"
 #include "../Misc/Master.h"
 #include "../Misc/Part.h"
 #include "../Effects/EffectMgr.h"
@@ -40,6 +41,7 @@
 #include "instrumentcontrol.h"
 #include "keyboard.h"
 #include "kitwindow.h"
+#include "pianoroll.h"
 
 using namespace std;
 
@@ -54,14 +56,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->_effectButtons = new QPushButton[NUM_SYS_EFX];
     for (int i = 0; i < NUM_SYS_EFX; i++)
     {
-        this->_effectButtons[i].setText(EffectMgr::FilterTitles[Master::getInstance().sysefx[i]->geteffect()]);
+        this->_effectButtons[i].setText(EffectMgr::FilterTitles[SynthData::Instance().GetSysFxAt(i)->geteffect()]);
         this->ui->syseffects->layout()->addWidget(&this->_effectButtons[i]);
     }
-    this->ui->sysmaster->setValue(Master::getInstance().Pvolume);
+    this->ui->sysmaster->setValue(SynthData::Instance().GetVolume());
 
-    for (int i = 0; i < NUM_MIDI_PARTS; i++)
+    for (int i = 0; i < SynthData::Instance().GetPartCount(); i++)
     {
-        if (Master::getInstance().part[i]->Penabled)
+        if (SynthData::Instance().GetPartAt(i)->Penabled)
         {
             InstrumentControl* instrument = new InstrumentControl(i);
             ((QVBoxLayout*)this->ui->bussesContainer->layout())->insertWidget(((QVBoxLayout*)this->ui->bussesContainer->layout())->count() - 1, instrument);
@@ -94,6 +96,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->ui->toolBar->addAction(this->ui->keyboardDock->toggleViewAction());
     this->ui->toolBar->addAction(this->ui->bussesDock->toggleViewAction());
     this->ui->toolBar->addAction(this->ui->pianorollDock->toggleViewAction());
+
+    connect(&SynthData::Instance(), SIGNAL(ClipSelectionChanged(QList<int>)), this, SLOT(OnSelectClips(QList<int>)));
 }
 
 MainWindow::~MainWindow()
@@ -116,7 +120,7 @@ void MainWindow::SelectChannel(int channel)
     this->ui->instruments->ClearInstruments();
     for (int i = 0;i < NUM_MIDI_PARTS; i++)
     {
-        Part* part = Master::getInstance().part[i];
+        Part* part = SynthData::Instance().GetPartAt(i);
         if (part->Prcvchn == channel)
         {
             this->ui->instruments->AddInstrument(i);
@@ -132,7 +136,7 @@ void MainWindow::OnSelectPart(int part)
 
 void MainWindow::SelectPart(int index)
 {
-    Part* part = Master::getInstance().part[index];
+    Part* part = SynthData::Instance().GetPartAt(index);
 
     for (int k = 0; k < 128; k++)
         this->ui->keyboardDockWidgetContents->SetNoteEnabled(k, false);
@@ -153,9 +157,19 @@ void MainWindow::SelectPart(int index)
     }
 }
 
+void MainWindow::SelectClips(const QList<int>& clips)
+{
+    this->ui->pianoroll->ShowClips(clips);
+}
+
+void MainWindow::OnSelectClips(const QList<int>& clips)
+{
+    this->SelectClips(clips);
+}
+
 void MainWindow::OnMasterGainChanged(int value)
 {
-    Master::getInstance().setPvolume(value);
+    SynthData::Instance().SetVolume(value);
 }
 
 void MainWindow::OnPlay()
@@ -233,7 +247,7 @@ void MainWindow::OnVuTimer()
     static float oldrmsdbr = 0;
 #define MIN_DB (-48)
 
-    vuData data = Master::getInstance().getVuData();
+    vuData data = SynthData::Instance().GetVuData();
 
     this->dbl=rap2dB(data.outpeakl);
     this->dbr=rap2dB(data.outpeakr);

@@ -53,6 +53,10 @@ public:
 
     void SelectClip(ChannelClip* clip);
 
+signals:
+    void SelectedChannelChanged(int channel);
+    void ViewScaleChanged(int scale);
+
 protected slots:
     void AddChannel();
     void RemoveChannel(int index);
@@ -62,10 +66,6 @@ protected slots:
     void ChannelIsSelected();
     void ChannelIsRemoved();
     void SetViewScale(int scale);
-
-signals:
-    void SelectedChannelChanged(int channel);
-    void ViewScaleChanged(int scale);
 
 private:
     Ui::ChannelContainer *ui;

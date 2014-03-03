@@ -22,12 +22,13 @@
 #include "instrumentwindow.h"
 #include "ui_instrumentwindow.h"
 #include "../Misc/Master.h"
+#include "synthdata.h"
 
 InstrumentWindow::InstrumentWindow(int partindex, InstrumentContainer* c, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::InstrumentWindow),
     _container(c),
-    _part(Master::getInstance().part[partindex]), _partIndex(partindex)
+    _part(SynthData::Instance().GetPartAt(partindex)), _partIndex(partindex)
 {
     for (int i = 0; i < NUM_KIT_ITEMS; i++)
         this->_kitWindows[i] = 0;

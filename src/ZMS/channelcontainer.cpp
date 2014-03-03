@@ -21,8 +21,9 @@
 */
 #include "channelcontainer.h"
 #include "ui_channelcontainer.h"
+#include "mainwindow.h"
 #include "channelwindow.h"
-#include "../Misc/Master.h"
+#include "synthdata.h"
 #include "../Misc/Part.h"
 #include "../Sequence/sequence.h"
 #include <QMouseEvent>
@@ -140,6 +141,7 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
             for (int i = 0; i < NUM_MAX_CLIPS; i++)
                 if (this->_clips[i] != 0)
                     this->_clips[i]->Unselect();
+            SynthData::Instance().ClipSelectionChanged(QList<int>());
         }
     }
     return false;
@@ -212,7 +214,7 @@ void ChannelContainer::UpdateChannels()
     {
         for (int j = 0; j < NUM_MIDI_PARTS; j++)
         {
-            Part* part = Master::getInstance().part[j];
+            Part* part = SynthData::Instance().GetPartAt(j);
             if (part->Prcvchn == i && part->Penabled)
             {
                 h += 150;
@@ -237,9 +239,9 @@ void ChannelContainer::UpdateClips()
         return;
 
     //this->_clips->addRect(0, 0, 10, 10, QPen(QColor::fromRgb(255, 255, 255, 0)), QBrush(QColor::fromRgb(255, 255, 255, 0)));
-    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+    for (int i = 0; i < SynthData::Instance().GetClipCount(); i++)
     {
-        MidiClip* clip = Sequence::getInstance().Pclips[i];
+        MidiClip* clip = SynthData::Instance().GetClipAt(i);
         if (clip != 0)
         {
             if (this->_clips[i] == 0)
@@ -275,11 +277,15 @@ void ChannelContainer::UpdateClips()
 
 void ChannelContainer::SelectClip(ChannelClip* clip)
 {
+    QList<int> selectedClips;
     for (int i = 0; i < NUM_MAX_CLIPS; i++)
     {
         if (this->_clips[i] != 0 && this->_clips[i] != clip)
             this->_clips[i]->Unselect();
+        else if (this->_clips[i] != 0)
+            selectedClips.append(i);
     }
+    SynthData::Instance().ClipSelectionChanged(selectedClips);
 }
 
 void ChannelContainer::AddChannel()
@@ -290,11 +296,12 @@ void ChannelContainer::AddChannel()
         {
             for (int j = 0; j < NUM_MIDI_PARTS; j++)
             {
-                if (((Part*)Master::getInstance().part[j])->Penabled == false)
+                Part* part = SynthData::Instance().GetPartAt(j);
+                if (part->Penabled == false)
                 {
-                    ((Part*)Master::getInstance().part[j])->defaults();
-                    ((Part*)Master::getInstance().part[j])->Prcvchn = i;
-                    Master::getInstance().partonoff(j, 1);
+                    part->defaults();
+                    part->Prcvchn = i;
+                    SynthData::Instance().EnablePartAt(j, true);
                     break;
                 }
             }
@@ -324,20 +331,19 @@ void ChannelContainer::ChannelIsSelected()
 void ChannelContainer::RemoveChannel(int index)
 {
     // Disable all part for this channel
-    for (int j = 0; j < NUM_MIDI_PARTS; j++)
+    for (int j = 0; j < SynthData::Instance().GetPartCount(); j++)
     {
-        if (((Part*)Master::getInstance().part[j])->Penabled &&
-                ((Part*)Master::getInstance().part[j])->Prcvchn == index)
-            Master::getInstance().partonoff(j, 0);
+        Part* part = SynthData::Instance().GetPartAt(j);
+        if (part->Penabled &&
+                part->Prcvchn == index)
+            SynthData::Instance().EnablePartAt(j, false);
     }
     // Disable all clips for this channel
-    for (int j = 0; j < NUM_MAX_CLIPS; j++)
+    for (int j = 0; j < SynthData::Instance().GetClipCount(); j++)
     {
-        if (Sequence::getInstance().Pclips[j] != 0 && Sequence::getInstance().Pclips[j]->Pchannel == index)
-        {
-            delete Sequence::getInstance().Pclips[j];
-            Sequence::getInstance().Pclips[j] = 0;
-        }
+        MidiClip* clip = SynthData::Instance().GetClipAt(j);
+        if (clip != 0 && clip->Pchannel == index)
+            SynthData::Instance().RemoveClipAt(j);
     }
     int itemindex = ((QVBoxLayout*)ui->channels->layout())->indexOf(this->_channels[index]);
     QLayoutItem* item = ((QVBoxLayout*)ui->channels->layout())->itemAt(itemindex);
@@ -359,9 +365,9 @@ void ChannelContainer::ChannelIsRemoved()
 
 void ChannelContainer::RemoveClip(int index)
 {
-    for (int i = 0; i < NUM_MAX_CLIPS; i++)
+    for (int i = 0; i < SynthData::Instance().GetClipCount(); i++)
     {
-        MidiClip* clip = Sequence::getInstance().Pclips[i];
+        MidiClip* clip = SynthData::Instance().GetClipAt(i);
         if (clip != 0)
         {
             if (clip->Pchannel == index)

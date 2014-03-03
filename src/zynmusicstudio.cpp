@@ -117,8 +117,8 @@ int main(int argc, char *argv[])
     clip2->Pchannel = 1;
     clip2->Pstart = 8;
     clip2->addNote(80, 64, 1.0, 1.0);
-    clip2->addNote(86, 64, 2.0, 0.5);
-    clip2->addNote(80, 64, 2.5, 1.0);
+    clip2->addNote(82, 64, 2.0, 1.5);
+    clip2->addNote(86, 64, 2.5, 1.0);
     clip2->Pname = "Clip 2 channel 1";
     Sequence::getInstance().Pclips[1] = clip2;
 
