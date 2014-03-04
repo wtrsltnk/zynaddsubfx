@@ -21,6 +21,7 @@
 */
 #include "pianoroll.h"
 #include "ui_pianoroll.h"
+#include "pianorollnote.h"
 #include <QGraphicsRectItem>
 #include <QGraphicsItemGroup>
 #include "../Sequence/sequence.h"
@@ -34,6 +35,12 @@ PianoRoll::PianoRoll(QWidget *parent) :
 
     this->_scene = new QGraphicsScene();
     this->ui->notes->setScene(this->_scene);
+    this->ui->notes->installEventFilter(this);
+
+    this->_group = new QGraphicsItemGroup();
+    this->_group->setFiltersChildEvents(false);
+    this->_group->setHandlesChildEvents(false);
+    this->_scene->addItem(this->_group);
 }
 
 PianoRoll::~PianoRoll()
@@ -45,6 +52,11 @@ void PianoRoll::ShowClips(const QList<int>& clips)
 {
     this->_clips = clips;
     this->ShowSelectedNotes();
+}
+
+void PianoRoll::SelectItem(SnappingGraphicsItem* item)
+{
+    item->Select();
 }
 
 void PianoRoll::ShowSelectedNotes()
@@ -66,19 +78,20 @@ void PianoRoll::ShowSelectedNotes()
         MidiClip* clip = Sequence::getInstance().Pclips[*i];
         if (clip != 0)
         {
-            QGraphicsItemGroup* group = new QGraphicsItemGroup();
-            group->data(0).setValue(*i);
-            this->_scene->addItem(group);
+            QGraphicsItemGroup* grp = new QGraphicsItemGroup();
+            grp->data(0).setValue(*i);
+            this->_group->addToGroup(grp);
             for (std::vector<MidiClip::Note*>::iterator j = clip->Pnotes.begin(); j != clip->Pnotes.end(); ++j)
             {
                 MidiClip::Note* note = *j;
-                QGraphicsRectItem* n = new QGraphicsRectItem();
-                n->setRect(note->start * 25, note->note * -25, note->length * 25, 25);
-                n->setPen(QPen(Qt::red));
-                n->setBrush(QBrush(Qt::red));
-                n->data(0).setValue<void*>(note);
-                group->addToGroup(n);
+                QGraphicsItemGroup* n = new PianoRollNote(this, note);
+                grp->addToGroup(n);
             }
         }
     }
+}
+
+bool PianoRoll::eventFilter(QObject* watched, QEvent* event)
+{
+    return false;
 }

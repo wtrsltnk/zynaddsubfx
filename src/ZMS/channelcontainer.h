@@ -47,9 +47,9 @@ public:
     ~ChannelContainer();
 
     void UpdateChannels();
-    virtual void UpdateClips();
+    virtual void UpdateItems();
 
-    void SelectClip(ChannelClip* clip);
+    virtual void SelectItem(SnappingGraphicsItem* item);
 
 signals:
     void SelectedChannelChanged(int channel);

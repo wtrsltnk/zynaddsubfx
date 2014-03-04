@@ -10,6 +10,9 @@ class SnappingGraphicsItem : public QGraphicsItemGroup
 public:
     SnappingGraphicsItem(SnappingContainer* container);
 
+    virtual void Select() = 0;
+    virtual void Unselect() = 0;
+
 protected:
     virtual void moveItem(int x, int y) = 0;
     virtual QGraphicsRectItem* tempCopyRect() = 0;

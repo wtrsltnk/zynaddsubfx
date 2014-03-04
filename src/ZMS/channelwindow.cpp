@@ -50,5 +50,5 @@ ChannelWindow::~ChannelWindow()
 
 void ChannelWindow::resizeEvent(QResizeEvent* event)
 {
-    this->_container->UpdateClips();
+    this->_container->UpdateItems();
 }

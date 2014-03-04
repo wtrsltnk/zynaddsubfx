@@ -41,14 +41,17 @@ public:
 
     void ShowClips(const QList<int>& clips);
 
-    virtual void UpdateClips() { }
+    virtual void UpdateItems() { }
+    virtual void SelectItem(SnappingGraphicsItem* item);
 private:
     Ui::PianoRoll *ui;
     int _hscale;
     QGraphicsScene* _scene;
+    QGraphicsItemGroup* _group;
     QList<int> _clips;
 
     void ShowSelectedNotes();
+    virtual bool eventFilter(QObject* watched, QEvent* event);
 };
 
 #endif // PIANOROLL_H

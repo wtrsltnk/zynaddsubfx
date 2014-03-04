@@ -32,8 +32,8 @@ public:
     ChannelClip(ChannelContainer* container, int clip);
     virtual ~ChannelClip();
 
-    void Select();
-    void Unselect();
+    virtual void Select();
+    virtual void Unselect();
 
     void SetHeight(int height);
     void UpdateClip();

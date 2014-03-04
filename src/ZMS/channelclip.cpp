@@ -137,5 +137,5 @@ void ChannelClip::copyMe(double start)
     int copyclip = Sequence::getInstance().CopyClip(this->_clip);
     MidiClip* clip = Sequence::getInstance().Pclips[copyclip];
     clip->Pstart = start;
-    this->_container->UpdateClips();
+    this->_container->UpdateItems();
 }

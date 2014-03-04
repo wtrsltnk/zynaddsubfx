@@ -1,6 +1,8 @@
 #ifndef SNAPPINGCONTAINER_H
 #define SNAPPINGCONTAINER_H
 
+class SnappingGraphicsItem;
+
 class SnappingContainer
 {
 public:
@@ -11,7 +13,8 @@ public:
     int Scale();
     void SetScale(int scale);
 
-    virtual void UpdateClips() = 0;
+    virtual void UpdateItems() = 0;
+    virtual void SelectItem(SnappingGraphicsItem* item) = 0;
 private:
     int _scrollOffset;
     int _scale;

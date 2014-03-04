@@ -4,12 +4,18 @@
 #include <QBrush>
 #include <QPen>
 
+#include <iostream>
+
+using namespace std;
+
 SnappingGraphicsItem::SnappingGraphicsItem(SnappingContainer* container)
     : _dragState(0), _container(container)
 { }
 
 void SnappingGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    cout << "void SnappingGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)" << endl;
+    this->_container->SelectItem(this);
     if (event->buttons() &= Qt::LeftButton && event->modifiers().testFlag(Qt::ControlModifier))
     {
         this->_dragState = 2;
@@ -38,7 +44,7 @@ void SnappingGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (this->_dragState == 2)
     {
         this->copyMe(this->_dragCopyGhost->x() / this->_container->Scale());
-        this->_container->UpdateClips();
+        this->_container->UpdateItems();
 
         this->removeFromGroup(this->_dragCopyGhost);
         delete this->_dragCopyGhost;

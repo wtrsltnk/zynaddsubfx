@@ -97,7 +97,7 @@ void ChannelContainer::UpdateUI()
 
 void ChannelContainer::resizeEvent(QResizeEvent* event)
 {
-    this->UpdateClips();
+    this->UpdateItems();
 }
 
 bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
@@ -228,10 +228,10 @@ void ChannelContainer::UpdateChannels()
         }
     }
     this->ui->scrollAreaWidgetContents->setMinimumHeight(h);
-    this->UpdateClips();
+    this->UpdateItems();
 }
 
-void ChannelContainer::UpdateClips()
+void ChannelContainer::UpdateItems()
 {
     if (this->_scene == 0)
         return;
@@ -273,15 +273,18 @@ void ChannelContainer::UpdateClips()
     }
 }
 
-void ChannelContainer::SelectClip(ChannelClip* clip)
+void ChannelContainer::SelectItem(SnappingGraphicsItem* item)
 {
     QList<int> selectedClips;
     for (int i = 0; i < NUM_MAX_CLIPS; i++)
     {
-        if (this->_clips[i] != 0 && this->_clips[i] != clip)
+        if (this->_clips[i] != 0 && this->_clips[i] != item)
             this->_clips[i]->Unselect();
         else if (this->_clips[i] != 0)
+        {
+            this->_clips[i]->Select();
             selectedClips.append(i);
+        }
     }
     SynthData::Instance().ClipSelectionChanged(selectedClips);
 }
