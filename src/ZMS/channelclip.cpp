@@ -33,7 +33,7 @@
 using namespace std;
 
 ChannelClip::ChannelClip(ChannelContainer* container, int clip)
-    : _container(container), _clip(clip), _drag(0)
+    : SnappingGraphicsItem(container), _clip(clip), _dragState(0)
 {
     QPixmap p = this->GetPixmapFromClip();
     this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
@@ -70,16 +70,16 @@ QPixmap ChannelClip::GetPixmapFromClip()
     minrange -= 15;
     maxrange += 15;
 
-    QPixmap p(len * this->_container->vscale(), (maxrange - minrange) * 10);
+    QPixmap p(len * this->_container->Scale(), (maxrange - minrange) * 10);
     p.fill(QColor::fromRgb(0, 143, 191));
 
     QPainter painter(&p);
     for (std::vector<MidiClip::Note*>::iterator i = clip->Pnotes.begin(); i != clip->Pnotes.end(); ++i)
     {
         MidiClip::Note* n = (MidiClip::Note*)*i;
-        painter.fillRect(n->start * this->_container->vscale(),
+        painter.fillRect(n->start * this->_container->Scale(),
                          p.height() - ((n->note - minrange) * 10) - 5,
-                         n->length * this->_container->vscale(),
+                         n->length * this->_container->Scale(),
                          10,
                          QColor::fromRgb(0, 48, 64));
     }
@@ -112,69 +112,30 @@ void ChannelClip::SetHeight(int height)
     this->_notes.setTransform(QTransform::fromScale(1.0, scale));
 }
 
-void ChannelClip::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void ChannelClip::moveItem(int x, int y)
 {
-    this->Select();
-    this->_container->SelectClip(this);
+    this->setPos(x, y);
 
-    if (event->buttons() &= Qt::LeftButton && event->modifiers().testFlag(Qt::ControlModifier))
-    {
-        this->_drag = 2;
-        this->_dragStart = event->pos();
-        this->_copyClip = new QGraphicsRectItem(this->parentItem());
-        this->_copyClip->setRect(this->_border.rect());
-        this->_copyClip->setPos(this->pos());
-        this->_copyClip->setBrush(QBrush(QColor::fromRgb(255, 255, 255, 100)));
-        this->_copyClip->setPen(QPen(Qt::transparent));
-        ((QGraphicsItemGroup*)this->parentItem())->addToGroup(this->_copyClip);
-    }
-    else if (event->buttons() &= Qt::LeftButton)
-    {
-        this->_drag = 1;
-        this->_dragStart = event->pos();
-    }
+    MidiClip* c = Sequence::getInstance().Pclips[this->_clip];
+    c->Pstart = this->x() / this->_container->Scale();
 }
 
-void ChannelClip::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+QGraphicsRectItem* ChannelClip::tempCopyRect()
 {
-    int x = this->mapToScene(event->pos()).x() - this->_dragStart.x() - this->boundingRect().x();
-    if (this->_drag == 1)   // normal drag
-    {
-        this->setPos(x - (x % (4 * this->_container->vscale())), this->y());
+    QGraphicsRectItem* rect = new QGraphicsRectItem();
 
-        MidiClip* c = Sequence::getInstance().Pclips[this->_clip];
-        c->Pstart = this->x() / this->_container->vscale();
-    }
-    if (this->_drag == 2)
-        this->_copyClip->setPos(x - (x % (4 * this->_container->vscale())), this->y());
+    rect->setRect(this->_border.rect());
+    rect->setPos(this->pos());
+    rect->setBrush(QBrush(QColor::fromRgb(255, 255, 255, 100)));
+    rect->setPen(QPen(Qt::transparent));
+
+    return rect;
 }
 
-void ChannelClip::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void ChannelClip::copyMe(double start)
 {
-    if (this->_drag == 2)
-    {
-        int copyclip = Sequence::getInstance().CopyClip(this->_clip);
-        MidiClip* clip = Sequence::getInstance().Pclips[copyclip];
-        clip->Pstart = this->_copyClip->x() / this->_container->vscale();
-        this->_container->UpdateClips();
-
-        this->removeFromGroup(this->_copyClip);
-        delete this->_copyClip;
-        this->_copyClip = 0;
-    }
-    this->_drag = 0;
+    int copyclip = Sequence::getInstance().CopyClip(this->_clip);
+    MidiClip* clip = Sequence::getInstance().Pclips[copyclip];
+    clip->Pstart = start;
+    this->_container->UpdateClips();
 }
-
-void ChannelClip::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    // todo : open this clip in a pianoroll
-}
-
-void ChannelClip::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{ }
-
-void ChannelClip::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-{ }
-
-void ChannelClip::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{ }

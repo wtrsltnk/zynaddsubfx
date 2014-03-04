@@ -11,6 +11,8 @@ set(zynmusicstudio_zms_SRCS
     kitwindow.cpp
     pianoroll.cpp
     synthdata.cpp
+    snappinggraphicsitem.cpp
+    snappingcontainer.cpp
     )
 set(zynmusicstudio_zms_HEADERS
     mainwindow.h
@@ -24,6 +26,8 @@ set(zynmusicstudio_zms_HEADERS
     kitwindow.h
     pianoroll.h
     synthdata.h
+    snappinggraphicsitem.h
+    snappingcontainer.h
     )
 set(zynmusicstudio_zms_FORMS
     mainwindow.ui

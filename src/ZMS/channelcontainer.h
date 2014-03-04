@@ -29,6 +29,7 @@
 #include <QSplitter>
 #include "../globals.h"
 #include "channelclip.h"
+#include "snappingcontainer.h"
 
 namespace Ui {
 class ChannelContainer;
@@ -37,7 +38,7 @@ class ChannelContainer;
 
 class ChannelWindow;
 
-class ChannelContainer : public QWidget
+class ChannelContainer : public QWidget, public SnappingContainer
 {
     Q_OBJECT
 
@@ -45,11 +46,8 @@ public:
     explicit ChannelContainer(QWidget *parent = 0);
     ~ChannelContainer();
 
-    int vscrollOffset() { return this->_vscrollOffset; }
-    int vscale() { return this->_vscale; }
-
     void UpdateChannels();
-    void UpdateClips();
+    virtual void UpdateClips();
 
     void SelectClip(ChannelClip* clip);
 
@@ -76,8 +74,6 @@ private:
     QGraphicsScene* _scene;
     QGraphicsItemGroup* _group;
     QGraphicsLineItem* _cursor;
-    int _vscrollOffset;
-    int _vscale;
     int _lastHScroll;
     QTimer* _updateTimer;
 

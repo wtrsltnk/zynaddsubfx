@@ -35,8 +35,6 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelContainer),
     _selectedChannel(0),
-    _vscrollOffset(0),
-    _vscale(25),
     _lastHScroll(0),
     _scene(0)
 {
@@ -93,8 +91,8 @@ ChannelContainer::~ChannelContainer()
 void ChannelContainer::UpdateUI()
 {
     this->ui->timeline->update();
-    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->_vscale;
-    this->_cursor->setLine(c + this->_vscrollOffset, 0, c + this->_vscrollOffset, this->ui->clips->height());
+    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->Scale();
+    this->_cursor->setLine(c + this->ScrollOffset(), 0, c + this->ScrollOffset(), this->ui->clips->height());
 }
 
 void ChannelContainer::resizeEvent(QResizeEvent* event)
@@ -124,11 +122,11 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
     if (watched == this->ui->timeline && event->type() == QEvent::MouseButtonRelease)
     {
         this->_rangeselection.draw = false;
-        int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
-        int e = (this->_rangeselection.end - this->_vscrollOffset) - (this->_rangeselection.end % this->_vscale);
+        int s = (this->_rangeselection.start - this->ScrollOffset()) - (this->_rangeselection.start % this->Scale());
+        int e = (this->_rangeselection.end - this->ScrollOffset()) - (this->_rangeselection.end % this->Scale());
         Sequence::getInstance().SetPlayRange(
-                    Sequence::getInstance().BeatsToFrames(s / this->_vscale),
-                    Sequence::getInstance().BeatsToFrames(e / this->_vscale));
+                    Sequence::getInstance().BeatsToFrames(s / this->Scale()),
+                    Sequence::getInstance().BeatsToFrames(e / this->Scale()));
         this->ui->timeline->update();
         return true;
     }
@@ -154,52 +152,52 @@ void ChannelContainer::PaintTimeline()
     // Draw timeline
     p.setPen(QPen(this->palette().brightText().color()));
     p.setFont(QFont("Verdana", 10));
-    for (int x = 0; (x * this->_vscale) < 1000; x++)
+    for (int x = 0; (x * this->Scale()) < 1000; x++)
     {
         if (x % 4)
-            p.drawLine((x * this->_vscale) + this->_vscrollOffset,
+            p.drawLine((x * this->Scale()) + this->ScrollOffset(),
                        this->ui->top->height()/2,
-                       (x * this->_vscale) + this->_vscrollOffset,
+                       (x * this->Scale()) + this->ScrollOffset(),
                        this->ui->top->height());
         else
         {
-            p.drawLine((x * this->_vscale) + this->_vscrollOffset,
+            p.drawLine((x * this->Scale()) + this->ScrollOffset(),
                        0,
-                       (x * this->_vscale) + this->_vscrollOffset,
+                       (x * this->Scale()) + this->ScrollOffset(),
                        this->ui->top->height());
-            p.drawText((x * this->_vscale) + this->_vscrollOffset+2,
+            p.drawText((x * this->Scale()) + this->ScrollOffset()+2,
                        p.fontInfo().pointSize(),
                        QString::number(x+1));
         }
     }
 
     // Draw time range
-    int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->_vscale;
-    int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->_vscale;
-    p.fillRect(x + this->_vscrollOffset, this->ui->timeline->height()/2, w - x, this->ui->timeline->height()/2, QBrush(QColor::fromRgb(0, 143, 191, 155)));
+    int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->Scale();
+    int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->Scale();
+    p.fillRect(x + this->ScrollOffset(), this->ui->timeline->height()/2, w - x, this->ui->timeline->height()/2, QBrush(QColor::fromRgb(0, 143, 191, 155)));
     p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
-    p.drawLine(x + this->_vscrollOffset, this->ui->timeline->height()/2, x + this->_vscrollOffset, this->ui->timeline->height());
-    p.drawLine(w + this->_vscrollOffset, this->ui->timeline->height()/2, w + this->_vscrollOffset, this->ui->timeline->height());
+    p.drawLine(x + this->ScrollOffset(), this->ui->timeline->height()/2, x + this->ScrollOffset(), this->ui->timeline->height());
+    p.drawLine(w + this->ScrollOffset(), this->ui->timeline->height()/2, w + this->ScrollOffset(), this->ui->timeline->height());
 
     // Draw cursor
     p.setPen(QPen(QColor::fromRgb(255, 255, 255), 2));
-    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->_vscale;
-    p.drawLine(c + this->_vscrollOffset, 0, c + this->_vscrollOffset, this->ui->timeline->height());
+    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->Scale();
+    p.drawLine(c + this->ScrollOffset(), 0, c + this->ScrollOffset(), this->ui->timeline->height());
 
     // Draw change timerange
     if (this->_rangeselection.draw)
     {
-        int s = (this->_rangeselection.start - this->_vscrollOffset) - (this->_rangeselection.start % this->_vscale);
-        int e = (this->_rangeselection.end - this->_vscrollOffset) - (this->_rangeselection.end % this->_vscale);
+        int s = (this->_rangeselection.start - this->ScrollOffset()) - (this->_rangeselection.start % this->Scale());
+        int e = (this->_rangeselection.end - this->ScrollOffset()) - (this->_rangeselection.end % this->Scale());
         if (e < s) { int tmp = s; s = e; e = tmp; }
         p.setPen(QPen(QColor::fromRgb(0, 191, 255), 4));
-        p.drawLine(s + this->_vscrollOffset, this->ui->timeline->height() - 2, e + this->_vscrollOffset, this->ui->timeline->height() - 2);
+        p.drawLine(s + this->ScrollOffset(), this->ui->timeline->height() - 2, e + this->ScrollOffset(), this->ui->timeline->height() - 2);
     }
 }
 
 void ChannelContainer::HScrollChannel(int value)
 {
-    this->_vscrollOffset = -(value * 10);
+    this->SetScrollOffset(-(value * 10));
 
     this->_group->moveBy((this->_lastHScroll - value) * 10, 0);
     this->ui->timeline->update();
@@ -257,7 +255,7 @@ void ChannelContainer::UpdateClips()
                 height += ((QWidget*)this->_splitter->children()[j])->height() + 4;
                 if (this->_splitter->children()[j] == this->_channels[clip->Pchannel])
                 {
-                    this->_clips[i]->setPos(clip->Pstart * this->_vscale, this->_splitter->height() - height + 4);
+                    this->_clips[i]->setPos(clip->Pstart * this->Scale(), this->_splitter->height() - height + 4);
                     this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
                     break;
                 }
@@ -385,7 +383,7 @@ void ChannelContainer::RemoveClip(int index)
 
 void ChannelContainer::SetViewScale(int scale)
 {
-    this->_vscale = scale;
+    this->SetScale(scale);
     this->update();
     this->UpdateChannels();
 }

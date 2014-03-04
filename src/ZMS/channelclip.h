@@ -22,11 +22,11 @@
 #ifndef CHANNELCLIP_H
 #define CHANNELCLIP_H
 
-#include <QGraphicsPixmapItem>
+#include "snappinggraphicsitem.h"
 #include "../Sequence/midiclip.h"
 class ChannelContainer;
 
-class ChannelClip : public QGraphicsItemGroup
+class ChannelClip : public SnappingGraphicsItem
 {
 public:
     ChannelClip(ChannelContainer* container, int clip);
@@ -40,26 +40,23 @@ public:
 
     int ClipIndex() { return this->_clip; }
 
+protected:
+    virtual void moveItem(int x, int y);
+    virtual QGraphicsRectItem* tempCopyRect();
+    virtual void copyMe(double start);
+
 private:
-    ChannelContainer* _container;
     QGraphicsRectItem _border;
     QGraphicsRectItem _header;
     QGraphicsSimpleTextItem _headertext;
     QGraphicsPixmapItem _notes;
     int _clip;
-    int _drag;
+    int _dragState;
     QPointF _dragStart;
-    QGraphicsRectItem* _copyClip;
+    QGraphicsRectItem* _dragCopyGhost;
 
     QPixmap GetPixmapFromClip();
 
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 };
 
 #endif // CHANNELCLIP_H
