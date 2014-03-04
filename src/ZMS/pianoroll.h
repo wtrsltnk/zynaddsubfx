@@ -24,13 +24,14 @@
 
 #include <QWidget>
 #include <QGraphicsScene>
+#include "snappingcontainer.h"
 #include "../Sequence/midiclip.h"
 
 namespace Ui {
 class PianoRoll;
 }
 
-class PianoRoll : public QWidget
+class PianoRoll : public QWidget, public SnappingContainer
 {
     Q_OBJECT
 
@@ -40,6 +41,7 @@ public:
 
     void ShowClips(const QList<int>& clips);
 
+    virtual void UpdateClips() { }
 private:
     Ui::PianoRoll *ui;
     int _hscale;

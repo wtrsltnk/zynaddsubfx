@@ -10,6 +10,7 @@ set(zynmusicstudio_zms_SRCS
     keyboard.cpp
     kitwindow.cpp
     pianoroll.cpp
+    pianorollnote.cpp
     synthdata.cpp
     snappinggraphicsitem.cpp
     snappingcontainer.cpp
@@ -25,6 +26,7 @@ set(zynmusicstudio_zms_HEADERS
     keyboard.h
     kitwindow.h
     pianoroll.h
+    pianorollnote.h
     synthdata.h
     snappinggraphicsitem.h
     snappingcontainer.h
