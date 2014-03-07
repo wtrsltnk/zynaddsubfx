@@ -21,7 +21,7 @@ MidiClip::~MidiClip()
 
 void MidiClip::addNote(unsigned char note, unsigned char velocity, double start, double length)
 {
-    Note* n = new Note;
+    Note* n = new Note(this);
     n->note = note;
     n->velocity = velocity;
     n->start = start;

@@ -12,14 +12,25 @@ public:
     virtual void Select();
     virtual void Unselect();
 
+    void UpdateMe();
+
 protected:
     virtual void moveItem(int x, int y);
     virtual QGraphicsRectItem* tempCopyRect();
-    virtual void copyMe(double start) { }
+    virtual void copyMe(double start);
+
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     MidiClip::Note* _note;
     QGraphicsRectItem _border;
+    QGraphicsRectItem _resizeHandle;
+
+    bool _resizing;
+    QPointF _resizingStart;
+
 };
 
 #endif // PIANOROLLNOTE_H

@@ -25,6 +25,7 @@ private:
     QPointF _dragStart;
     QGraphicsRectItem* _dragCopyGhost;
 
+protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

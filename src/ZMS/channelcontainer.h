@@ -64,6 +64,8 @@ protected slots:
     void ChannelIsSelected();
     void ChannelIsRemoved();
     void SetViewScale(int scale);
+    void OnClipsChanged();
+    void OnClipChanged(MidiClip* clip);
 
 private:
     Ui::ChannelContainer *ui;

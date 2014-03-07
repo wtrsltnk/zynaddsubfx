@@ -36,7 +36,6 @@ PianoRoll::PianoRoll(QWidget *parent) :
     this->_scene = new QGraphicsScene();
     this->ui->notes->setScene(this->_scene);
     this->ui->notes->installEventFilter(this);
-
     this->_group = new QGraphicsItemGroup();
     this->_group->setFiltersChildEvents(false);
     this->_group->setHandlesChildEvents(false);
@@ -54,6 +53,11 @@ void PianoRoll::ShowClips(const QList<int>& clips)
     this->ShowSelectedNotes();
 }
 
+void PianoRoll::UpdateItems()
+{
+    this->ShowSelectedNotes();
+}
+
 void PianoRoll::SelectItem(SnappingGraphicsItem* item)
 {
     item->Select();
@@ -61,31 +65,23 @@ void PianoRoll::SelectItem(SnappingGraphicsItem* item)
 
 void PianoRoll::ShowSelectedNotes()
 {
-    while (this->_scene->items().empty() == false)
+    while (this->_group->childItems().empty() == false)
     {
-        QGraphicsItemGroup* group = (QGraphicsItemGroup*)this->_scene->items().back();
-        while (group->childItems().empty() == false)
-        {
-            QGraphicsItem* item = group->childItems().back();
-            group->removeFromGroup(item);
-            delete item;
-        }
-        this->_scene->removeItem(group);
-        delete group;
+        PianoRollNote* note = (PianoRollNote*)this->_group->childItems().back();
+        this->_group->removeFromGroup(note);
+        delete note;
     }
+
     for (QList<int>::iterator i = this->_clips.begin(); i != this->_clips.end(); ++i)
     {
         MidiClip* clip = Sequence::getInstance().Pclips[*i];
         if (clip != 0)
         {
-            QGraphicsItemGroup* grp = new QGraphicsItemGroup();
-            grp->data(0).setValue(*i);
-            this->_group->addToGroup(grp);
             for (std::vector<MidiClip::Note*>::iterator j = clip->Pnotes.begin(); j != clip->Pnotes.end(); ++j)
             {
                 MidiClip::Note* note = *j;
-                QGraphicsItemGroup* n = new PianoRollNote(this, note);
-                grp->addToGroup(n);
+                PianoRollNote* n = new PianoRollNote(this, note);
+                this->_group->addToGroup(n);
             }
         }
     }

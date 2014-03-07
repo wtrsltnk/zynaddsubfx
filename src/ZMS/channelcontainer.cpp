@@ -74,6 +74,8 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     this->_updateTimer->start(10);
 
     connect(this->ui->viewscale, SIGNAL(valueChanged(int)), this, SLOT(SetViewScale(int)));
+    connect(&SynthData::Instance(), SIGNAL(ClipsChanged()), this, SLOT(OnClipsChanged()));
+    connect(&SynthData::Instance(), SIGNAL(ClipDataChanged(MidiClip*)), this, SLOT(OnClipChanged(MidiClip*)));
 
     this->UpdateChannels();
 }
@@ -86,6 +88,26 @@ ChannelContainer::~ChannelContainer()
     delete this->_scene;
     delete this->_updateTimer;
     delete ui;
+}
+
+void ChannelContainer::OnClipsChanged()
+{
+    this->UpdateItems();
+}
+
+void ChannelContainer::OnClipChanged(MidiClip* clip)
+{
+    for (int i = 0; i < SynthData::Instance().GetClipCount(); i++)
+    {
+        MidiClip* tmp = SynthData::Instance().GetClipAt(i);
+        if (tmp == clip)
+        {
+            if (this->_clips[i] != 0)
+            {
+                this->_clips[i]->UpdateClip();
+            }
+        }
+    }
 }
 
 void ChannelContainer::UpdateUI()

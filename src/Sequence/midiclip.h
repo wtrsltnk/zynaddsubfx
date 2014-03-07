@@ -10,6 +10,8 @@ public:
     class Note
     {
     public:
+        Note(MidiClip* clip) : _clip(clip) { }
+        MidiClip* _clip;
         unsigned char note, velocity;
         double start, length; //start en length of this note in beats
     };

@@ -41,7 +41,7 @@ public:
 
     void ShowClips(const QList<int>& clips);
 
-    virtual void UpdateItems() { }
+    virtual void UpdateItems();
     virtual void SelectItem(SnappingGraphicsItem* item);
 private:
     Ui::PianoRoll *ui;
