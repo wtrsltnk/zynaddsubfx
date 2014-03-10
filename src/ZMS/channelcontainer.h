@@ -23,8 +23,6 @@
 #define CHANNELCONTAINER_H
 
 #include <QWidget>
-#include <QGraphicsScene>
-#include <QGraphicsItemGroup>
 #include <QTimer>
 #include <QSplitter>
 #include "../globals.h"
@@ -73,8 +71,6 @@ private:
     ChannelWindow* _selectedChannel;
     ChannelClip* _clips[NUM_MAX_CLIPS];
     QSplitter* _splitter;
-    QGraphicsScene* _scene;
-    QGraphicsItemGroup* _group;
     QGraphicsLineItem* _cursor;
     int _lastHScroll;
     QTimer* _updateTimer;

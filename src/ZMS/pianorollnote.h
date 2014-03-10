@@ -17,7 +17,7 @@ public:
 protected:
     virtual void moveItem(int x, int y);
     virtual QGraphicsRectItem* tempCopyRect();
-    virtual void copyMe(double start);
+    virtual void copyMe(double x, double y);
 
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -30,6 +30,9 @@ private:
 
     bool _resizing;
     QPointF _resizingStart;
+    double _fineStart;
+    double _fineLength;
+    double _fineNote;
 
 };
 

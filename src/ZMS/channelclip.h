@@ -43,7 +43,7 @@ public:
 protected:
     virtual void moveItem(int x, int y);
     virtual QGraphicsRectItem* tempCopyRect();
-    virtual void copyMe(double start);
+    virtual void copyMe(double x, double y);
 
 private:
     QGraphicsRectItem _border;
@@ -51,11 +51,9 @@ private:
     QGraphicsSimpleTextItem _headertext;
     QGraphicsPixmapItem _notes;
     int _clip;
-    int _dragState;
-    QPointF _dragStart;
-    QGraphicsRectItem* _dragCopyGhost;
+    double _fineStart;
 
-    QPixmap GetPixmapFromClip();
+    QPixmap GetPixmapFromClip(MidiClip* clip);
 
 };
 

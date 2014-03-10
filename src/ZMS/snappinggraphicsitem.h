@@ -16,9 +16,11 @@ public:
 protected:
     virtual void moveItem(int x, int y) = 0;
     virtual QGraphicsRectItem* tempCopyRect() = 0;
-    virtual void copyMe(double start) = 0;
+    virtual void copyMe(double x, double y) = 0;
 
     SnappingContainer* _container;
+    bool _allowVerticalMove;
+    bool _allowHorizontalMove;
 
 private:
     int _dragState;

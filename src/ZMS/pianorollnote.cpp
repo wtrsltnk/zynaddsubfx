@@ -4,7 +4,11 @@
 #include <cmath>
 #include <QBrush>
 #include <QPen>
+#include <QCursor>
 #include <QGraphicsSceneMouseEvent>
+#include <iostream>
+
+using namespace std;
 
 PianoRollNote::PianoRollNote(SnappingContainer* container, MidiClip::Note* note)
     : SnappingGraphicsItem(container), _note(note), _resizeHandle(this), _resizing(false)
@@ -15,6 +19,13 @@ PianoRollNote::PianoRollNote(SnappingContainer* container, MidiClip::Note* note)
     this->addToGroup(&this->_resizeHandle);
 
     this->Unselect();
+
+    this->_allowHorizontalMove = true;
+    this->_allowVerticalMove = true;
+
+    this->_fineStart = double(note->start);
+    this->_fineLength = double(note->length);
+    this->_fineNote = double(note->note);
 }
 
 void PianoRollNote::Select()
@@ -29,21 +40,30 @@ void PianoRollNote::Unselect()
 
 void PianoRollNote::UpdateMe()
 {
-    this->_border.setRect(this->_note->start * 25, this->_note->note * -25, this->_note->length * 25, 25);
+    int x = this->_note->start * this->_container->HScale();
+    int w = (this->_note->length) * this->_container->HScale();
+    int y = (128 * this->_container->VScale()) - this->_note->note * this->_container->VScale();
+
+    this->_border.setRect(x, y, w, this->_container->VScale());
     this->_border.setPen(QPen(Qt::red));
     this->_border.setBrush(QBrush(Qt::red));
+    this->_border.setCursor(Qt::SizeAllCursor);
 
-    this->_resizeHandle.setRect((this->_note->start + this->_note->length) * 25, this->_note->note * -25, 25, 25);
-    this->_resizeHandle.setBrush(QBrush(Qt::yellow));
+    this->_resizeHandle.setRect(x + w, y, 25, this->_container->VScale());
+    this->_resizeHandle.setBrush(QBrush(QColor::fromRgb(0, 0, 0, 0)));
+    this->_resizeHandle.setPen(QPen(QColor::fromRgb(0, 0, 0, 50)));
+    this->_resizeHandle.setCursor(Qt::SizeHorCursor);
 }
 
 void PianoRollNote::moveItem(int x, int y)
 {
-    this->setPos(x, y);
-    int oldstart = this->_note->start;
+    this->_fineStart += (double(x) / this->_container->HScale());
+    this->_note->start = (int)this->_fineStart;
+    this->_fineNote -= (double(y) / this->_container->VScale());
+    this->_note->note = (unsigned char)this->_fineNote;
+
     this->UpdateMe();
-    if (oldstart != this->_note->start)
-        SynthData::Instance().ClipDataChanged(this->_note->_clip);
+    SynthData::Instance().ClipDataChanged(this->_note->_clip);
 }
 
 QGraphicsRectItem* PianoRollNote::tempCopyRect()
@@ -52,19 +72,19 @@ QGraphicsRectItem* PianoRollNote::tempCopyRect()
 
     rect->setRect(this->_border.rect());
     rect->setPos(this->pos());
-    rect->setBrush(QBrush(QColor::fromRgb(255, 255, 255, 100)));
+    rect->setBrush(QBrush(QColor::fromRgb(155, 200, 255, 100)));
     rect->setPen(QPen(Qt::transparent));
 
     return rect;
 }
 
-void PianoRollNote::copyMe(double start)
+void PianoRollNote::copyMe(double x, double y)
 {
     MidiClip::Note* note = new MidiClip::Note(this->_note->_clip);
     this->_note->_clip->Pnotes.push_back(note);
-    note->start = start;
+    note->start = this->_note->start + x;
+    note->note = this->_note->note - y;
     note->length = this->_note->length;
-    note->note = this->_note->note;
     note->velocity = this->_note->velocity;
     SynthData::Instance().ClipsChanged();
 }
@@ -84,9 +104,14 @@ void PianoRollNote::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (this->_resizing)
     {
-        double x = this->mapToScene(event->pos()).x() - this->_resizingStart.x();
-        this->_note->length = x / this->_container->Scale() - this->_note->start;
+        QPointF mapped = this->mapToScene(event->pos());
+        double x = (mapped.x() - this->_resizingStart.x())  / this->_container->HScale();
+        this->_resizingStart = mapped;
+
+        this->_fineLength += x;
+        this->_note->length = (int)this->_fineLength;
         if (this->_note->length < 0) this->_note->length = 0;
+
         this->UpdateMe();
         SynthData::Instance().ClipDataChanged(this->_note->_clip);
     }

@@ -35,8 +35,7 @@ ChannelContainer::ChannelContainer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChannelContainer),
     _selectedChannel(0),
-    _lastHScroll(0),
-    _scene(0)
+    _lastHScroll(0)
 {
     this->_rangeselection.start = this->_rangeselection.end = this->_rangeselection.draw = 0;
 
@@ -113,7 +112,7 @@ void ChannelContainer::OnClipChanged(MidiClip* clip)
 void ChannelContainer::UpdateUI()
 {
     this->ui->timeline->update();
-    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->Scale();
+    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->HScale();
     this->_cursor->setLine(c + this->ScrollOffset(), 0, c + this->ScrollOffset(), this->ui->clips->height());
 }
 
@@ -144,11 +143,11 @@ bool ChannelContainer::eventFilter(QObject* watched, QEvent* event)
     if (watched == this->ui->timeline && event->type() == QEvent::MouseButtonRelease)
     {
         this->_rangeselection.draw = false;
-        int s = (this->_rangeselection.start - this->ScrollOffset()) - (this->_rangeselection.start % this->Scale());
-        int e = (this->_rangeselection.end - this->ScrollOffset()) - (this->_rangeselection.end % this->Scale());
+        int s = (this->_rangeselection.start - this->ScrollOffset()) - (this->_rangeselection.start % this->HScale());
+        int e = (this->_rangeselection.end - this->ScrollOffset()) - (this->_rangeselection.end % this->HScale());
         Sequence::getInstance().SetPlayRange(
-                    Sequence::getInstance().BeatsToFrames(s / this->Scale()),
-                    Sequence::getInstance().BeatsToFrames(e / this->Scale()));
+                    Sequence::getInstance().BeatsToFrames(s / this->HScale()),
+                    Sequence::getInstance().BeatsToFrames(e / this->HScale()));
         this->ui->timeline->update();
         return true;
     }
@@ -174,28 +173,28 @@ void ChannelContainer::PaintTimeline()
     // Draw timeline
     p.setPen(QPen(this->palette().brightText().color()));
     p.setFont(QFont("Verdana", 10));
-    for (int x = 0; (x * this->Scale()) < 1000; x++)
+    for (int x = 0; (x * this->HScale()) < 1000; x++)
     {
         if (x % 4)
-            p.drawLine((x * this->Scale()) + this->ScrollOffset(),
+            p.drawLine((x * this->HScale()) + this->ScrollOffset(),
                        this->ui->top->height()/2,
-                       (x * this->Scale()) + this->ScrollOffset(),
+                       (x * this->HScale()) + this->ScrollOffset(),
                        this->ui->top->height());
         else
         {
-            p.drawLine((x * this->Scale()) + this->ScrollOffset(),
+            p.drawLine((x * this->HScale()) + this->ScrollOffset(),
                        0,
-                       (x * this->Scale()) + this->ScrollOffset(),
+                       (x * this->HScale()) + this->ScrollOffset(),
                        this->ui->top->height());
-            p.drawText((x * this->Scale()) + this->ScrollOffset()+2,
+            p.drawText((x * this->HScale()) + this->ScrollOffset()+2,
                        p.fontInfo().pointSize(),
                        QString::number(x+1));
         }
     }
 
     // Draw time range
-    int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->Scale();
-    int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->Scale();
+    int x = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StartPlayAt()) * this->HScale();
+    int w = Sequence::getInstance().FramesToBeats(Sequence::getInstance().StopPlayAt()) * this->HScale();
     p.fillRect(x + this->ScrollOffset(), this->ui->timeline->height()/2, w - x, this->ui->timeline->height()/2, QBrush(QColor::fromRgb(0, 143, 191, 155)));
     p.setPen(QPen(QColor::fromRgb(0, 191, 255), 2));
     p.drawLine(x + this->ScrollOffset(), this->ui->timeline->height()/2, x + this->ScrollOffset(), this->ui->timeline->height());
@@ -203,14 +202,14 @@ void ChannelContainer::PaintTimeline()
 
     // Draw cursor
     p.setPen(QPen(QColor::fromRgb(255, 255, 255), 2));
-    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->Scale();
+    int c = Sequence::getInstance().FramesToBeats(Sequence::getInstance().Cursor()) * this->HScale();
     p.drawLine(c + this->ScrollOffset(), 0, c + this->ScrollOffset(), this->ui->timeline->height());
 
     // Draw change timerange
     if (this->_rangeselection.draw)
     {
-        int s = (this->_rangeselection.start - this->ScrollOffset()) - (this->_rangeselection.start % this->Scale());
-        int e = (this->_rangeselection.end - this->ScrollOffset()) - (this->_rangeselection.end % this->Scale());
+        int s = (this->_rangeselection.start - this->ScrollOffset()) - (this->_rangeselection.start % this->HScale());
+        int e = (this->_rangeselection.end - this->ScrollOffset()) - (this->_rangeselection.end % this->HScale());
         if (e < s) { int tmp = s; s = e; e = tmp; }
         p.setPen(QPen(QColor::fromRgb(0, 191, 255), 4));
         p.drawLine(s + this->ScrollOffset(), this->ui->timeline->height() - 2, e + this->ScrollOffset(), this->ui->timeline->height() - 2);
@@ -277,7 +276,7 @@ void ChannelContainer::UpdateItems()
                 height += ((QWidget*)this->_splitter->children()[j])->height() + 4;
                 if (this->_splitter->children()[j] == this->_channels[clip->Pchannel])
                 {
-                    this->_clips[i]->setPos(clip->Pstart * this->Scale(), this->_splitter->height() - height + 4);
+                    this->_clips[i]->setPos(clip->Pstart * this->HScale(), this->_splitter->height() - height + 4);
                     this->_clips[i]->SetHeight(this->_channels[clip->Pchannel]->height() - 8);
                     break;
                 }
@@ -408,7 +407,7 @@ void ChannelContainer::RemoveClip(int index)
 
 void ChannelContainer::SetViewScale(int scale)
 {
-    this->SetScale(scale);
+    this->SetHScale(scale);
     this->update();
     this->UpdateChannels();
 }

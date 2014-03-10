@@ -32,10 +32,11 @@
 
 using namespace std;
 
-ChannelClip::ChannelClip(ChannelContainer* container, int clip)
-    : SnappingGraphicsItem(container), _clip(clip), _dragState(0)
+ChannelClip::ChannelClip(ChannelContainer* container, int clipIndex)
+    : SnappingGraphicsItem(container), _clip(clipIndex)
 {
-    QPixmap p = this->GetPixmapFromClip();
+    MidiClip* clip = Sequence::getInstance().Pclips[this->_clip];
+    QPixmap p = this->GetPixmapFromClip(clip);
     this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
     this->_notes.setPos(0, 22);
     this->addToGroup(&this->_notes);
@@ -55,14 +56,15 @@ ChannelClip::ChannelClip(ChannelContainer* container, int clip)
     this->addToGroup(&this->_border);
 
     this->Unselect();
+
+    this->_fineStart = clip->Pstart;
 }
 
 ChannelClip::~ChannelClip()
 { }
 
-QPixmap ChannelClip::GetPixmapFromClip()
+QPixmap ChannelClip::GetPixmapFromClip(MidiClip* clip)
 {
-    MidiClip* clip = Sequence::getInstance().Pclips[this->_clip];
     double len = 0;
     unsigned char minrange = 0, maxrange = 0;
 
@@ -70,16 +72,16 @@ QPixmap ChannelClip::GetPixmapFromClip()
     minrange -= 15;
     maxrange += 15;
 
-    QPixmap p(len * this->_container->Scale(), (maxrange - minrange) * 10);
+    QPixmap p(len * this->_container->HScale(), (maxrange - minrange) * 10);
     p.fill(QColor::fromRgb(0, 143, 191));
 
     QPainter painter(&p);
     for (std::vector<MidiClip::Note*>::iterator i = clip->Pnotes.begin(); i != clip->Pnotes.end(); ++i)
     {
         MidiClip::Note* n = (MidiClip::Note*)*i;
-        painter.fillRect(n->start * this->_container->Scale(),
+        painter.fillRect(n->start * this->_container->HScale(),
                          p.height() - ((n->note - minrange) * 10) - 5,
-                         n->length * this->_container->Scale(),
+                         n->length * this->_container->HScale(),
                          10,
                          QColor::fromRgb(0, 48, 64));
     }
@@ -99,7 +101,8 @@ void ChannelClip::Unselect()
 
 void ChannelClip::UpdateClip()
 {
-    QPixmap p = this->GetPixmapFromClip();
+    MidiClip* clip = Sequence::getInstance().Pclips[this->_clip];
+    QPixmap p = this->GetPixmapFromClip(clip);
     this->_notes.setPixmap(p.scaled(p.width(), 128, Qt::IgnoreAspectRatio, Qt::FastTransformation));
     this->_header.setRect(this->_header.rect().x(), this->_header.rect().y(), p.width(), this->_header.rect().height());
     this->_border.setRect(this->_border.rect().x(), this->_border.rect().y(), p.width(), this->_border.rect().height());
@@ -114,10 +117,10 @@ void ChannelClip::SetHeight(int height)
 
 void ChannelClip::moveItem(int x, int y)
 {
-    this->setPos(x, y);
-
     MidiClip* c = Sequence::getInstance().Pclips[this->_clip];
-    c->Pstart = this->x() / this->_container->Scale();
+    this->_fineStart += double(x) / this->_container->HScale();
+    c->Pstart = (int)this->_fineStart;
+    this->setPos(c->Pstart * this->_container->HScale(), this->y());
 }
 
 QGraphicsRectItem* ChannelClip::tempCopyRect()
@@ -132,10 +135,10 @@ QGraphicsRectItem* ChannelClip::tempCopyRect()
     return rect;
 }
 
-void ChannelClip::copyMe(double start)
+void ChannelClip::copyMe(double x, double y)
 {
     int copyclip = Sequence::getInstance().CopyClip(this->_clip);
     MidiClip* clip = Sequence::getInstance().Pclips[copyclip];
-    clip->Pstart = start;
+    clip->Pstart = x;
     this->_container->UpdateItems();
 }

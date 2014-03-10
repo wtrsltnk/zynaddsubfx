@@ -1,7 +1,7 @@
 #include "snappingcontainer.h"
 
 SnappingContainer::SnappingContainer()
-    : _scrollOffset(0), _scale(25)
+    : _scrollOffset(0), _hscale(25), _vscale(10)
 { }
 
 int SnappingContainer::ScrollOffset()
@@ -14,12 +14,22 @@ void SnappingContainer::SetScrollOffset(int offset)
     this->_scrollOffset = offset;
 }
 
-int SnappingContainer::Scale()
+int SnappingContainer::HScale()
 {
-    return this->_scale;
+    return this->_hscale;
 }
 
-void SnappingContainer::SetScale(int scale)
+void SnappingContainer::SetHScale(int scale)
 {
-    this->_scale = scale;
+    this->_hscale = scale;
+}
+
+int SnappingContainer::VScale()
+{
+    return this->_vscale;
+}
+
+void SnappingContainer::SetVScale(int scale)
+{
+    this->_vscale = scale;
 }

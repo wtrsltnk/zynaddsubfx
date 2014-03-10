@@ -45,9 +45,7 @@ public:
     virtual void SelectItem(SnappingGraphicsItem* item);
 private:
     Ui::PianoRoll *ui;
-    int _hscale;
-    QGraphicsScene* _scene;
-    QGraphicsItemGroup* _group;
+    QGraphicsRectItem* _bg;
     QList<int> _clips;
 
     void ShowSelectedNotes();

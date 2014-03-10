@@ -28,18 +28,23 @@
 
 PianoRoll::PianoRoll(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PianoRoll),
-    _hscale(25)
+    ui(new Ui::PianoRoll)
 {
     ui->setupUi(this);
 
     this->_scene = new QGraphicsScene();
     this->ui->notes->setScene(this->_scene);
     this->ui->notes->installEventFilter(this);
+    this->ui->notes->setBackgroundBrush(QBrush(QColor(35, 35, 35)));
+
     this->_group = new QGraphicsItemGroup();
     this->_group->setFiltersChildEvents(false);
     this->_group->setHandlesChildEvents(false);
     this->_scene->addItem(this->_group);
+
+    this->_bg = new QGraphicsRectItem();
+    this->_bg->setRect(0, 0, 1000, 127 * this->VScale());
+    this->_scene->addItem(this->_bg);
 }
 
 PianoRoll::~PianoRoll()

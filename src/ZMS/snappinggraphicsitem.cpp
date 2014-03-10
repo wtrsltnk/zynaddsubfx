@@ -3,9 +3,12 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QBrush>
 #include <QPen>
+#include <iostream>
+
+using namespace std;
 
 SnappingGraphicsItem::SnappingGraphicsItem(SnappingContainer* container)
-    : _dragState(0), _container(container)
+    : _dragState(0), _container(container), _allowHorizontalMove(true), _allowVerticalMove(false)
 { }
 
 void SnappingGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -21,24 +24,33 @@ void SnappingGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     else if (event->buttons() &= Qt::LeftButton)
     {
         this->_dragState = 1;
-        this->_dragStart = event->pos();
+        this->_dragStart = this->mapToScene(event->pos());
     }
 }
 
 void SnappingGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    int x = this->mapToScene(event->pos()).x() - this->_dragStart.x();// - this->boundingRect().x();
+    QPointF mapped = this->mapToScene(event->pos());
+    int x = mapped.x() - this->_dragStart.x();
+    int y = mapped.y() - this->_dragStart.y();
+
     if (this->_dragState == 1)   // normal drag
-        this->moveItem(x - (x % (4 * this->_container->Scale())), this->y());
+        this->moveItem((this->_allowHorizontalMove ? x : 0),
+                       (this->_allowVerticalMove ? y : 0));
+
     if (this->_dragState == 2)
-        this->_dragCopyGhost->setPos(x - (x % (4 * this->_container->Scale())), this->y());
+        this->_dragCopyGhost->setPos((this->_allowHorizontalMove ? this->x() + x : this->x()),
+                                     (this->_allowVerticalMove ? this->y() + y : this->y()));
+
+    this->_dragStart = mapped;
 }
 
 void SnappingGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (this->_dragState == 2)
     {
-        this->copyMe(this->_dragCopyGhost->x() / this->_container->Scale());
+        this->copyMe(this->_dragCopyGhost->x() / this->_container->HScale(),
+                     this->_dragCopyGhost->y() / this->_container->HScale());
 
         this->removeFromGroup(this->_dragCopyGhost);
         delete this->_dragCopyGhost;
