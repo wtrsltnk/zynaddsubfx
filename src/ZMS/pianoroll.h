@@ -43,9 +43,12 @@ public:
 
     virtual void UpdateItems();
     virtual void SelectItem(SnappingGraphicsItem* item);
+
+protected slots:
+    void OnScrollChanged(int value);
+
 private:
     Ui::PianoRoll *ui;
-    QGraphicsRectItem* _bg;
     QList<int> _clips;
 
     void ShowSelectedNotes();

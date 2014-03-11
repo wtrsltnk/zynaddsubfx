@@ -30,12 +30,12 @@ PianoRollNote::PianoRollNote(SnappingContainer* container, MidiClip::Note* note)
 
 void PianoRollNote::Select()
 {
-    this->_border.setPen(QPen(Qt::red));
+    this->_border.setPen(QPen(Qt::green));
 }
 
 void PianoRollNote::Unselect()
 {
-    this->_border.setPen(QPen(Qt::green));
+    this->_border.setPen(QPen(Qt::red));
 }
 
 void PianoRollNote::UpdateMe()
