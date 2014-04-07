@@ -32,7 +32,7 @@
 
 using namespace std;
 
-extern char *instance_name;
+char *instance_name = "zynaddsubfx";
 
 JackEngine::JackEngine()
     :AudioOut(), jackClient(NULL)
@@ -185,7 +185,7 @@ bool JackEngine::openAudio()
     if((NULL != audio.ports[0]) && (NULL != audio.ports[1])) {
         audio.jackSamplerate = jack_get_sample_rate(jackClient);
         audio.jackNframes    = jack_get_buffer_size(jackClient);
-        samplerate = audio.jackSamplerate;
+        unsigned int samplerate = audio.jackSamplerate;
         bufferSize = audio.jackNframes;
 
 
@@ -376,6 +376,7 @@ void JackEngine::handleMidi(unsigned long frames)
                 break;
 
             case 0xB0: /* controller */
+            printf("controller %d %d\n", midi_data[1], midi_data[2]);
                 ev.type  = M_CONTROLLER;
                 ev.num   = midi_data[1];
                 ev.value = midi_data[2];
@@ -383,6 +384,7 @@ void JackEngine::handleMidi(unsigned long frames)
                 break;
 
             case 0xC0: /* program change */
+            printf("program change %d\n", midi_data[1]);
                 ev.type  = M_PGMCHANGE;
                 ev.num   = midi_data[1];
                 ev.value = 0;

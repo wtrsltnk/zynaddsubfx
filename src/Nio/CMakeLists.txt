@@ -16,7 +16,7 @@ set(zynaddsubfx_nio_SRCS
     )
 
 find_package(Alsa)
-#find_package(JACK)
+find_package(JACK)
 find_package(PORTAUDIO)
 
 set(AlsaEnable ${ALSA_FOUND} CACHE BOOL
@@ -33,6 +33,7 @@ set(LibloEnable ${LIBLO_FOUND} CACHE BOOL
     "Enable Liblo")
 
 if(JackEnable)
+message(STATUS "Jack gevonden")
     set(DefaultOutput jack CACHE STRING
         "Default Output module: [null, alsa, jack, pa]")
     if(AlsaEnable)

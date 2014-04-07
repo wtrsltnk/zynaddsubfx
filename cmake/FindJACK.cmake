@@ -1,17 +1,44 @@
-#Find JACK Audio Connection Kit
+# - Find jack
+# Find the native JACK includes and library
+#
+#  JACK_INCLUDE_DIRS - where to find jack.h, etc.
+#  JACK_LIBRARIES    - List of libraries when using jack.
+#  JACK_FOUND        - True if jack found.
 
-include(LibFindMacros)
-libfind_pkg_check_modules(JACK jack)
-find_path(JACK_INCLUDE_DIR
-    NAMES jack/jack.h
-    PATHS ${JACK_INCLUDE_DIRS}
-    )
+#=============================================================================
+# Copyright 2001-2009 Kitware, Inc.
+#
+# Distributed under the OSI-approved BSD License (the "License");
+# see accompanying file Copyright.txt for details.
+#
+# This software is distributed WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the License for more information.
+#=============================================================================
+# (To distributed this file outside of CMake, substitute the full
+#  License text for the above reference.)
 
-find_library(JACK_LIBRARY
-    NAMES jack
-    PATHS ${JACK_LIBRARY_DIRS}
-    )
+IF (JACK_INCLUDE_DIR)
+  # Already in cache, be silent
+  SET(JACK_FIND_QUIETLY TRUE)
+ENDIF (JACK_INCLUDE_DIR)
 
-set(JACK_PROCESS_INCLUDES JACK_INCLUDE_DIR)
-set(JACK_PROCESS_LIBS JACK_LIBRARY)
-libfind_process(JACK)
+FIND_PATH(JACK_INCLUDE_DIR jack/jack.h)
+
+IF (CMAKE_CL_64)
+    SET(JACK_NAMES libjack64.lib)
+ELSE()
+    SET(JACK_NAMES libjack.lib)
+ENDIF()
+
+FIND_LIBRARY(JACK_LIBRARY NAMES ${JACK_NAMES})
+MARK_AS_ADVANCED(JACK_LIBRARY JACK_INCLUDE_DIR)
+
+# Per-recommendation
+SET(JACK_INCLUDE_DIRS "${JACK_INCLUDE_DIR}")
+SET(JACK_LIBRARIES    "${JACK_LIBRARY}")
+
+# handle the QUIETLY and REQUIRED arguments and set JACK_FOUND to TRUE if
+# all listed variables are TRUE
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(JACK DEFAULT_MSG JACK_LIBRARIES JACK_INCLUDE_DIRS)

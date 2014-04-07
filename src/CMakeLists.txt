@@ -4,7 +4,6 @@ message(STATUS "Building on a '${CMAKE_SYSTEM_NAME} v${CMAKE_SYSTEM_VERSION}' Sy
 
 option(ZASFEnable "Build ZynAddSybFX executable" ON)
 option(DssiEnable "Build DSSI plugin" OFF)
-option(ZMSEnable "Build ZynMusicStudio executable" ON)
 
 find_package(FFTW REQUIRED)
 find_package(MXML REQUIRED)
@@ -133,36 +132,11 @@ if(ZASFEnable)
     target_link_libraries(zynaddsubfx
         zynaddsubfx_core
         zynaddsubfx_nio
-        zynaddsubfx_sequence
         ${UI_LIBRARIES}
         ${NIO_LIBRARIES}
         )
 endif(ZASFEnable)
 ### END : Gui ZynAddSubFx code
-#####################################################################################
-
-
-#####################################################################################
-### BEGIN : ZynMusicStudio code (ZMS)
-#   - needed for zynmusicstudio executable
-if(ZMSEnable)
-    message(STATUS "Building ZynMusicStudio executable")
-    add_subdirectory(ZMS)
-    add_subdirectory(Sequence)
-
-    include_directories(${ZMS_INCLUDE_DIRS})
-
-    add_executable(zynmusicstudio zynmusicstudio.cpp)
-
-    target_link_libraries(zynmusicstudio
-        zynaddsubfx_core
-        zynaddsubfx_nio
-        zynmusicstudio_zms
-        zynaddsubfx_sequence
-        ${NIO_LIBRARIES}
-        )
-endif(ZMSEnable)
-### END : ZynMusicStudio code (ZMS)
 #####################################################################################
 
 

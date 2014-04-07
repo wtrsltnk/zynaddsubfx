@@ -23,7 +23,6 @@
 
 #include "Master.h"
 #include "Part.h"
-#include "../Sequence/sequence.h"
 
 #include "../Params/LFOParams.h"
 #include "../Effects/EffectMgr.h"
@@ -216,6 +215,7 @@ void Master::setController(char chan, int type, int par)
     }
     else
     if(type == C_bankselectmsb) {      // Change current bank
+        cout << "Jaa" << endl;
         if(((unsigned int)par < bank.banks.size())
            && (bank.banks[par].dir != bank.bankfiletitle))
             bank.loadbank(bank.banks[par].dir);
@@ -336,9 +336,9 @@ void Master::AudioOut(float *outl, float *outr)
     memset(outl, 0, synth->bufferbytes);
     memset(outr, 0, synth->bufferbytes);
 
-    // When the sequences is paused, we should not make any sound
-    if (Sequence::getInstance().Status() == Sequence::Paused)
-        return;
+//    // When the sequences is paused, we should not make any sound
+//    if (Sequence::getInstance().Status() == Sequence::Paused)
+//        return;
 
     //Compute part samples and store them part[npart]->partoutl,partoutr
     for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart) {
@@ -485,7 +485,7 @@ void Master::AudioOut(float *outl, float *outr)
     //update the LFO's time
     LFOParams::time++;
 
-    Sequence::getInstance().AddFrames(config.cfg.SoundBufferSize);
+//    Sequence::getInstance().AddFrames(config.cfg.SoundBufferSize);
 
     dump.inctick();
 }

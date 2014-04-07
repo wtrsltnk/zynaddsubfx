@@ -92,7 +92,7 @@ LASHClient *lash = NULL;
 NSM_Client *nsm = 0;
 #endif
 
-char *instance_name = 0;
+//char *instance_name = 0;
 
 void exitprogram();
 
