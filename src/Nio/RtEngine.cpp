@@ -37,6 +37,7 @@ bool RtEngine::Start()
 {
     this->midiin = new RtMidiIn();
     this->midiin->setCallback(RtEngine::callback, this);
+    std::cout << this->midiin->getPortCount() << std::endl;
     this->midiin->openPort(0);
 
     return true;
