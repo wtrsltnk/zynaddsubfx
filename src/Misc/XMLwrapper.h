@@ -228,6 +228,7 @@ class XMLwrapper
          * @param xmldata String to be saved
          */
         int dosavefile(const char *filename,
+                       int compression,
                        const char *xmldata) const;
 
         /**

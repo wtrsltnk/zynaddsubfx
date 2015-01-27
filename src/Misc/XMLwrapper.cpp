@@ -29,6 +29,7 @@
 #include <cstdarg>
 #include <iostream>
 #include <sstream>
+#include <zlib.h>
 
 #include "../globals.h"
 #include "Util.h"
@@ -192,7 +193,8 @@ int XMLwrapper::saveXMLfile(const string &filename) const
     if(xmldata == NULL)
         return -2;
 
-    int result      = dosavefile(filename.c_str(), xmldata);
+    int compression = config.cfg.GzipCompression;
+    int result      = dosavefile(filename.c_str(), compression, xmldata);
 
     free(xmldata);
     return result;
@@ -209,15 +211,32 @@ char *XMLwrapper::getXMLdata() const
 
 
 int XMLwrapper::dosavefile(const char *filename,
+                           int compression,
                            const char *xmldata) const
 {
+    if(compression == 0) {
         FILE *file;
         file = fopen(filename, "w");
         if(file == NULL)
             return -1;
         fputs(xmldata, file);
         fclose(file);
+    }
+    else {
+        if(compression > 9)
+            compression = 9;
+        if(compression < 1)
+            compression = 1;
+        char options[10];
+        snprintf(options, 10, "wb%d", compression);
 
+        gzFile gzfile;
+        gzfile = gzopen(filename, options);
+        if(gzfile == NULL)
+            return -1;
+        gzputs(gzfile, xmldata);
+        gzclose(gzfile);
+    }
     return 0;
 }
 
@@ -329,19 +348,41 @@ int XMLwrapper::loadXMLfile(const string &filename)
 char *XMLwrapper::doloadfile(const string &filename) const
 {
     char  *xmldata = NULL;
-    FILE* file  = fopen(filename.c_str(), "r");
+//    FILE* file  = fopen(filename.c_str(), "r");
 
-    if(file != 0) {
-        fseek(file, 0, SEEK_END);
-        int size = ftell(file);
-        fseek(file, 0, SEEK_SET);
-        xmldata = new char[size + 1];
-        memset(xmldata, 0, size + 1);
-        fread(xmldata, 1, size, file);
+//    if(file != 0) {
+//        fseek(file, 0, SEEK_END);
+//        int size = ftell(file);
+//        fseek(file, 0, SEEK_SET);
+//        xmldata = new char[size + 1];
+//        memset(xmldata, 0, size + 1);
+//        fread(xmldata, 1, size, file);
 
-        fclose(file);
+//        fclose(file);
+//    }
+    gzFile gzfile  = gzopen(filename.c_str(), "rb");
+
+    if(gzfile != NULL) { //The possibly compressed file opened
+        stringstream strBuf;             //reading stream
+        const int    bufSize = 500;      //fetch size
+        char fetchBuf[bufSize + 1];      //fetch buffer
+        int  read = 0;                   //chars read in last fetch
+
+        fetchBuf[bufSize] = 0; //force null termination
+
+        while(bufSize == (read = gzread(gzfile, fetchBuf, bufSize)))
+            strBuf << fetchBuf;
+
+        fetchBuf[read] = 0; //Truncate last partial read
+        strBuf << fetchBuf;
+
+        gzclose(gzfile);
+
+        //Place data in output format
+        string tmp = strBuf.str();
+        xmldata = new char[tmp.size() + 1];
+        strncpy(xmldata, tmp.c_str(), tmp.size() + 1);
     }
-
     return xmldata;
 }
 
