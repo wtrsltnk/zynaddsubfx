@@ -252,10 +252,10 @@ struct Settings {
 
     inline void alias(void)
     {
-        halfsamplerate_f = (samplerate_f = samplerate) / 2.0f;
-        buffersize_f     = buffersize;
+        halfsamplerate_f = (samplerate_f = float(samplerate)) / 2.0f;
+        buffersize_f     = float(buffersize);
         bufferbytes      = buffersize * sizeof(float);
-        oscilsize_f      = oscilsize;
+        oscilsize_f      = float(oscilsize);
     }
     float numRandom(void) const; //defined in Util.cpp for now
 };

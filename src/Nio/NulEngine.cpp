@@ -117,5 +117,5 @@ void NulEngine::setAudioEn(bool nval)
 
 bool NulEngine::getAudioEn() const
 {
-    return pThread;
+    return pThread != 0;
 }

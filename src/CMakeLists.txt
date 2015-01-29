@@ -6,20 +6,17 @@ option(ZASFEnable "Build ZynAddSybFX executable" ON)
 option(DssiEnable "Build DSSI plugin" OFF)
 
 find_package(FFTW REQUIRED)
-find_package(MXML REQUIRED)
 find_package(PTHREAD REQUIRED)
 find_package(ZLIB REQUIRED)
 
 link_directories(
     ${FFTW_LIBRARY_DIRS}
-    ${MXML_LIBRARY_DIRS}
     ${PTHREAD_LIBRARY_DIRS}
     ${ZLIB_LIBRARY_DIRS}
     )
 
 include_directories(
     ${FFTW_INCLUDE_DIR}
-    ${MXML_INCLUDE_DIR}
     ${PTHREAD_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -100,6 +97,7 @@ add_subdirectory(Synth)
 add_subdirectory(Effects)
 add_subdirectory(Params)
 add_subdirectory(DSP)
+add_subdirectory(Mxml)
 
 add_library(zynaddsubfx_core STATIC
     ${zynaddsubfx_dsp_SRCS}
@@ -107,11 +105,11 @@ add_library(zynaddsubfx_core STATIC
     ${zynaddsubfx_misc_SRCS}
     ${zynaddsubfx_params_SRCS}
     ${zynaddsubfx_synth_SRCS}
+    ${zynaddsubfx_mxml_SRCS}
     )
 
 target_link_libraries(zynaddsubfx_core
     ${FFTW_LIBRARIES}
-    ${MXML_LIBRARIES}
     ${PTHREAD_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${OS_LIBRARIES}

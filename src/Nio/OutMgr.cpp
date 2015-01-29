@@ -124,7 +124,7 @@ static size_t resample(float *dest,
                        float s_out,
                        size_t elms)
 {
-    size_t out_elms = elms * s_out / s_in;
+    size_t out_elms = size_t(elms * s_out / s_in);
     float  r_pos    = 0.0f;
     for(int i = 0; i < (int)out_elms; ++i, r_pos += s_in / s_out)
         dest[i] = interpolate(src, elms, r_pos);
