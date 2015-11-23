@@ -176,6 +176,7 @@ void exitprogram()
 
 int main(int argc, char *argv[])
 {
+    Fl::scheme("gtk+");
     synth = new Settings;
     config.init();
     dump.startnow();

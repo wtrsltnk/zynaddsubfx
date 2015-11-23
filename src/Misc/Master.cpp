@@ -540,10 +540,12 @@ Master::~Master()
     for(int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         delete sysefx[nefx];
 
-    delete fft;
-
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&vumutex);
+
+
+    // this crashes on quitting
+    //delete fft;
 }
 
 

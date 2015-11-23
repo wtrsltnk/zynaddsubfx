@@ -166,10 +166,9 @@ void WidgetPDial::drawgradient(int cx, int cy, int sx, double m1, double m2)
 #else
     for(int i = (int)(m1 * sx); i < (int)(m2 * sx); i++) {
         double tmp = 1.0f - powf(i * 1.0f / sx, 2.0f);
-        pdialcolor(140
-                   + (int) (tmp
-                            * 90), 140
-                   + (int)(tmp * 90), 140 + (int) (tmp * 100));
+        pdialcolor(140 + (int) (tmp * 95),
+                   140 + (int) (tmp * 95),
+                   140 + (int) (tmp * 100));
         fl_arc(cx + sx / 2 - i / 2, cy + sx / 2 - i / 2, i, i, 0, 360 );
     }
 #endif
@@ -191,19 +190,19 @@ void WidgetPDial::draw()
     fl_pie(cx - 1, cy - 1, sx + 2, sy + 2, 0, 360);
 
     /* //Draws the button face (gradinet) */
-    drawgradient(cx, cy, sx, 0.5f, 1.0f); 
+    drawgradient(cx, cy, sx, 0.95f, 1.0f);
 
     double val = (value() - minimum()) / (maximum() - minimum());
 
     //draws the scale
     pdialcolor(220, 220, 250);
     double a1 = angle1(), a2 = angle2();
-    for(int i = 0; i < 12; i++) {
-        double a = -i / 12.0f * 360.0f - val * (a2 - a1) - a1;
-        fl_pie(cx, cy, sx, sy, a + 270 - 3, a + 3 + 270);
-    }
+//    for(int i = 0; i < 12; i++) {
+//        double a = -i / 12.0f * 360.0f - val * (a2 - a1) - a1;
+//        fl_pie(cx, cy, sx, sy, a + 270 - 3, a + 3 + 270);
+//    }
 
-    drawgradient(cx, cy, sx, 0.0f, 0.75f);
+    //drawgradient(cx, cy, sx, 0.0f, 0.9f);
 
 
 
@@ -211,7 +210,8 @@ void WidgetPDial::draw()
     double a = -(a2 - a1) * val - a1;
 
     //draws the max and min points
-    pdialcolor(0, 100, 200);
+//    pdialcolor(0, 100, 200);
+    pdialcolor(0, 0, 0);
     int xp =
         (int)(cx + sx / 2.0f + sx / 2.0f * sinf(angle1() / 180.0f * 3.141592f));
     int yp =
@@ -231,9 +231,10 @@ void WidgetPDial::draw()
 
     fl_begin_polygon();
     pdialcolor(0, 0, 0);
-    fl_vertex(-10, -4);
-    fl_vertex(-10, 4);
-    fl_vertex(0, 0);
+    fl_vertex(-10, -1);
+    fl_vertex(-10, 1);
+    fl_vertex(-1, 1);
+    fl_vertex(-1, -1);
     fl_end_polygon();
 
     fl_pop_matrix();
