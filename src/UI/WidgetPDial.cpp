@@ -115,9 +115,10 @@ WidgetPDial::~WidgetPDial()
 
 int WidgetPDial::handle(int event)
 {
-//#ifdef NTK_GUI
-//    return Fl_Dial::handle( event );
-//#else
+    return Fl_Dial::handle( event );
+#ifdef NTK_GUI
+    return Fl_Dial::handle( event );
+#else
     double dragsize, min = minimum(), max = maximum();
     int    my;
 
@@ -156,11 +157,12 @@ int WidgetPDial::handle(int event)
             break;
     }
     return 0;
-//#endif
+#endif
 }
 
 void WidgetPDial::drawgradient(int cx, int cy, int sx, double m1, double m2)
 {
+    return;
 #ifdef NTK_GUI
     return;
 #else
@@ -176,6 +178,11 @@ void WidgetPDial::drawgradient(int cx, int cy, int sx, double m1, double m2)
 
 void WidgetPDial::draw()
 {
+    //box( FL_NO_BOX );
+
+    Fl_Dial::draw();
+
+    return;
 #ifdef NTK_GUI
     box( FL_NO_BOX );
 
