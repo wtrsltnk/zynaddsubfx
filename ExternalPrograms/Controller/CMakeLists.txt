@@ -4,22 +4,15 @@ message(STATUS "Building on a '${CMAKE_SYSTEM_NAME} v${CMAKE_SYSTEM_VERSION}' Sy
 
 option(ZASFEnable "Build ZynAddSybFX executable" ON)
 option(DssiEnable "Build DSSI plugin" OFF)
-option(VstEnable "Build VST plugin" OFF)
 
-find_package(FFTW REQUIRED)
 find_package(PTHREAD REQUIRED)
-find_package(ZLIB REQUIRED)
 
 link_directories(
-    ${FFTW_LIBRARY_DIRS}
     ${PTHREAD_LIBRARY_DIRS}
-    ${ZLIB_LIBRARY_DIRS}
     )
 
 include_directories(
-    ${FFTW_INCLUDE_DIR}
     ${PTHREAD_INCLUDE_DIR}
-    ${ZLIB_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     )
@@ -163,32 +156,4 @@ if(DssiEnable)
     endif()
 endif(DssiEnable)
 ### END : Dssi ZynAddSubFx code (ZASF)
-#####################################################################################
-
-
-#####################################################################################
-### BEGIN : Vst ZynAddSubFx code (ZASF)
-#   - needed for Vst plugin of zynaddsubfx
-if(VstEnable)
-	if(MSVC)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEF:${CMAKE_CURRENT_SOURCE_DIR}/defs.def /NODEFAULTLIB")
-	endif()
-	message(STATUS "Building Vst plugin ")
-
-	include_directories(
-		"${CMAKE_PREFIX_PATH}/vstsdk365/public.sdk/source/vst2.x"
-		"${CMAKE_PREFIX_PATH}/vstsdk365"
-		)
-
-	add_library(zynaddsubfx_vst SHARED
-		Vst/VstAudioOutput.cpp
-		${CMAKE_PREFIX_PATH}/vstsdk365/public.sdk/source/vst2.x/audioeffect.cpp
-		${CMAKE_PREFIX_PATH}/vstsdk365/public.sdk/source/vst2.x/audioeffectx.cpp
-		${CMAKE_PREFIX_PATH}/vstsdk365/public.sdk/source/vst2.x/vstplugmain.cpp
-		)
-
-	target_link_libraries(zynaddsubfx_vst
-		)
-endif(VstEnable)
-### END : Vst ZynAddSubFx code (ZASF)
 #####################################################################################
