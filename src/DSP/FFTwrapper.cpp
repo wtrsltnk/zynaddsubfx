@@ -24,59 +24,73 @@
 #include <cassert>
 #include <cstring>
 #include "FFTwrapper.h"
+#include <fftw3.h>
+
+class FFTwrapper_Pimpl
+{
+public:
+    FFTwrapper_Pimpl(FFTwrapper* _parent) : parent(_parent) { }
+
+    FFTwrapper* parent;
+    int fftsize;
+    fftw_real    *time;
+    fftw_complex *fft;
+    fftw_plan     planfftw, planfftw_inv;
+};
 
 FFTwrapper::FFTwrapper(int fftsize_)
+    : pimpl(new FFTwrapper_Pimpl(this))
 {
-    fftsize  = fftsize_;
-    time     = new fftw_real[fftsize];
-    fft      = new fftw_complex[fftsize + 1];
-    planfftw = fftw_plan_dft_r2c_1d(fftsize,
-                                    time,
-                                    fft,
+    pimpl->fftsize  = fftsize_;
+    pimpl->time     = new fftw_real[pimpl->fftsize];
+    pimpl->fft      = new fftw_complex[pimpl->fftsize + 1];
+    pimpl->planfftw = fftw_plan_dft_r2c_1d(pimpl->fftsize,
+                                    pimpl->time,
+                                    pimpl->fft,
                                     FFTW_ESTIMATE);
-    planfftw_inv = fftw_plan_dft_c2r_1d(fftsize,
-                                        fft,
-                                        time,
+    pimpl->planfftw_inv = fftw_plan_dft_c2r_1d(pimpl->fftsize,
+                                        pimpl->fft,
+                                        pimpl->time,
                                         FFTW_ESTIMATE);
 }
 
 FFTwrapper::~FFTwrapper()
 {
-    fftw_destroy_plan(planfftw);
-    fftw_destroy_plan(planfftw_inv);
+    fftw_destroy_plan(pimpl->planfftw);
+    fftw_destroy_plan(pimpl->planfftw_inv);
 
-    delete [] time;
-    delete [] fft;
+    delete [] pimpl->time;
+    delete [] pimpl->fft;
 }
 
 void FFTwrapper::smps2freqs(const float *smps, fft_t *freqs)
 {
     //Load data
-    for(int i = 0; i < fftsize; ++i)
-        time[i] = static_cast<double>(smps[i]);
+    for(int i = 0; i < pimpl->fftsize; ++i)
+        pimpl->time[i] = static_cast<double>(smps[i]);
 
     //DFT
-    fftw_execute(planfftw);
+    fftw_execute(pimpl->planfftw);
 
     //Grab data
-    memcpy((void *)freqs, (const void *)fft, fftsize * sizeof(double));
+    memcpy((void *)freqs, (const void *)pimpl->fft, pimpl->fftsize * sizeof(double));
 }
 
 void FFTwrapper::freqs2smps(const fft_t *freqs, float *smps)
 {
     //Load data
-    memcpy((void *)fft, (const void *)freqs, fftsize * sizeof(double));
+    memcpy((void *)pimpl->fft, (const void *)freqs, pimpl->fftsize * sizeof(double));
 
     //clear unused freq channel
-    fft[fftsize / 2][0] = 0.0f;
-    fft[fftsize / 2][1] = 0.0f;
+    pimpl->fft[pimpl->fftsize / 2][0] = 0.0f;
+    pimpl->fft[pimpl->fftsize / 2][1] = 0.0f;
 
     //IDFT
-    fftw_execute(planfftw_inv);
+    fftw_execute(pimpl->planfftw_inv);
 
     //Grab data
-    for(int i = 0; i < fftsize; ++i)
-        smps[i] = static_cast<float>(time[i]);
+    for(int i = 0; i < pimpl->fftsize; ++i)
+        smps[i] = static_cast<float>(pimpl->time[i]);
 }
 
 void FFT_cleanup()

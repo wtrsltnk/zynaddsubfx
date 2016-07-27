@@ -28,7 +28,11 @@ add_definitions(-DVERSION="${VERSION}")
 add_definitions(-DPIXMAP_PATH="${CMAKE_INSTALL_PREFIX}/share/zynaddsubfx/pixmaps/")
 add_definitions(-DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
-if(MSVC)
+if(MSVC)	
+	if (MSVC_VERSION GREATER 1800)
+		add_definitions(-DHAVE_STRUCT_TIMESPEC)
+	endif()
+
     if(CMAKE_CL_64)
         add_definitions(-D_AMD64_)
     endif(CMAKE_CL_64)

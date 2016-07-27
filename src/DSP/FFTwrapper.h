@@ -22,7 +22,6 @@
 
 #ifndef FFT_WRAPPER_H
 #define FFT_WRAPPER_H
-#include <fftw3.h>
 #include <complex>
 typedef double                  fftw_real;
 typedef std::complex<fftw_real> fft_t;
@@ -42,10 +41,7 @@ class FFTwrapper
         void smps2freqs(const float *smps, fft_t *freqs);
         void freqs2smps(const fft_t *freqs, float *smps);
     private:
-        int fftsize;
-        fftw_real    *time;
-        fftw_complex *fft;
-        fftw_plan     planfftw, planfftw_inv;
+        class FFTwrapper_Pimpl* pimpl;
 };
 
 void FFT_cleanup();
